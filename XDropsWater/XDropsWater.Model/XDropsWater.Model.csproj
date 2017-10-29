@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{67982515-08B5-4188-8B94-517EAD076AE8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>XDropsWater.Model</RootNamespace>
+    <AssemblyName>XDropsWater.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Achieve.cs" />
+    <Compile Include="AddPersonalOrder.cs" />
+    <Compile Include="BaseModel.cs" />
+    <Compile Include="BaseSummary.cs" />
+    <Compile Include="ChangePasswordModel.cs" />
+    <Compile Include="Constants\SystemSettingConstants.cs" />
+    <Compile Include="CurrentUser.cs" />
+    <Compile Include="CurrentUserPermission.cs" />
+    <Compile Include="Enum\CodeStatus.cs" />
+    <Compile Include="Enum\OrderDetailsStatus.cs" />
+    <Compile Include="Enum\OrderStatus.cs" />
+    <Compile Include="IBaseModel.cs" />
+    <Compile Include="IdentityCode.cs" />
+    <Compile Include="LogModel.cs" />
+    <Compile Include="ModelEnumHelper.cs" />
+    <Compile Include="ErrorCodes.cs" />
+    <Compile Include="ExecuteResult.cs" />
+    <Compile Include="MemberOrderModel.cs" />
+    <Compile Include="MemberModel.cs" />
+    <Compile Include="MenuData.cs" />
+    <Compile Include="Model\AddUpdateMember.cs" />
+    <Compile Include="Model\AddUpdateOrder.cs" />
+    <Compile Include="Model\BaseInfo.cs" />
+    <Compile Include="Model\CityAgent.cs" />
+    <Compile Include="Model\MemberPassword.cs" />
+    <Compile Include="Model\MemberProduct.cs" />
+    <Compile Include="Model\OrderDetails.cs" />
+    <Compile Include="Model\Member.cs" />
+    <Compile Include="Model\OrderProduct.cs" />
+    <Compile Include="Model\PersonalInfo.cs" />
+    <Compile Include="Model\ProductMemberRole.cs" />
+    <Compile Include="Model\ShoppingCart.cs" />
+    <Compile Include="OpResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Summary\IdentityCodeSummary.cs" />
+    <Compile Include="Summary\MemberProductSummary.cs" />
+    <Compile Include="Summary\MemberSummary.cs" />
+    <Compile Include="Model\Product.cs" />
+    <Compile Include="Summary\OrderDetailsSummary.cs" />
+    <Compile Include="Summary\OrderProductSummary.cs" />
+    <Compile Include="Summary\ProductMemberRoleSummary.cs" />
+    <Compile Include="Summary\ProductSummary.cs" />
+    <Compile Include="Summary\ShoppingCartSummary.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="UserLog.cs" />
+    <Compile Include="UserOperations.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XDropsWater.DataAccess\XDropsWater.DataAccess.csproj">
+      <Project>{DC1B5157-F149-445E-B957-6C525292FA7F}</Project>
+      <Name>XDropsWater.DataAccess</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

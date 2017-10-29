@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@using PagedList;
+@using XDropsWater.Model;
+@using PagedList.Mvc;
+@using System.Collections.Generic;
+@model IPagedList<DetailsModel>
+<style type="text/css">
+    .clear:after {
+        display: block;
+        clear: both;
+        content: ".";
+        visibility: hidden;
+        height: 0;
+    }
+
+    .clear {
+        zoom: "1";
+    }
+</style>
+<link href="~/Content/bootstrap-datepicker.min.css" rel="stylesheet" />
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+@Scripts.Render("~/Scripts/bootstrap-datepicker.min.js")
+@Scripts.Render("~/Scripts/bootstrap-datepicker.zh-CN.min.js")
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    
+    <section class="content">
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="form-group">
+                            @Html.TextBox("dateFrom", "", new { @class = "form-control datepicker", placeholder = "开始日期" })
+                        </div>
+                        <div class="form-group">
+                            @Html.TextBox("dateTo", "", new { @class = "form-control datepicker", placeholder = "结束日期" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.TextBox("mobileOrName", "", new { @class = "form-control", placeholder = "电话号码或姓名" })
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-default" type="button" id="btnSearch">查询</button>
+                        </div>
+
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 table-responsive" id="Details503020List">
+                                    @Html.Partial("Details503020List", Model)
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 id="detailsTitle" class="modal-title"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12 table-responsive" id="Details503020List">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="memberId" />
+        <input type="hidden" id="memberName" />
+        <input type="hidden" id="detailsType" />
+        <input type="hidden" id="dateFrom" />
+        <input type="hidden" id="dateTo" />
+    </section>
+
+</div>
+
+<script type="text/javascript">
+        // Adding popstate event listener to handle browser back button
+        window.addEventListener("popstate", function (e) {
+            $.ajax({
+                url: location.href,
+                success: function (result) {
+                    $('#Details503020List').html(result);
+                }
+            });
+        });
+
+        function getUrlVars() {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < hashes.length; i++) {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        }
+
+</script>

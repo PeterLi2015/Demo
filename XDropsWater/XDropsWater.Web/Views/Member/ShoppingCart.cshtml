@@ -1,0 +1,139 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            我的购物车
+            <small>Version 1.0</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+            <li class="active">我的购物车</li>
+        </ol>
+    </section>
+    <section class="content">
+        <!-- /.row -->
+        <div class="row" id="shoppingCartRows">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div v-show="totalCount>0" class="form-group">
+                            <span style="font-weight: bold; color: red">总价：{{description}}</span>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-lg-6 col-md-6 col-xs-6" v-show="totalCount>0">
+                                <button v-on:click="addOrder()" class="btn btn-info form-control" type="button">
+                                    <i class="glyphicon glyphicon-ok"></i> 提交订单
+                                </button>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-xs-6">
+                                <button v-on:click="add()" class="btn btn-success form-control" type="button">
+                                    <i class="glyphicon glyphicon-plus"></i> 添加产品
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <xdropswater-nodata v-show="!error.show" v-bind:total-count="totalCount"></xdropswater-nodata>
+                            <xdropswater-error v-bind:error="error"></xdropswater-error>
+
+                            <div class="row" v-show="totalCount>0">
+                                <div class="col-sm-12 table-responsive">
+                                    <table class="table table-striped table-hover table-xdropswater" id="members">
+                                        <thead>
+                                            <tr>
+                                                <th>序号</th>
+                                                <th>产品名称</th>
+                                                <th>购买数量</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody">
+                                            <tr v-for="(item, index) in items">
+                                                <td>{{item.No}}</td>
+                                                <td v-if="item.Product">{{item.Product.Name}}</td>
+                                                <td>{{item.Quantity}}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" v-bind:data-item="item" v-on:click="update(index, item)">
+                                                        <i class="glyphicon glyphicon-edit"></i> 修改
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger" v-on:click="remove(index, item)">
+                                                        <i class="glyphicon glyphicon-remove"></i> 删除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <xdropswater-pagination v-bind:row-from="rowFrom"
+                                                            v-bind:row-to="rowTo"
+                                                            v-bind:total-count="totalCount"
+                                                            v-bind:current-page="currentPage"
+                                                            v-bind:total-pages="totalPages"
+                                                            v-bind:display-pages="displayPages">
+                                    </xdropswater-pagination>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="shoppingCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-bg-xdropswater">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">{{title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="shoppingCartForm" method="post" v-on:submit.prevent="submit">
+                            <div class="form-horizontal">
+
+                                <input type="hidden" v-model="model.ID" />
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="Product">选择产品</label>
+                                        <select name="Product" class="form-control" v-model="model.ProductID">
+                                            <option v-for="(item,index) in Products" v-bind:value="item.ID">{{item.Name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="Quantity">购买数量</label>
+                                        <input name="Quantity" v-model="model.Quantity" class="form-control" type="text" />
+                                    </div>
+                                </div>
+
+                                <xdropswater-error v-bind:error="error"></xdropswater-error>
+
+                                <xdropswater-modal-footer></xdropswater-modal-footer>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+</div>
+<script src="~/Scripts/App/Member/shoppingCart.js"></script>

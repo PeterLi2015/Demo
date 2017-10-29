@@ -1,0 +1,302 @@
+﻿@{
+    Layout = null;
+}
+
+<script>
+    //时间格式化
+    Date.prototype.format = function (format) {
+        if (!format) {
+            format = "yyyy-MM-dd hh:mm:ss";
+        }
+        var o = {
+            "M+": this.getMonth() + 1, // month
+            "d+": this.getDate(), // day
+            "h+": this.getHours(), // hour
+            "m+": this.getMinutes(), // minute
+            "s+": this.getSeconds(), // second
+            "q+": Math.floor((this.getMonth() + 3) / 3), // quarter
+            "S": this.getMilliseconds()
+            // millisecond
+        };
+        if (/(y+)/.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            }
+        }
+        return format;
+    };
+    function formatDateTime(str) {
+        return (new Date(parseInt(str.substring(str.indexOf('(') + 1, str.indexOf(')'))))).format("yyyy-MM-dd hh:mm:ss");
+    }
+
+    function formatDate(str) {
+        return (new Date(parseInt(str.substring(str.indexOf('(') + 1, str.indexOf(')'))))).format("yyyy-MM-dd");
+    }
+
+    $(function () {
+        $('#newMemberCheckGrid').datagrid({
+            url: '/Member/GetMemberForCheck?random=' +
+            Math.random(),
+            queryParams: { userId: '', hasChecked: $('#selIsNewMember').val(),cardNo:$('#txtIDCardNo').val() },
+            pagination: true,
+            pageSize: 10,
+            pageList: [10,20,30,40],
+            columns: [[
+                { field: 'ID', title: 'ID', hidden: true, width: 80 },
+        { field: 'IdentityCardNo', title: '身份证号码', width: 200 },
+        { field: 'MemberName', title: '姓名', width: 100 },
+        { field: 'BankName', title: '银行名称', width: 100 },
+        { field: 'BankCardNo', title: '银行卡号', width: 100 },
+        {
+            field: 'opt', title: '操作', width: 150, align: 'center',
+            formatter: function (value, rec, index) {
+                var btn = '<a class="confirmcls" onclick="confirmMemberInfo(\'' + rec.ID + '\',\'' + rec.IdentityCardNo + '\',\'' + rec.MemberName
+                    + '\',\'' +rec.BankName+'\',\''+rec.BankCardNo+'\',\''+ index + '\')" href="javascript:void(0)">确认</a>' +
+                    '<a class="editcls" onclick="checkMemberInfo(\'' + rec.ID + '\',\'' + rec.IdentityCardNo + '\',\'' + rec.MemberName +
+                    '\',\'' + rec.BankName + '\',\'' + rec.BankCardNo + '\',\''
+                    + index + '\')" href="javascript:void(0)">修改</a>';
+                return btn;
+            }
+        },
+        { field: 'HasChecked', title: '是否核对过', width: 100 },
+        { field: 'CheckBy', title: '核对人', width: 100 },
+        {
+            field: 'CheckOn', title: '核对时间', width: 150,
+            formatter: function (value) {
+                if (value.substr(1, 4) != 'Date') return value;
+                var m_checkOn = formatDateTime(value);
+                if (m_checkOn == '1900-01-01 00:00:00') return '';
+                return formatDateTime(value);
+            }
+        }
+            ]],
+            onLoadSuccess: function (data) {
+                $('.editcls').linkbutton({ text: '修改', iconCls: 'icon-edit' });
+                $('.confirmcls').linkbutton({ text: '确认', iconCls: 'icon-ok' });
+            }
+        });
+
+        $.post("/User/GetCurrentUserName?random="+
+            Math.random(), function (data) { $('#txtUserName').val(data); });
+    });
+
+
+    function confirmMemberInfo(id, cardNo, name, bankName, bankNo, index) {
+        if (bankName == 'null') bankName = '';
+        if (bankNo == 'null') bankNo = '';
+        $.messager.confirm('请再确认一下身份信息',
+            '<span style="font-size:large">身份证号码：' + cardNo.substr(0, 6) + '&nbsp;&nbsp;'
+             + cardNo.substr(6, 4) + '&nbsp;&nbsp;' + cardNo.substr(10, 4) + '&nbsp;&nbsp;' + cardNo.substr(14, 10) +
+             '</span><br/><span style="font-size:large">姓名：' + name + '</span><br><span style="font-size:large">银行名称：'+
+             bankName + '</span><br/><span style="font-size:large">银行卡号：'+bankNo+'</span>'
+             , function (r) {
+                 if (r) {
+                     $.post("/Member/CheckedByOperator", { memberId: id }, function (data) {
+                         if (data.ErrCode == 0) {
+                             var currentDate = new Date();
+                             var currentYear = currentDate.getFullYear();
+                             var currentMonth = currentDate.getMonth();
+                             var currentDay = currentDate.getDay();
+                             var currentHour = currentDate.getHours();
+                             var currentMinute = currentDate.getMinutes();
+                             var currentSecond = currentDate.getSeconds();
+                             $.messager.alert('提示', '确认成功', 'info');
+                             $('#newMemberCheckGrid').datagrid('updateRow', {
+                                 index: index,
+                                 row: {
+                                     HasChecked: '是',
+                                     CheckBy: $('#txtUserName').val(),
+                                     CheckOn: new Date(currentYear, currentMonth, currentDay, currentHour, currentMinute, currentSecond).format("yyyy-MM-dd hh:mm:ss")
+                                 }
+                             });
+                             $('.editcls').linkbutton({ text: '修改', iconCls: 'icon-edit' });
+                             $('.confirmcls').linkbutton({ text: '确认', iconCls: 'icon-ok' });
+                         }
+                         else {
+                             $.messager.alert('修改失败', data.ErrMsg, 'error');
+                         }
+                     });
+                 }
+             });
+    }
+
+    function checkMemberInfo(id, cardNo, name, bankName, bankCardNo, index) {
+        if (bankName == 'null') bankName = '';
+        if (bankCardNo == 'null') bankCardNo = '';
+        $('#txtCardNo').val(cardNo);
+        $('#txtMemberName').val(name);
+        $('#txtMemberId').val(id);
+        $('#txtRowNo').val(index);
+        $('#txtBankName').val(bankName);
+        $('#txtBankCardNo').val(bankCardNo);
+        var dlg = $('#checkMemberDlg');
+        dlg.dialog({ title: '修改会员身份信息', modal: true, cache: false });
+        dlg.dialog('open');
+    }
+    function saveMem() {
+        var memberId = $('#txtMemberId').val();
+        if (memberId == '')
+        {
+            $.messager.alert('提示', '还没获取到会员ID，请刷新页面再试试', 'info');
+            return;
+        }
+        var cardNo = $('#txtCardNo').val().trim();
+        if (cardNo == '')
+        {
+            $('#txtCardNo').focus();
+            $.messager.alert('提示', '身份证号码必须输入', 'info');
+            return;
+        }
+        var memberName = $('#txtMemberName').val().trim();
+        if (memberName == '') {
+            $('#txtMemberName').focus();
+            $.messager.alert('提示', '姓名必须输入', 'info');
+            return;
+        }
+        var bankName = $('#txtBankName').val().trim();
+        if (bankName == '') {
+            $('#txtBankName').focus();
+            $.messager.alert('提示', '银行名称必须输入', 'info');
+            return;
+        }
+        var bankCardNo = $('#txtBankCardNo').val().trim();
+        if (bankCardNo == '') {
+            $('#txtBankCardNo').focus();
+            $.messager.alert('提示', '银行卡号必须输入', 'info');
+            return;
+        }
+        $.post("/Member/UpdateMemberForCheck",
+            {
+                memberId: memberId,
+                cardNo: cardNo,
+                memberName: memberName,
+                bankName: bankName,
+                bankCardNo: bankCardNo
+            }
+            , function (data) {
+                if (data.ErrCode == 0) {
+                    $('#checkMemberDlg').dialog('close');
+                    $.messager.alert('修改成功', data.ErrMsg, 'info');
+                    var currentDate = new Date();
+                    var currentYear = currentDate.getFullYear();
+                    var currentMonth = currentDate.getMonth();
+                    var currentDay = currentDate.getDay();
+                    var currentHour = currentDate.getHours();
+                    var currentMinute = currentDate.getMinutes();
+                    var currentSecond = currentDate.getSeconds();
+
+                    $('#newMemberCheckGrid').datagrid('updateRow', {
+                        index: $('#txtRowNo').val(),
+                        row: {
+                            HasChecked: '是',
+                            BankName: bankName,
+                            BankCardNo: bankCardNo,
+                            IdentityCardNo: cardNo,
+                            MemberName:memberName,
+                            CheckBy: $('#txtUserName').val(),
+                            //CheckOn: formatDateTime(new Date())
+                            //CheckOn:currentYear+"-"+currentMonth+"-"+currentDay+" "+currentHour+":"+currentMinute+":"+currentSecond
+                            //CheckOn: formatDateTime(new Date(currentYear, currentMonth, currentDay, currentHour, currentMinute, currentSecond))
+                            CheckOn: new Date(currentYear, currentMonth, currentDay, currentHour, currentMinute, currentSecond).format("yyyy-MM-dd hh:mm:ss")
+                            //CheckOn:currentYear.toString()
+                        }
+                    });
+                    $('.editcls').linkbutton({ text: '修改', iconCls: 'icon-edit' });
+                    $('.confirmcls').linkbutton({ text: '确认', iconCls: 'icon-ok' });
+                }
+                else {
+                    $.messager.alert('修改失败', data.ErrMsg, 'error');
+                }
+            });
+    }
+    function FindData() {
+        var account = $('#txtStoreAccount').val();
+        if (account == '') {
+            $.messager.alert('提示', '请输入专卖店账号', 'info');
+            return;
+        }
+        $.post('/User/GetUserID', { account: account }, function (data) {
+            if (data == '') {
+                $.messager.alert('提示', '该专卖店账号不存在，请重新输入', 'info');
+                return;
+            }
+            else {
+                $('#newMemberCheckGrid').datagrid({
+                    url: '/Member/GetMemberForCheck?random=' +
+            Math.random(),
+                    queryParams: { userId: data, hasChecked: $('#selIsNewMember').val(), cardNo: $('#txtIDCardNo').val() }
+                });
+            }
+
+        });
+    }
+</script>
+
+<div id="checkMemberDlg" class="easyui-dialog" style="width: 500px; height: 300px" closed="true">
+    <table>
+        <tr>
+            <td><span style="font-size: large">身份证号码：</span></td>
+            <td>
+                <input id="txtCardNo" type="text" style="width: 250px; height: 30px; font-size: large" />
+                <input id="txtMemberId" type="text" style="display:none" />
+                <input id="txtRowNo" type="text" style="display:none" />
+                <input id="txtUserName" type="text" style="display:none" />
+            </td>
+        </tr>
+        <tr>
+            <td><span style="font-size: large">姓名：</span></td>
+            <td>
+                <input type="text" style="height: 30px; font-size: large" id="txtMemberName" />
+            </td>
+        </tr>
+        <tr>
+            <td><span style="font-size:large">银行名称：</span></td>
+            <td>
+                <input type="text" style="height: 30px; font-size: large" id="txtBankName" />
+            </td>
+        </tr>
+        <tr>
+            <td><span style="font-size:large">银行卡号：</span></td>
+            <td>
+                <input type="text" style="height: 30px; font-size: large" id="txtBankCardNo" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: right; padding-top: 10px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" id="btnMemSave" iconcls="icon-ok" onclick="saveMem()">确定</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#checkMemberDlg').dialog('close')">关闭</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="newMemberCheckGridTool">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    专卖店账号：<input type="text" id="txtStoreAccount" style="width: 200px" onkeydown="if (event.keyCode == 13) { FindData(); }" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    身份证号码：<input type="text" id="txtIDCardNo" style="width: 250px" onkeydown="if (event.keyCode == 13) { FindData(); }" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    是否核对过：<select id="selIsNewMember">
+        <option value="0">全部</option>
+        <option value="1">已核对</option>
+        <option value="2">未核对</option>
+    </select>
+    <a href="javascript:void(0)" onclick="FindData()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+
+</div>
+
+<table id="newMemberCheckGrid" title="" toolbar="#newMemberCheckGridTool"
+    data-options="rownumbers:true,singleSelect:true,method:'get',
+        loadMsg:'正在查询，请稍候……'">
+    @*<thead>
+            <tr>
+                <th data-options="field:'ID',hidden:true">编号</th>
+                <th data-options="field:'MemberIdentityCardNo',width:200">身份证号码</th>
+                <th data-options="field:'MemberName',width:100">姓名</th>
+                <th data-options="field:'Amount',width:100">业绩金额</th>
+            </tr>
+        </thead>*@
+</table>

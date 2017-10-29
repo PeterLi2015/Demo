@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F4B4DF7A-D1EE-4598-A39A-3BE732CB636E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>XDropsWater.Dal.Entity</RootNamespace>
+    <AssemblyName>XDropsWater.Dal.Entity</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="InteractivePreGeneratedViews">
+      <HintPath>..\packages\EFInteractiveViews.1.0.1\lib\net40\InteractivePreGeneratedViews.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AchieveEntity.cs" />
+    <Compile Include="BonusEntity.cs" />
+    <Compile Include="Constants\GlobalConstants.cs" />
+    <Compile Include="DbCacheHelper.cs" />
+    <Compile Include="Enum\SystemConfigStatus.cs" />
+    <Compile Include="IdentityCodeEntity.cs" />
+    <Compile Include="LevelEntity.cs" />
+    <Compile Include="LogEntity.cs" />
+    <Compile Include="ChildOrders.cs" />
+    <Compile Include="DirectorEntity.cs" />
+    <Compile Include="MemberProductCode.cs" />
+    <Compile Include="MemberProductEntity.cs" />
+    <Compile Include="OrderDetailsEntity.cs" />
+    <Compile Include="ParentChildEntity.cs" />
+    <Compile Include="ProductMemberRole.cs" />
+    <Compile Include="RoleUpgradeEntity.cs" />
+    <Compile Include="ShoppingCartEntity.cs" />
+    <Compile Include="StockEntity.cs" />
+    <Compile Include="UserRoles.cs" />
+    <Compile Include="Orders.cs" />
+    <Compile Include="MemberRoleConfig.cs" />
+    <Compile Include="MemberRoles.cs" />
+    <Compile Include="MemberHistoryEntity.cs" />
+    <Compile Include="MemberEntity.cs" />
+    <Compile Include="MigrationsConfiguration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ProductEntity.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoleEntity.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitOfWork.cs" />
+    <Compile Include="SystemConfigEntity.cs" />
+    <Compile Include="UserEntity.cs" />
+    <Compile Include="UserLogEntity.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XDropsWater.CrossCutting\XDropsWater.CrossCutting.csproj">
+      <Project>{fc216807-8878-438b-8bdd-ac4a81f41407}</Project>
+      <Name>XDropsWater.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XDropsWater.DataAccess\XDropsWater.DataAccess.csproj">
+      <Project>{dc1b5157-f149-445e-b957-6c525292fa7f}</Project>
+      <Name>XDropsWater.DataAccess</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

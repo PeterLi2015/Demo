@@ -1,0 +1,176 @@
+﻿@{
+    ViewBag.Title = "登录";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#UName').focus();
+        })
+        function CheckLogin() {
+            //验证用户必须输入必填项
+            var validate = $("#ff").form("validate");
+            if (validate == false) {
+                return false;
+            }
+            //获取传递前台的参数，UName，Pwd，Code
+            var postData = {
+                uname: $("#UName").val(),
+                pwd: $("#Pwd").val(),
+                code: $("#Code").val()
+            };
+            $.messager.progress({
+                title: '登录中',
+                msg: '正在登录，请稍候...'
+            });
+            //异步实现登录功能
+            $.post("/Login/CheckUser", postData, function (data) {
+                $.messager.progress('close');
+                if (data.ErrCode == 0) {
+                    window.location.href = "/Home/Index";
+                }
+                else {
+                    $.messager.alert('登录失败', data.ErrMsg, 'error');
+                    $("#Code").val('');
+                    $("#Pwd").val('');
+                }
+            });
+        }
+
+        function ResetLogin() {
+            $('#ff').form('clear');
+        }
+
+
+        //单击重新改变验证码
+        function ChangeVerifyCode() {
+            var code = $("#imgCode").attr("src");
+            $("#imgCode").attr("src", code + "1");
+        }
+    </script>
+}
+<br />
+<br />
+<form id="form1">
+    <table height="413" cellspacing="0" cellpadding="0" width="612" align="center" border="0">
+        <tbody>
+            <tr>
+                <td valign="top" width="600" background="~/Content/Themes/Default/login_content2.png" height="412">
+                    <div align="center">
+                        <table width="100%" height="392" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" height="181">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td>&nbsp;
+                                                    
+                                                </td>
+                                                <td>&nbsp;
+                                                    
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>&nbsp;
+                                                    
+                                                </td>
+                                                <td>
+                                                    <div align="right" style="margin-right: 20px;">
+                                                        <p>&nbsp;</p>
+                                                        <p>&nbsp;</p>
+                                                        <p>
+                                                            <strong><font color="#990000">
+                                                                <br>版本号: 2015版</font>&nbsp;&nbsp;
+                                                                <font color='yellow'></font></strong>&nbsp;&nbsp;
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" align="center" height="30">&nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="38%" height="180">
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <div align="center"></div>
+                                    </td>
+                                    <td width="62%">
+                                        <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td>&nbsp;</td>
+                                                    <td width="4" class="ssa">&nbsp;</td>
+                                                    <td width="264" height="35" align="left">
+                                                        <input type="text" class="easyui-validatebox" id="UName" name="UName" style="width: 165px; height: 21px" value="@ViewBag.UName" data-options="required:true,validType:'length[1,32]'" onkeydown="if(event.keyCode==13){CheckLogin();}" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="style1"></td>
+                                                    <td width="4" class="style1"></td>
+                                                    <td width="264" class="style1"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="style4"></td>
+                                                    <td width="4" class="style4">&nbsp;
+                                                        
+                                                    </td>
+                                                    <td width="264" align="left" class="style4">
+                                                        <input type="password" class="easyui-validatebox" id="Pwd" name="Pwd" data-options="required:true,validType:'length[1,32]'" onkeydown="if(event.keyCode==13){CheckLogin();}" style="width: 165px; height: 21px" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="style1"></td>
+                                                    <td width="4" class="style1"></td>
+                                                    <td width="264" class="style1"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="style4"></td>
+                                                    <td width="4" class="style4">&nbsp;
+                                                        <div class="labelAndTextboxSeparation">
+                                                            <label for="Code">
+                                                                验证码：
+                                                            </label>
+                                                        </div>
+                                                    </td>
+                                                    <td width="264" align="left" class="style4">
+                                                        <div>
+                                                            <img src="/Login/GetVerifyCode?Code=1" id="imgCode" title="单击可刷新" class="easyui-tooltip"
+                                                                onclick="ChangeVerifyCode()" height="25px" width="60px" align="top" />
+                                                            &nbsp;
+                    <input style="width: 80px" class="easyui-validatebox" type="text" id="Code" name="Code" data-options="required:true,validType:'length[1,20]'"
+                        onkeydown="if(event.keyCode==13){CheckLogin();}" style="width: 80px" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="style3"></td>
+                                                    <td class="style3"></td>
+                                                    <td valign="bottom" class="style3"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3" align="center" class="style5">
+                                                        <img src="~/Content/Themes/Default/btn_login2.png" id="btnLogin" style="height: 30px; width: 65px; margin-right: 40px; margin-left: 15px; cursor: pointer" />
+                                                        <img src="~/Content/Themes/Default/btn_reset2.png" width="65" height="30" border="0" style="cursor: pointer" onclick='doReset()'>
+                                                    </td>
+                                                </tr>
+                                                <td colspan="3" height="40px">&nbsp;</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

@@ -1,0 +1,2 @@
+Object reference not set to an instance of an object./r/n   at DuoBang.Bll.UserService.IsValidUser(String account, String password) in f:\Project\DuoBang\DuoBang\DuoBang.Bll\UserService.cs:line 93
+   at DuoBang.Web.Controllers.LoginController.CheckUser(String uname, String pwd, String code) in f:\Project\DuoBang\DuoBang\DuoBang.Web\Controllers\LoginController.cs:line 50

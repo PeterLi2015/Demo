@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            添加代理
+            <small>Version 1.0</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index","Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+            <li class="active">添加代理</li>
+        </ol>
+    </section>
+    <section class="content">
+        <!-- /.row -->
+        <div class="row" id="members">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <input id="txtSearch" type="text" class="form-control" placeholder="电话号码或姓名">
+                                <span class="input-group-btn">
+                                    <xdropswater-search-button></xdropswater-search-button>
+                                </span>
+                                <span class="input-group-btn">
+                                    <xdropswater-add-button></xdropswater-add-button>
+                                </span>
+                            </div>
+                            <!-- /input-group -->
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <xdropswater-nodata v-show="!error.show" v-bind:total-count="totalCount"></xdropswater-nodata>
+                            <xdropswater-error v-bind:error="error"></xdropswater-error>
+                            <div class="row" v-show="totalCount>0">
+                                <div class="col-sm-12 table-responsive">
+                                    <table class="table table-striped table-hover table-xdropswater">
+                                        <thead>
+                                            <tr>
+                                                <th>手机号码</th>
+                                                <th>姓名</th>
+                                                <th>身份证号码</th>
+                                                <th>级别</th>
+                                                <th>注册时间</th>
+                                                <th>住址</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody">
+                                            <tr v-for="(item, index) in items">
+                                                <td>{{item.Mobile}}</td>
+                                                <td>{{item.MemberName}}</td>
+                                                <td>{{item.IdentityNo}}</td>
+                                                <td>{{item.Role.RoleName}}</td>
+                                                <td>{{item.CreateOn | formatDate}}</td>
+                                                <td>{{item.Address}}</td>
+                                                <td>
+                                                    <button v-show="item.Role.ID==1" class="btn btn-sm btn-danger" v-on:click="remove(item, index)">
+                                                        <i class="glyphicon glyphicon-remove"></i> 删除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <xdropswater-pagination v-bind:row-from="rowFrom"
+                                                            v-bind:row-to="rowTo"
+                                                            v-bind:total-count="totalCount"
+                                                            v-bind:current-page="currentPage"
+                                                            v-bind:total-pages="totalPages"
+                                                            v-bind:display-pages="displayPages">
+                                    </xdropswater-pagination>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="modal fade" id="addUpdateMember" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-bg-xdropswater">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalMemberOrderLabel">{{title}}</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addUpdateMemberForm" v-on:submit="submit">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label class="control-label" for="Mobile">手机号码</label>
+                                <input name="Mobile" v-model="model.Mobile" class="form-control" type="text" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label class="control-label" for="MemberName">姓名</label>
+                                <input name="MemberName" v-model="model.MemberName" class="form-control" type="text" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label class="control-label" for="IdentityNo">身份证号码</label>
+                                <input name="IdentityNo" v-model="model.IdentityNo" class="form-control" type="text" />
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <label class="control-label" for="Address">地址</label>
+                                <input name="Address" v-model="model.Address" class="form-control" type="text" />
+                            </div>
+                        </div>
+                        <xdropswater-error v-bind:error="error"></xdropswater-error>
+                        <xdropswater-modal-footer></xdropswater-modal-footer>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/App/Member/directChildMember1.js"></script>

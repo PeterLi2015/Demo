@@ -1,0 +1,76 @@
+﻿<script>
+    $(function () {
+        $('#recommendMemberLocation_MemberGrid').datagrid({
+            url: '/Member/GetRecommendMemberLocation?random=' +
+            Math.random(),
+            queryParams: {recommendCardNo:$('#recommendMemberLocation_TextRecommendCardNo').val() },
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30, 40],
+            columns: [[
+                { field: 'IdentityCardNo', title: '身份证号码', width: 150 },
+                { field: 'MemberName', title: '姓名', width: 80 }
+            ]]
+        });
+    });
+    //推荐人位置查询
+    function recommendMemberLocation_FindRecommendMemberRecords() {
+        //check session expire
+        $.post("/Common/SessionExpire?random=" + Math.random(), {}, function (data) {
+            if (data == XDropsWaterSystem.executeResult.Success)
+            {
+                recommendMemberLocation_CheckIDCard();
+                $('#recommendMemberLocation_MemberGrid').datagrid({
+                    url: '/Member/GetRecommendMemberLocation?random=' +
+                        Math.random(),
+                    queryParams: { recommendCardNo: $('#recommendMemberLocation_TextRecommendCardNo').val() }
+                });
+            }
+            else if (data == XDropsWaterSystem.executeResult.Login) {
+                $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                    window.location.href = "../Login/Logout";
+                });
+            }
+        });
+    }
+
+    //根据身份证号码查姓名
+    function recommendMemberLocation_CheckIDCard() {
+        var cardNo = $('#recommendMemberLocation_TextRecommendCardNo').val();
+        if (cardNo == '') return;
+
+        var parentName = $('#recommendMemberLocation_TextRecommendMemberName').val();
+        if (parentName == '' || parentName.trim() == '') {
+            $.messager.progress({
+                title: '正在获取推荐人姓名',
+                msg: '正在获取推荐人姓名，请稍候...'
+            });
+        }
+
+        $.post("/Achieve/CheckIDCard?random=" + Math.random(), { cardNo: cardNo }, function (data) {
+            $.messager.progress('close');
+            if (data == XDropsWaterSystem.executeResult.Exception)
+            {
+                $.messager.alert('获取代理姓名失败', '系统出现异常，请联系管理员', 'error');
+            }
+            else if (data != '') {
+                $('#recommendMemberLocation_TextRecommendMemberName').val(data);
+            }
+        });
+    }
+</script>
+
+
+<div id="recommendMemberLocation_MemberGridTool">
+    推荐人身份证号码：<input type="text" id="recommendMemberLocation_TextRecommendCardNo" style="width: 250px" 
+                    onblur="recommendMemberLocation_CheckIDCard()"
+                    onkeydown="if (event.keyCode == 13) { recommendMemberLocation_FindRecommendMemberRecords(); }" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    姓名：<input type="text" id="recommendMemberLocation_TextRecommendMemberName" style="width: 100px" disabled="disabled" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="javascript:void(0)" onclick="recommendMemberLocation_FindRecommendMemberRecords()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+</div>
+
+<table id="recommendMemberLocation_MemberGrid" title="" toolbar="#recommendMemberLocation_MemberGridTool"
+       data-options="rownumbers:true,singleSelect:true,method:'get',
+        loadMsg:'正在查询，请稍候……'"></table>

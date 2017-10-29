@@ -1,0 +1,307 @@
+﻿<table id="roleGrid" class="easyui-datagrid" title="角色列表" style="height:250px" 
+        data-options="rownumbers:true,singleSelect:true,pagination:true,url:'/Role/List',method:'get',
+        loadMsg:'正在加载角色列表，请稍候……',
+        toolbar: [{
+                    text:'刷新',
+                    iconCls:'icon-reload',
+                    handler:function(){
+                        reloadRole()
+                    }
+                },'-',{
+                    text:'添加',
+                    iconCls:'icon-add',
+                    handler:function(){
+                        addRole()
+                    }
+                },'-',{
+                    text:'修改',
+                    iconCls:'icon-edit',
+                    handler:function(){
+                        editRole()
+                    }
+                },'-',{
+                    text:'删除',
+                    iconCls:'icon-remove',
+                    handler:function(){
+                        removeRole()
+                    }
+                }]">
+    <thead>
+        <tr>
+            <th data-options="field:'Name',width:100">名称</th>
+            <th data-options="field:'Permissions',width:300">拥有权限</th>
+            <th data-options="field:'Description',width:300">描述</th>
+        </tr>
+    </thead>
+</table>
+<div id="roleDepDlg" class="easyui-dialog" style="width:470px;height:500px;padding:10px 20px"
+			closed="true" resizable="true" modal="true" align="center">
+    <form id="roleDepForm" method="post">
+        <table id="roletblAdd">
+            <tr>
+            <td>
+                <input type="text" id="roleId" name="roleId" style="display: none" />
+            </td>
+            </tr>
+            <tr>
+                <td colspan="3" width="450px" height="50px">
+                <label>名称：</label><br />
+                <input class="easyui-validatebox" type="text" id="roleName" name="roleName" data-options="required:true,validType:'rolename'" style="width: 400px" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" width="450px" height="100px">
+                <label>描述：</label><br />
+                <textarea id="roleDescription" name="roleDescription"  style="width: 400px" />       
+                </td>
+            </tr>
+            <tr>
+                <td width="150px" height="200px" rowspan="2">
+                    <table id="myperGrid" class="easyui-datagrid" title="已添加权限" style="height:200px; width: 150px;"
+                     data-options="rownumbers:false,singleSelect:true">
+                     <thead>
+                     <tr>
+                      <th data-options="field:'Name',width:145">权限名称</th>
+                      </tr>
+                    </thead>
+                    </table>
+                </td>
+                <td width="100px" height="100px" align="center" valign="middle">
+                <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddRole" iconcls="icon-add" onclick="AddMyPermission()">添加</a>
+                </td>
+                <td width="150px" height="200px" rowspan="2">
+                    <table id="allperGrid" class="easyui-datagrid" title="所有权限" style="height:200px; width: 150px;"
+                     data-options="rownumbers:false,singleSelect:true,url:'/DataMan/List?ser=per'">
+                    <thead>
+                      <tr>
+                      <th data-options="field:'Name',width:145">权限名称</th>
+                      </tr>
+                    </thead>
+                    </table>
+                 </td>
+            </tr>
+            <tr>
+                <td width="100px" height="100px" align="center" valign="top">
+                <a href="javascript:void(0)" class="easyui-linkbutton" id="btnRemoveRole" iconcls="icon-remove" onclick="RemoveMyPermission()">移除</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align:center; padding-top:10px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" id="btnSaveRole" iconcls="icon-ok" onclick="saveRole()">确定</a>&nbsp;
+                <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#roleDepDlg').dialog('close')">关闭</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+    var busOpMode = 0; //0:None, 1:Add, 2:Edit
+
+    $(function () {
+        $('#roleGrid').datagrid({
+            onDblClickRow: function (index, data) {
+                editRole();
+            }
+        });
+        VaildRole();
+    });
+
+//EasyUI datagrid 动态导出Excel
+//    function ExporterExcel() {
+//        //获取Datagride的列
+//        var rows = $('#roleGrid').datagrid('getRows');
+//        var columns = $("#roleGrid").datagrid("options").columns[0];
+//        var oXL = new ActiveXObject("Excel.Application"); //创建AX对象excel 
+//        var oWB = oXL.Workbooks.Add(); //获取workbook对象 
+//        var oSheet = oWB.ActiveSheet; //激活当前sheet
+//        //设置工作薄名称
+//        oSheet.name = "导出Excel报表";
+//        //设置表头
+//        for (var i = 0; i < columns.length; i++) {
+//            oSheet.Cells(1, i + 1).value = columns[i].title;
+//        }
+//        //设置内容部分
+//        for (var i = 0; i < rows.length; i++) {
+//            //动态获取每一行每一列的数据值
+//            for (var j = 0; j < columns.length; j++) {
+//                oSheet.Cells(i + 2, j + 1).value = rows[i][columns[j].field];
+//            }
+//        }
+//        oXL.Visible = true; //设置excel可见属性
+//    }
+
+
+ function VaildRole() {
+    $.extend($.fn.validatebox.defaults.rules, {
+        //  验证角色名是否重复
+        rolename: {
+            validator: function (value) {
+                var isExist;
+                $.ajax({
+                    type: 'post',
+                    url: '/Role/IsRoleExist',
+                    data: { name: value },
+                    async: false,
+                    success: function (data) {
+                        if (data) {
+                            $.fn.validatebox.defaults.rules.rolename.message = '此角色已存在，请重新输入';
+                            isExist = data;
+                            return false;
+                        }
+                    }
+                });
+                if (!isExist)
+                    return true;
+            },
+            message: ''
+        }
+    });
+}
+
+    function reloadRole() {
+        $('#roleGrid').datagrid('reload', []);
+        $('#myperGrid').datagrid('reload',[]);
+        $('#allperGrid').datagrid('reload', []);
+    }
+
+    function addRole() {
+        depOpMode = 1;
+        var dlg = $('#roleDepDlg');
+        dlg.dialog('setTitle', '添加新角色');
+        $('#roleDepForm').form('clear');
+        var item = $('#myperGrid').datagrid('getRows');
+        if (item) {
+            for (var i = item.length - 1; i >= 0; i--) {
+                var index = $('#myperGrid').datagrid('getRowIndex', item[i]);
+                $('#myperGrid').datagrid('deleteRow', index);
+            }
+        }
+        $("#roleId").val(-1);
+        $('#roleName').validatebox({
+            novalidate: false
+        });  
+        dlg.dialog('open');
+    }
+
+    function editRole() {
+        depOpMode = 2;
+        var dlg = $('#roleDepDlg');
+        dlg.dialog('setTitle', '修改角色');
+        if ($("#roleGrid").datagrid("getSelections").length > 0) {
+            var selectId = $("#roleGrid").datagrid("getSelections")[0].Id;   
+            $('#roleDepForm').form('clear');
+            $.getJSON("/Role/GetDetail", { id: selectId }, function (data) {
+                //绑定数据显示到用户控件上面,RoleName1，RoleType1
+                $("#roleId").val(data.Id);
+                $("#roleName").val(data.Name);
+                $("#roleDescription").val(data.Description);
+                var item = $('#myperGrid').datagrid('getRows');
+                if (item) {
+                    for (var i = item.length - 1; i >= 0; i--) {
+                        var index = $('#myperGrid').datagrid('getRowIndex', item[i]);
+                        $('#myperGrid').datagrid('deleteRow', index);
+                    }
+                }
+                for (var i = 0; i < data.Permissions.length; i++) {
+                    $("#myperGrid").datagrid('appendRow', {
+                        Id: data.Permissions[i].Id,
+                        Name: data.Permissions[i].Name
+                    });
+                }
+            })
+            $('#roleName').validatebox({
+                novalidate: true
+            });  
+            dlg.dialog('open');
+        }
+        else {
+            $.messager.alert('提示', '请先选择要修改的角色！', 'info');
+        }
+    }
+
+    function removeRole() {
+        if ($("#roleGrid").datagrid("getSelections").length > 0) {
+            var selectName = $("#roleGrid").datagrid("getSelections")[0].Name;
+            $.messager.confirm('删除角色', '删除后数据不能恢复，你真的要删除角色[' + selectName + ']吗？', function (res) {
+                if (res) {
+                    var postData = {
+                        id: $("#roleGrid").datagrid("getSelections")[0].Id
+                    };
+                    $.post("/Role/Remove", postData, function (data) {
+                        if (data.ErrCode == 0) {
+                            reloadRole();
+                            $.messager.alert('提示', '删除成功！', 'info');
+                        }
+                        else {
+                            $.messager.alert('提示', '删除失败：' + data.ErrMsg, 'info');
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $.messager.alert('提示', '请先选择要删除的角色！', 'info');
+        }
+    }
+
+    function saveRole() {
+        //验证用户必须输入必填项
+        var validate = $("#roleDepForm").form("validate");
+        if (validate == false) {
+            return false;
+        }
+        var perList = '';
+        if ($("#myperGrid").datagrid("getRows").length > 0)
+        {
+            for (var i = 0; i < $("#myperGrid").datagrid("getRows").length; i++)
+            {
+                perList += $("#myperGrid").datagrid("getRows")[i].Id + ",";
+            }
+        }
+
+        var postData = {
+            roleId: $("#roleId").val(),
+            name: $("#roleName").val(),
+            description:$("#roleDescription").val(),
+            permissionList:perList.substring(0, perList.length-1)
+        };
+        $.messager.progress({
+            title: '保存中',
+            msg: '正在保存，请稍候...'
+        });
+        //异步实现登录功能
+        $.post("/Role/SaveRole", postData, function (data) {
+            $.messager.progress('close');
+            if (data.ErrCode == 0) {
+                reloadRole();
+                $('#roleDepDlg').dialog('close');
+            }
+            else {
+                $.messager.alert('保存失败', data.ErrMsg, 'error');
+            }
+        });
+    }
+    //添加权限
+    function AddMyPermission() {
+        var addper = $('#allperGrid').datagrid('getSelected');
+        for (var i = 0; i < $("#myperGrid").datagrid("getRows").length; i++) {
+            var index = $('#myperGrid').datagrid('getRows')[i].Name;
+            if (index == addper.Name) {
+                $.messager.alert('提示', '该权限已添加，请不要重复添加！', 'info');
+                return false;
+            }
+        }
+        $('#myperGrid').datagrid('appendRow',{
+             Id:addper.Id, Name:addper.Name
+        });
+     }
+     //删除权限
+     function RemoveMyPermission() {
+         var row = $('#myperGrid').datagrid('getSelected');
+         var remove = $('#myperGrid').datagrid('getRowIndex', row);
+         $('#myperGrid').datagrid('deleteRow', remove);
+     }
+
+</script>

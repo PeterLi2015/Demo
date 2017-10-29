@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<div class="easyui-panel" data-options="fit:true">
+    <div class="easyui-layout" style="height:700px;" data-options="fit:true">
+        <div data-options="region:'north'" style="height:50px;">
+            <div class="easyui-layout" data-options="fit:true">
+                <div data-options="region:'west'" style="width:200px; overflow-x:visible; overflow-y:visible;">
+                    <img alt="SimpleWeb Site" src="~/Images/logo.jpg" style="width:200px; height:48px;" />
+                </div>
+                <div data-options="region:'east', iconCls:'icon-ok'" style="width:200px; height:50px;">
+                     <span>@ViewBag.UserName | @ViewBag.Account</span>
+                     <a href="#" class="easyui-linkbutton" onclick="logout();">退出</a>
+                </div>
+                @*<span>@ViewBag.UserName | @ViewBag.Account</span>
+                     <a href="#" class="easyui-linkbutton" onclick="logout();">退出</a>*@
+                <div data-options="region:'center'" ></div>
+            </div>
+        </div>
+        <div data-options="region:'south',split:true" style="height:50px;">
+            <span style="text-align:center"> 版权所有 浙江小水滴</span>
+        </div>
+        <div data-options="region:'west',split:true" title="功能栏" style="width:150px;">
+            <div id="menuAc" class="easyui-accordion" data-options="fit:true,border:false"></div>
+        </div>
+        <div data-options="region:'center',iconCls:'icon-ok', fit:true">
+            <div id="mainTab" class="easyui-tabs" data-options="fit:true,border:false,plain:true"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+<script type="text/javascript" src="/Content/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/Content/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/Content/easyui/plugins/jquery.datagrid.scrollview.js"></script>
+<script type="text/javascript">
+    
+    //页面初始化操作
+    $(function () {
+        genMenu();
+    });
+
+    //生成菜单
+    function genMenu()
+    {
+        $.getJSON("/Home/LoadMenuData", {}, function (data) {
+            //实现在菜单拦中的显示,遍历节点集合
+            for (var i = 0; i < data.length; i++) {
+                var groupInfo = data[i]; //拿到组的信息
+
+                //拿到分组的信息,每个菜单项构造成一个p标签
+                var strMenuItemHTMl = "";
+                for (var j = 0; j < groupInfo.MenuItems.length; j++) {
+                    var menuItem = groupInfo.MenuItems[j];
+                    strMenuItemHTMl += '<p><a href="#" src="' + menuItem.Url + '" class="menuLink">' + menuItem.Name + '</a></p>';
+                }
+                    
+                //EasyUI添加节点
+                $("#menuAc").accordion('add', {
+                    title: groupInfo.Name,
+                    content: strMenuItemHTMl,
+                    selected: true
+                });
+                $("#menuAc").accordion('select', 0)
+                //绑定用户单击跳转事件
+                bindMenuClickEvent();
+            }
+        });
+    }
+
+    //实现用户单击导航栏跳转页面的方法
+    function bindMenuClickEvent(title, index) {
+        $(".menuLink").click(function () {
+            //获取按钮里面的Src属性
+            var src = $(this).attr("src");
+            //Tab页面添加页面标签，每当单击左边的导航栏的时候跳转
+            var titleShow = $(this).text();            //判断Tab标签中是否有相同的数据标签
+            var isExist = $("#mainTab").tabs('exists', titleShow);
+            if (!isExist) {
+                var strHtml = '<div width="100%" class="easyui-panel" height="100%" href="' + src + '"></div>';
+                $("#mainTab").tabs('add', {
+                    title: titleShow,
+                    content: strHtml,
+                    iconCls: 'icon-save',
+                    closable: true,
+                });
+            }
+            else {
+                $('#mainTab').tabs('select', titleShow);
+            }
+        });
+    }
+
+    function logout()
+    {
+         $.messager.confirm('退出系统', '你真的要退出该系统吗？', function (res) {
+            if (res) {
+                window.location.href = "/Home/Logout";
+            }
+        });
+    }
+</script>
+}

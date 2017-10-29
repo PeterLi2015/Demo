@@ -1,0 +1,387 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@using PagedList;
+@using XDropsWater.Model;
+@using PagedList.Mvc;
+@using System.Collections.Generic;
+@model Tuple<IPagedList<MemberOrderModel>, MemberOrderModel>
+
+<style type="text/css">
+    .clear:after
+    {
+        display: block;
+        clear: both;
+        content: ".";
+        visibility: hidden;
+        height: 0;
+    }
+
+    .clear
+    {
+        zoom: "1";
+    }
+</style>
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>代理订单
+            <small>Version 1.0</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+            <li class="active">代理订单</li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <!-- /.row -->
+        <div class="row">
+
+            <div class="col-xs-12">
+                <div class="box">
+
+                    <div class="box-header">
+                        <div class="form-group">
+                            @Html.DropDownList("dlSearch", new SelectList(new List<SelectListItem>() {
+                               new SelectListItem(){Text="全部",Value="-1",Selected=true},
+                               new SelectListItem(){Text="已发货",Value="1"},
+                               new SelectListItem(){Text="未发货",Value="0"},
+                           }, "Value", "Text"),
+                            htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "placeholder","是否发货" },
+                                        })
+                        </div>
+                        <div class="form-group">
+                            <input id="txtSearch" type="text" class="form-control" placeholder="电话号码或姓名">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-default" type="button" id="btnSearch">查询</button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <div class="box-body">
+                        <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <div class="row">
+                                <div class="col-sm-6"></div>
+                                <div class="col-sm-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 table-responsive" id="ChildMemberOrderList">
+                                    @Html.Partial("ChildMemberOrderList", Model.Item1)
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="modalMemberOrder" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalMemberOrderLabel">发货</h4>
+                    </div>
+                    <div class="modal-body">
+                        @using (Html.BeginForm("SendMemberOrder", "Member", FormMethod.Post, new Dictionary<string, object> { { "id", "frmMemberOrderSend" } }))
+                        {
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                @Html.HiddenFor(model => model.Item2.ID)
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @Html.LabelFor(model => model.Item2.Mobile, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.Item2.Mobile,
+                                        htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "readonly","readonly" },
+                                        })
+                                        @Html.ValidationMessageFor(model => model.Item2.Mobile, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        @Html.LabelFor(model => model.Item2.MemberName, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.Item2.MemberName, htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "readonly","readonly" },
+                                        })
+                                        @Html.ValidationMessageFor(model => model.Item2.MemberName, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        @Html.LabelFor(model => model.Item2.Quantity, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.Item2.Quantity, htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "readonly","readonly" },
+                                        })
+                                        @Html.ValidationMessageFor(model => model.Item2.Quantity, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        @Html.LabelFor(model => model.Item2.Express, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextAreaFor(model => model.Item2.Express, htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "data-bv-message", "快递信息无效" },
+                                            { "required data-bv-notempty-message", "快递信息必填" },
+
+                                        })
+                                        @Html.ValidationMessageFor(model => model.Item2.Express, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group has-error">
+                                    <div class="col-sm-offset-1  col-sm-10">
+                                        <span class="help-block" id="myErrors">asdfasdfsad</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="btnSave" class="btn btn-primary" onclick="$('#frmMemberOrderSend').submit()">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+</div>
+
+<script type="text/javascript">
+    // Adding popstate event listener to handle browser back button
+    window.addEventListener("popstate", function (e) {
+        $.ajax({
+            url: location.href,
+            success: function (result) {
+                $('#ChildMemberOrderList').html(result);
+            }
+        });
+    });
+
+    function getUrlVars() {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+    function search() {
+
+        var search = '';
+        var search1 = $('#txtSearch').val();
+        var search2 = '';
+
+        var isDelivery = null;
+        if ($('#dlSearch').val() == "1") {
+            isDelivery = true;
+            search2 = "true";
+        }
+        else if ($('#dlSearch').val() == "0") {
+            isDelivery = false;
+            search2 = "false";
+        }
+
+        if (search1 != '') {
+            search = "?mobileOrName=" + search1;
+        }
+
+        if (search2 != '') {
+            if (search != '') {
+                search = search + "&isDelivery=" + search2;
+            }
+            else {
+                search = "?isDelivery=" + search2;
+            }
+        }
+
+        var param = {
+            mobileOrName: $('#txtSearch').val(),
+            isDelivery: isDelivery
+        };
+        var url = "@Url.Action("ChildMemberOrder", "Member")";
+        showMsg('正在查询，请稍后...');
+        $.post(url, param, function (result) {
+            closeMsg();
+            $('#ChildMemberOrderList').html(result);
+        });
+    }
+
+    $('#modalMemberOrder').on('shown.bs.modal', function (event) {
+        $('#frmMemberOrderSend').bootstrapValidator('resetForm', true);
+        $('#myErrors').html('');
+        if ($(event.relatedTarget).html() == "发货") {
+            if ($(event.relatedTarget).attr('data-item')) {
+                var item = $(event.relatedTarget).attr('data-item');
+                var model = $.parseJSON(item);
+                $('#Item2_ID').val(model.ID);
+                $('#Item2_Mobile').val(model.Mobile);
+                $('#Item2_MemberName').val(model.MemberName);
+                $('#Item2_Quantity').val(model.Quantity);
+                $('#Item2_Express').val(model.Express);
+
+                $('#modalMemberOrderLabel').html("发货");
+            }
+        }
+        else if ($(event.relatedTarget).html() == "修改") {
+            if ($(event.relatedTarget).attr('data-item')) {
+                var item = $(event.relatedTarget).attr('data-item');
+                var model = $.parseJSON(item);
+                $('#Item2_ID').val(model.ID);
+                $('#Item2_Mobile').val(model.Mobile);
+                $('#Item2_MemberName').val(model.MemberName);
+                $('#Item2_Quantity').val(model.Quantity);
+                $('#Item2_Express').val(model.Express);
+                $('#modalMemberOrderLabel').html("修改快递信息");
+            }
+        }
+
+    });
+
+    addLoadEvent(function () {
+
+
+        $("#btnSearch").click(function () {
+            search();
+        });
+
+        $("#txtSearch").keypress(function (e) {
+            if (e.keyCode == 13) {
+                search();
+            }
+        });
+
+        var getPage = function ()
+        {
+            var random = '&random=' + new Date().getTime();
+            var search = '';
+            var search1 = $('#txtSearch').val();
+            var search2 = '';
+
+            if ($('#dlSearch').val() == "1")
+                search2 = "true";
+            else if ($('#dlSearch').val() == "0")
+                search2 = "false";
+
+            if (search1 != '') {
+                search = '&mobileOrName=' + search1;
+            }
+
+            if (search2 != '') {
+                if (search == '')
+                    search = '&isDelivery=' + search2;
+                else
+                    search = search + '&isDelivery=' + search2;
+            }
+            search += random;
+            var url = $(this).attr('href') + search;
+            showMsg('正在翻页，请稍后...');
+            $.ajax({
+                url: url,
+                success: function (result) {
+                    closeMsg();
+                    $('#ChildMemberOrderList').html(result);
+                }
+            });
+        }
+
+        $('body').on('click', '#ChildMemberOrderList .pagination a', getPage);
+
+
+       
+        $('#frmMemberOrderSend').bootstrapValidator().on('success.form.bv', function (e) {
+            // Prevent form submission
+            e.preventDefault();
+
+            if ($('#modalMemberOrderLabel').html() == "发货") {
+                var box = bootbox.confirm({
+                    size: 'small',
+                    onEscape: function () { },
+                    closeButton: true,
+                    message: '请再次确认代理订单，因为发货后订单数据不能修改和删除，您确定要为' + $('#Item2_MemberName').val() + '的订单发货吗？',
+                    callback: function (result) {
+                        if (result) {
+                            $("#btnSave").attr("disabled", "disabled");
+                            $form = $('#frmMemberOrderSend');
+                            //string mobile, string memberName, string parentMobile, string roleID, string address
+                            // Use Ajax to submit form data
+                            var oParam = {
+                                orderId: $('#Item2_ID').val(),
+                                expressContent: $('#Item2_Express').val(),
+                            };
+                            $.post($form.attr('action'), oParam, function (result) {
+                                setTimeout(function () { location.href = location.href; }, 1000);
+                            }).fail(function (xhr, status, error) {
+                                $('#myErrors').html(xhr.responseJSON.message);
+                                $("#btnSave").removeAttr('disabled');
+                            });
+                        }
+                        else {
+                            return;
+                        }
+                    }
+
+                });
+            }
+            else if ($('#modalMemberOrderLabel').html() == "修改快递信息") {
+                $("#btnSave").attr("disabled", "disabled");
+                $form = $('#frmMemberOrderSend');
+                //string mobile, string memberName, string parentMobile, string roleID, string address
+                // Use Ajax to submit form data
+                var oParam = {
+                    orderId: $('#Item2_ID').val(),
+
+                    expressContent: $('#Item2_Express').val(),
+                };
+                $.post("@Url.Action("UpdateOrderExpress", "Member")", oParam, function (result) {
+                    setTimeout(function () { location.href = location.href; }, 1000);
+                }).fail(function (xhr, status, error) {
+                    $('#myErrors').html(xhr.responseJSON.message);
+                    $("#btnSave").removeAttr('disabled');
+                });
+            }
+
+
+        });
+
+    });
+
+</script>
