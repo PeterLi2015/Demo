@@ -57,7 +57,11 @@ var addUpdateMember = new Vue({
             IdentityCode: '',
             Address: '',
             Products: [],
-            ProductID: ''
+            ProductID: '',
+            ParentMember: {
+                Mobile: '',
+                MemberName: ''
+            },
         },
         error: {
             show: '',
@@ -71,15 +75,27 @@ var addUpdateMember = new Vue({
         },
         remove: function () {
             remove();
-        }
+        },
+        getParentName: function (mobile) {
+            getParentName(mobile, this);
+        },
     }
 });
 
 
-/************************************** vue instances **********************************************/
 
+/*
+功能: 添加/修改代理的时候，根据上级代理的手机号码获取上级代理的姓名
+参数:
+    mobile: 上级代理的手机号码
+    $this: 添加/修改代理的Vue对象
+*/
+function getParentName(mobile, $this) {
+    $this.$http.post("GetMemberName", { mobile: mobile }).then(function (result) {
+        $this.model.ParentMember.MemberName = result.data.MemberName;
+    }, function (error) { });
+}
 
-/************************************** children members *******************************************/
 
 /*
     get all children members
@@ -259,6 +275,30 @@ function addUpdateMemberFormValidator() {
                 validators: {
                     notEmpty: {
                         message: '地址不能为空'
+                    }
+                }
+            },
+            ParentMobile: {
+                message: '上级手机号码验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '地址不能为空'
+                    },
+                    stringLength: {
+                        min: 11,
+                        max: 11,
+                        message: '上级手机号码长度必须11位'
+                    },
+                    regexp: {
+                        regexp: /^1\d{10}$/,
+                        message: '上级手机号码必须是以1开头的11位数字'
+                    },
+                    remote: {
+                        url: '/Member/CheckMobile',
+                        message: '上级手机号码不存在',
+                        name: 'mobile',
+                        type: 'POST',
+                        delay: 1000
                     }
                 }
             },

@@ -53,6 +53,7 @@
                                                 <th>姓名</th>
                                                 <th>身份证号码</th>
                                                 <th>级别</th>
+                                                <th>上级姓名</th>
                                                 <th>注册时间</th>
                                                 <th>住址</th>
                                                 <th>操作</th>
@@ -64,6 +65,7 @@
                                                 <td>{{item.MemberName}}</td>
                                                 <td>{{item.IdentityNo}}</td>
                                                 <td>{{item.Role.RoleName}}</td>
+                                                <td>{{item.ParentMember.MemberName}}</td>
                                                 <td>{{item.CreateOn | formatDate}}</td>
                                                 <td>{{item.Address}}</td>
                                                 <td>
@@ -130,6 +132,22 @@
                             <div class="col-md-12">
                                 <label class="control-label" for="Address">地址</label>
                                 <input name="Address" v-model="model.Address" class="form-control" type="text" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="col-md-12">
+                                <label class="control-label" for="ParentMobile">上级手机号码</label>
+                                <input name="ParentMobile" v-model="model.ParentMember.Mobile" class="form-control" v-on:keyup="getParentName(model.ParentMember.Mobile)" type="text" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="col-md-12">
+                                <label class="control-label" for="ParentMemberName">上级姓名</label>
+                                <input name="ParentMemberName" v-model="model.ParentMember.MemberName" class="form-control" disabled="disabled" type="text" />
                             </div>
                         </div>
                         <xdropswater-error v-bind:error="error"></xdropswater-error>

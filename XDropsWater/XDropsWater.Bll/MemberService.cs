@@ -166,7 +166,7 @@ namespace XDropsWater.Bll
 
 
         /// <summary>
-        /// 获取代理订单
+        /// 获取我添加的和我直接下属的代理
         /// </summary>
         /// <param name="page">页码</param>
         /// <param name="size">每页显示行数</param>
@@ -180,6 +180,7 @@ namespace XDropsWater.Bll
             var db = new Repository<MemberEntity>(uow);
 
             Expression<Func<MemberEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.ParentMemberID == this.CurrentUser.MemberID;
+            whereExp = whereExp.Or(o => o.CreateBy == this.CurrentUser.ID);
             if (!string.IsNullOrWhiteSpace(mobileOrName))
             {
                 whereExp = whereExp.And(o => (o.Mobile.Contains(mobileOrName)
@@ -2769,10 +2770,27 @@ namespace XDropsWater.Bll
         {
             var memberDb = new Repository<MemberEntity>(uow);
 
-            var memberEntity = memberDb.FindBy(p => p.ID == memberId).First();
+            var member = memberDb.FindBy(p => p.ID == memberId).FirstOrDefault();
+            if (member == null)
+            {
+                throw new Exception("该代理不存在，请联系管理员");
+            }
+            //判断该代理是否已经有订单记录
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            var order = orderRepo.FindBy(o => o.MemberID == memberId).FirstOrDefault();
+            if (order != null)
+            {
+                throw new Exception("该代理已经下过订单，不能删除");
+            }
+            //有下级代理，不能删除
+            var hasChild = memberDb.FindBy(o => o.ParentMemberID == memberId).Any();
+            if (hasChild)
+            {
+                throw new Exception("该代理存在下级代理，不能删除");
+            }
 
             //删除代理
-            memberDb.Remove(memberEntity);
+            memberDb.Remove(member);
 
             //删除用户
             var userDb = new Repository<UserEntity>(uow);
@@ -2843,8 +2861,9 @@ namespace XDropsWater.Bll
             Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
             if (memberRepo.FindBy(m => m.Mobile == model.Mobile).FirstOrDefault() != null)
             {
-                throw new Exception("该手机号码已经存在于代理表中，请重新输入");
+                throw new Exception("该手机号码已经存在，请重新输入");
             }
+
 
             #region Check IdentityNo: It cannot be an existing IdentityNo
             if (!string.IsNullOrWhiteSpace(model.IdentityNo))
@@ -2954,6 +2973,30 @@ namespace XDropsWater.Bll
                 throw new Exception("手机号码已被使用，请重新输入");
             }
 
+            MemberEntity parent = null;
+            if (!string.IsNullOrWhiteSpace(model.ParentMember.Mobile))
+            {
+                long iParentMobile = 0;
+                if (!long.TryParse(model.ParentMember.Mobile, out iParentMobile))
+                {
+                    throw new Exception("上级手机号码必须是数字");
+                }
+                if (model.ParentMember.Mobile.Length != 11)
+                {
+                    throw new Exception("上级手机号码长度必须是11位");
+                }
+
+                parent = memberRepo.FindBy(p => p.Mobile == model.ParentMember.Mobile).FirstOrDefault();
+                if (parent == null)
+                {
+                    throw new Exception("上级手机号码输入有误，请重新输入");
+                }
+                if (model.Mobile == model.ParentMember.Mobile)
+                {
+                    throw new Exception("上级手机号码不能和本人手机号码一样");
+                }
+            }
+
             #endregion
 
             #region identity number should be unique
@@ -2984,6 +3027,10 @@ namespace XDropsWater.Bll
             member.RoleID = (int)enmMemberRole.Customer;
             member.Address = model.Address;
             member.IdentityNo = model.IdentityNo;
+            if (parent != null)
+            {
+                member.ParentMemberID = parent.ID;
+            }
             memberRepo.Add(member);
             #endregion
 
