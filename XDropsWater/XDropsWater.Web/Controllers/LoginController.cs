@@ -18,6 +18,7 @@ namespace XDropsWater.Web.Controllers
     {
         readonly IUserService service;
         readonly IUserLogService userLogService;
+
         public LoginController(IUserService service, IUserLogService userLogService)
         {
             this.service = service;

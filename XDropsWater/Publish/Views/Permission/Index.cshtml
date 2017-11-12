@@ -1,0 +1,165 @@
+﻿<table id="perGrid" class="easyui-datagrid" title="权限列表" style="height:250px" 
+        data-options="rownumbers:false,singleSelect:true,url:'/DataMan/List?ser=per',method:'get',
+        loadMsg:'正在加载角色列表，请稍候……',
+        toolbar: [{
+                    text:'刷新',
+                    iconCls:'icon-reload',
+                    handler:function(){
+                        reloadPermission()
+                    }
+                }]">
+    <thead>
+        <tr>
+            <th data-options="field:'Id',width:80">编号</th>
+            <th data-options="field:'ShortName',width:100">权限短名称</th>
+            <th data-options="field:'Name',width:100">权限名称</th>
+            <th data-options="field:'Description',width:100">权限描述</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="perDepDlg" class="easyui-dialog" style="width:360px;height:360px;padding:10px 20px"
+			closed="true" resizable="true" modal="true" align="center">
+    <form id="perDepForm" method="post">
+        <table id="roletblAdd">
+         <tr>
+            <td>
+                <input type="text" id="perId" name="perId" style="display: none" />
+            </td>
+        </tr>
+        <tr>
+                <td colspan="3" height="50px">
+                <label>权限短名：</label>
+                <input class="easyui-validatebox" type="text" id="perShortName" name="perShortName" disabled="true" data-options="required:true,validType:'length[1,32]'" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" height="50px">
+                <label>权限名称：</label>
+                <input class="easyui-validatebox" type="text" id="perName" name="perName" disabled="true" data-options="required:true,validType:'length[1,32]'" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" height="100px">
+                <label>权限描述：</label>
+                <textarea id="perDescription" name="perDescription" disabled="true"/>       
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align:center; padding-top:10px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" id="btnSaveRole" iconcls="icon-ok" onclick="savePermission()">确定</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#perDepDlg').dialog('close')">关闭</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+    var busOpMode = 0; //0:None, 1:Add, 2:Edit
+
+//    $(function () {
+//        $('#perGrid').datagrid({
+//	        onDblClickRow: function(index,data){
+//		        editPermission();
+//	        }
+//        });
+//    });
+
+    function reloadPermission() {
+        $('#perGrid').datagrid('reload', []);
+    }
+
+    function addPermission() {
+        depOpMode = 1;
+        var dlg = $('#perDepDlg');
+        dlg.dialog('setTitle', '添加新权限');
+        $('#perDepForm').form('clear');
+        $("#perId").val(-1);
+        dlg.dialog('open');
+    }
+
+    function editPermission() {
+        depOpMode = 2;
+        var dlg = $('#perDepDlg');
+        dlg.dialog('setTitle', '修改权限');
+        if ($("#perGrid").datagrid("getSelections").length > 0) {
+            var selectId = $("#perGrid").datagrid("getSelections")[0].Id;
+            $('#perDepForm').form('clear');
+            $.getJSON("/DataMan/Get", { ser:"per", id: selectId }, function (data) {
+                //绑定数据显示到用户控件上面,RoleName1，RoleType1
+                $("#perId").val(data.Id);
+                $("#perShortName").val(data.ShortName);
+                $("#perName").val(data.Name);
+                //绑定数据显示在前台的easyUI下拉框中
+                $("#perDescription").val(data.Description);
+            })
+            dlg.dialog('open');
+        }
+        else {
+            $.messager.alert('提示', '请先选择要修改的权限！', 'info');
+        }
+    }
+
+    function removePermission() {
+        if ($("#perGrid").datagrid("getSelections").length > 0) {
+            var selectName = $("#perGrid").datagrid("getSelections")[0].Name;
+            $.messager.confirm('删除权限', '删除后数据不能恢复，你真的要删除权限[' + selectName + ']吗？', function (res) {
+                if (res) {
+                    var postData = {
+                        ser: 'per',
+                        id: $("#perGrid").datagrid("getSelections")[0].Id
+                    };
+                    $.post("/DataMan/Remove", postData, function (data) {
+                        if (data.ErrCode == 0) {
+                            reloadPermission();
+                            $.messager.alert('提示', '删除成功！', 'info');
+                        }
+                        else {
+                            $.messager.alert('提示', '删除失败：' + data.ErrMsg, 'info');
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $.messager.alert('提示', '请先选择要删除的权限！', 'info');
+        }
+    }
+
+    function savePermission() {
+        //验证用户必须输入必填项
+        var validate = $("#perDepForm").form("validate");
+        if (validate == false) {
+            return false;
+        }
+        //获取传递前台的参数，UName，Pwd，Code
+        var permission = {
+            Id: $("#perId").val(),
+            ShortName: $("#perShortName").val(),
+            Name: $("#perName").val(),
+            Description: $("#perDescription").val()
+        };
+        var postData = {
+            ser:'per',
+            jsonStr: JSON.stringify(permission),
+        };
+        $.messager.progress({
+            title: '保存中',
+            msg: '正在保存，请稍候...'
+        });
+        //异步实现登录功能
+        $.post("/DataMan/Save", postData, function (data) {
+            $.messager.progress('close');
+            if (data.ErrCode == 0) {
+                reloadPermission();
+                $('#perDepDlg').dialog('close');
+            }
+            else {
+                $.messager.alert('保存失败', data.ErrMsg, 'error');
+            }
+        });
+    }
+
+</script>

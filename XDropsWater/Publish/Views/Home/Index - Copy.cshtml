@@ -1,0 +1,441 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<div class="easyui-panel" data-options="fit:true">
+    <div class="easyui-layout" style="height: 700px;" data-options="fit:true">
+        @*<div data-options="region:'north'" style="height:50px;">
+            <div class="easyui-layout" data-options="fit:true">
+                <div data-options="region:'west'" style="width:200px; overflow-x:visible; overflow-y:visible;">
+                    <img alt="SimpleWeb Site" src="~/Images/logo.jpg" style="width:200px; height:48px;" />
+                </div>
+                <div data-options="region:'east', iconCls:'icon-ok'" style="width:200px; height:50px;">
+                     <span>@ViewBag.UserName | @ViewBag.Account</span>
+                     <a href="#" class="easyui-linkbutton" onclick="logout();">退出</a>
+                </div>
+
+                <div data-options="region:'center'" ></div>
+            </div>
+        </div>*@
+        <div region="north" split="true" border="false" style="overflow: hidden; height: 30px;  background:url(/Content/themes/XDropsWater/images/layout-browser-hd-bg.gif) #7f99be repeat-x center 50%; line-height: 20px; color: #fff; font-family: Verdana, 微软雅黑,黑体">
+            <span style="float: right; padding-right: 20px;" class="head">欢迎 @ViewBag.UserName <a href="#" onclick="changePwd()" id="editpass">修改密码</a> <a href="#" id="loginOut" onclick="logout();">安全退出</a></span>
+            <span style="padding-left: 10px; font-size: 16px;">
+                <img src="~/Content/themes/XDropsWater/images/blocks.gif" width="20" height="20" align="absmiddle" />
+                小水滴代理系统</span>
+        </div>
+
+        <div data-options="region:'south',split:true" style="height: 50px;">
+            <span style="text-align: center">版权所有 浙江小水滴环保科技有限公司</span>
+        </div>
+        <div region="west" split="true" title="导航菜单" style="width: 180px;" id="west">
+            <div id="nav">
+                <!--  导航内容 -->
+
+            </div>
+
+        </div>
+        @*<div data-options="region:'west',split:true" title="功能栏" style="width:150px;">
+            <div id="menuAc" class="easyui-accordion" data-options="fit:true,border:false"></div>
+        </div>*@
+        @*<div data-options="region:'center',iconCls:'icon-ok', fit:true">*@
+        <div data-options="region:'center'">
+            <div id="tabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true"></div>
+        </div>
+    </div>
+</div>
+<div id="changePwdDlg" class="easyui-dialog" style="width: 500px; height: 300px" closed="true">
+    <table>
+        <tr>
+            <td style="text-align: right"><span style="font-size:large">请输入原始密码：</span></td>
+            <td><input id="oriPwd" type="password" style="width: 250px; height:30px; font-size:large"/></td>
+        </tr>
+        <tr><td style="text-align: right"><span style="font-size:large">请输入新密码：</span></td>
+            <td><input id="newPwd" type="password" style="width: 250px; height:30px; font-size:large"/></td></tr>
+        <tr><td style="text-align: right"><span style="font-size:large">请再输入新密码：</span></td>
+            <td><input id="crmNewPwd" type="password" style="width: 250px; height:30px; font-size:large"/></td></tr>
+        <tr>
+            <td colspan="2" style="text-align: right; padding-top: 10px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" id="btnChangePwd" iconcls="icon-ok" onclick="saveNewPwd()">确定</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#changePwdDlg').dialog('close')">关闭</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript" src="/Content/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="/Content/easyui/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="/Content/easyui/plugins/jquery.datagrid.scrollview.js"></script>
+    <script type="text/javascript">
+
+        var onlyOpenTitle = "欢迎使用";//不允许关闭的标签的标题
+        //页面初始化操作
+        $(function () {
+            genMenu();
+            tabClose();
+            tabCloseEven();
+        });
+
+        //生成菜单
+        function genMenu() {
+            $.getJSON("/Home/LoadMenuData", {}, function (data) {
+
+                _menus = data;
+
+                var selectedPanelname = '';
+                //hoverMenuItem();
+                $("#nav").accordion({ animate: false });
+
+                $.each(data, function (i, n) {
+                    var menulist = '';
+                    menulist += '<ul class="navlist">';
+                    $.each(n.MenuItems, function (j, o) {
+                        menulist += '<li><div ><a ref="' + o.Id + '" href="#" rel="' + o.Url + '" ><span class="icon ' +
+                            o.icon + '" >&nbsp;</span><span class="nav">' + o.Name + '</span></a></div> ';
+                        ////如果是脚本，连接的方式不同
+                        //if (o.Url && o.Url.indexOf("javascript") >= 0) {
+                        //    menulist += '<li><div><a ref="' + o.Id + '" href="javascript:void(0)" onclick="' + o.Url + '" ><span class="icon ' + o.icon + '" >&nbsp;</span><span class="nav">' + o.Name + '</span></a></div></li> ';
+                        //}
+                        //else {
+                        //    menulist += '<li><div><a ref="' + o.Id + '" href="#" rel="' + o.Url + '" ><span class="icon ' + o.icon + '" >&nbsp;</span><span class="nav">' + o.Name + '</span></a></div></li> ';
+                        //}
+
+                        if (o.child && o.child.length > 0) {
+                            //li.find('div').addClass('icon-arrow');
+
+                            menulist += '<ul class="third_ul">';
+                            $.each(o.child, function (k, p) {
+                                menulist += '<li><div><a ref="' + p.Id + '" href="#" rel="' + p.Url + '" ><span class="icon ' + p.Icon + '" >&nbsp;</span><span class="nav">' + p.Name + '</span></a></div> </li>'
+                            });
+                            menulist += '</ul>';
+                        }
+                        menulist += '</li>';
+                    })
+                    menulist += '</ul>';
+                    //alert(menulist);
+
+                    $('#nav').accordion('add', {
+                        title: n.Name,
+                        content: menulist,
+                        iconCls: n.Icon
+                    });
+
+                    if (i == 0)
+                        selectedPanelname = n.Name;
+
+                    //$("#menuAc").accordion('select', 0)
+                    ////绑定用户单击跳转事件
+                    //bindMenuClickEvent();
+
+                });
+
+                $('#nav').accordion('select', selectedPanelname);
+                $('.navlist li a').click(function () {
+                    var tabTitle = $(this).children('.nav').text();
+
+                    var url = $(this).attr("rel");
+                    var menuid = $(this).attr("ref");
+                    var icon = $(this).find('.icon').attr('class');
+
+                    var third = find(menuid);
+                    if (third && third.child && third.child.length > 0) {
+                        $('.third_ul').slideUp();
+
+                        var ul = $(this).parent().next();
+                        if (ul.is(":hidden"))
+                            ul.slideDown();
+                        else
+                            ul.slideUp();
+
+
+
+                    }
+                    else {
+                        addTab(tabTitle, url, icon);
+                        $('.navlist li div').removeClass("selected");
+                        $(this).parent().addClass("selected");
+                    }
+                }).hover(function () {
+                    $(this).parent().addClass("hover");
+                }, function () {
+                    $(this).parent().removeClass("hover");
+                });
+
+                ////实现在菜单拦中的显示,遍历节点集合
+                //for (var i = 0; i < data.length; i++) {
+                //    var groupInfo = data[i]; //拿到组的信息
+
+                //    //拿到分组的信息,每个菜单项构造成一个p标签
+                //    var strMenuItemHTMl = "";
+                //    for (var j = 0; j < groupInfo.MenuItems.length; j++) {
+                //        var menuItem = groupInfo.MenuItems[j];
+                //        strMenuItemHTMl += '<p><a href="#" src="' + menuItem.Url + '" class="menuLink">' + menuItem.Name + '</a></p>';
+                //    }
+
+                //    //EasyUI添加节点
+                //    $("#menuAc").accordion('add', {
+                //        title: groupInfo.Name,
+                //        content: strMenuItemHTMl,
+                //        selected: true
+                //    });
+                //    $("#menuAc").accordion('select', 0)
+                //    //绑定用户单击跳转事件
+                //    bindMenuClickEvent();
+                //}
+            });
+        }
+
+        ////实现用户单击导航栏跳转页面的方法
+        //function bindMenuClickEvent(title, index) {
+        //    $(".menuLink").click(function () {
+        //        //获取按钮里面的Src属性
+        //        var src = $(this).attr("src");
+        //        //Tab页面添加页面标签，每当单击左边的导航栏的时候跳转
+        //        var titleShow = $(this).text();            //判断Tab标签中是否有相同的数据标签
+        //        var isExist = $("#mainTab").tabs('exists', titleShow);
+        //        if (!isExist) {
+        //            var strHtml = '<div width="100%" class="easyui-panel" height="100%" href="' + src + '"></div>';
+        //            $("#mainTab").tabs('add', {
+        //                title: titleShow,
+        //                content: strHtml,
+        //                iconCls: 'icon-save',
+        //                closable: true,
+        //            });
+        //        }
+        //        else {
+        //            $('#mainTab').tabs('select', titleShow);
+        //        }
+        //    });
+        //}
+
+        function logout() {
+            $.messager.confirm('退出系统', '你真的要退出该系统吗？', function (res) {
+                if (res) {
+                    window.location.href = "/Home/Logout";
+                }
+            });
+        }
+
+        //获取左侧导航的图标
+        function getIcon(menuid) {
+            var icon = 'icon ';
+            $.each(_menus, function (i, n) {
+                $.each(n.MenuItems, function (j, o) {
+                    if (o.Id == menuid) {
+                        Icon += o.Icon;
+                    }
+                })
+            })
+
+            return icon;
+        }
+
+        function find(menuid) {
+            var obj = null;
+            $.each(_menus, function (i, n) {
+                $.each(n.MenuItems, function (j, o) {
+                    if (o.Id == menuid) {
+                        obj = o;
+                    }
+                });
+            });
+
+            return obj;
+        }
+
+        function addTab(subtitle, url, icon) {
+            if (!$('#tabs').tabs('exists', subtitle)) {
+                $('#tabs').tabs('add', {
+                    title: subtitle,
+                    content: createFrame(url),
+                    closable: true,
+                    icon: icon
+                });
+            } else {
+                $('#tabs').tabs('select', subtitle);
+                $('#mm-tabupdate').click();
+            }
+            tabClose();
+        }
+
+        function createFrame(url) {
+            var s = '<div width="100%" class="easyui-panel" href="' + url + '"></div>';
+            //var s = '<iframe scrolling="auto" frameborder="0"  src="' + url + '" style="width:100%;height:100%;"></iframe>';
+
+            //var s = url;
+            return s;
+        }
+
+        function tabClose() {
+            /*双击关闭TAB选项卡*/
+            $(".tabs-inner").dblclick(function () {
+                var subtitle = $(this).children(".tabs-closable").text();
+                $('#tabs').tabs('close', subtitle);
+            })
+            /*为选项卡绑定右键*/
+            $(".tabs-inner").bind('contextmenu', function (e) {
+                $('#mm').menu('show', {
+                    left: e.pageX,
+                    top: e.pageY
+                });
+
+                var subtitle = $(this).children(".tabs-closable").text();
+
+                $('#mm').data("currtab", subtitle);
+                $('#tabs').tabs('select', subtitle);
+                return false;
+            });
+        }
+
+
+        //绑定右键菜单事件
+        function tabCloseEven() {
+
+            $('#mm').menu({
+                onClick: function (item) {
+                    closeTab(item.Id);
+                }
+            });
+
+            return false;
+        }
+
+        function closeTab(action) {
+            var alltabs = $('#tabs').tabs('tabs');
+            var currentTab = $('#tabs').tabs('getSelected');
+            var allTabtitle = [];
+            $.each(alltabs, function (i, n) {
+                allTabtitle.push($(n).panel('options').title);
+            })
+
+
+            switch (action) {
+                case "refresh":
+                    var iframe = $(currentTab.panel('options').content);
+                    var src = iframe.attr('src');
+                    $('#tabs').tabs('update', {
+                        tab: currentTab,
+                        options: {
+                            content: createFrame(src)
+                        }
+                    })
+                    break;
+                case "close":
+                    var currtab_title = currentTab.panel('options').title;
+                    $('#tabs').tabs('close', currtab_title);
+                    break;
+                case "closeall":
+                    $.each(allTabtitle, function (i, n) {
+                        if (n != onlyOpenTitle) {
+                            $('#tabs').tabs('close', n);
+                        }
+                    });
+                    break;
+                case "closeother":
+                    var currtab_title = currentTab.panel('options').title;
+                    $.each(allTabtitle, function (i, n) {
+                        if (n != currtab_title && n != onlyOpenTitle) {
+                            $('#tabs').tabs('close', n);
+                        }
+                    });
+                    break;
+                case "closeright":
+                    var tabIndex = $('#tabs').tabs('getTabIndex', currentTab);
+
+                    if (tabIndex == alltabs.length - 1) {
+                        alert('亲，后边没有啦 !!');
+                    return false;
+                }
+                $.each(allTabtitle, function (i, n) {
+                    if (i > tabIndex) {
+                        if (n != onlyOpenTitle) {
+                            $('#tabs').tabs('close', n);
+                        }
+                    }
+                });
+
+                break;
+            case "closeleft":
+                var tabIndex = $('#tabs').tabs('getTabIndex', currentTab);
+                if (tabIndex == 1) {
+                    alert('亲，前边那个上头有人，咱惹不起哦。 !!');
+                return false;
+            }
+            $.each(allTabtitle, function (i, n) {
+                if (i < tabIndex) {
+                    if (n != onlyOpenTitle) {
+                        $('#tabs').tabs('close', n);
+                    }
+                }
+            });
+
+            break;
+        case "exit":
+            $('#closeMenu').menu('hide');
+            break;
+    }
+}
+
+
+//弹出信息窗口 title:标题 msgString:提示信息 msgType:信息类型 [error,info,question,warning]
+function msgShow(title, msgString, msgType) {
+    $.messager.alert(title, msgString, msgType);
+}
+function changePwd()
+{
+    var dlg = $('#changePwdDlg');
+    dlg.dialog({
+        title: '修改密码',
+        cache: false,
+        modal: true
+    });
+    
+    dlg.dialog('open');
+    $('#oriPwd').focus();
+}
+
+function saveNewPwd()
+{
+    var oriPwd = $('#oriPwd').val().trim();
+    var newPwd = $('#newPwd').val().trim();
+    var crmNewPwd = $('#crmNewPwd').val().trim();
+    if (oriPwd == '')
+    {
+        $.messager.alert('提示','原始密码不能为空','info');
+        return;
+    }
+    if (newPwd == '') {
+        $.messager.alert('提示', '新密码不能为空', 'info');
+        return;
+    }
+    if (crmNewPwd != newPwd) {
+        $.messager.alert('提示', '两次新密码输入不一致，请重新输入', 'info');
+        return;
+    }
+    $.post("/User/ChangePassword?random=" + Math.random(), { oldPassword: oriPwd, newPassword: newPwd }, function (data) {
+        if (data == XDropsWaterSystem.executeResult.Success)
+        {
+            $.messager.alert('提示', '密码修改成功，请记住新密码', 'info');
+            $('#changePwdDlg').dialog('close');
+        }
+        else if (data == XDropsWaterSystem.executeResult.Exception) {
+            $.messager.alert('密码修改失败', '系统出现异常，请联系管理员', 'error');
+            return;
+        }
+        else if (data == XDropsWaterSystem.executeResult.Login)
+        {
+            $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                window.location.href = "../Login/Logout";
+            });
+        }
+        else {
+            $.messager.alert('密码修改失败', data, 'info');
+            return;
+        }
+    });
+}
+       
+    </script>
+}

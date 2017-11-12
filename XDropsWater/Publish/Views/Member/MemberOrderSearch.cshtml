@@ -1,0 +1,216 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@using PagedList;
+@using XDropsWater.Model;
+@using PagedList.Mvc;
+@using System.Collections.Generic;
+@model IPagedList<MemberModel>
+    <style type="text/css">
+        .clear:after {
+            display: block;
+            clear: both;
+            content: ".";
+            visibility: hidden;
+            height: 0;
+        }
+
+        .clear {
+            zoom: "1";
+        }
+    </style>
+    <link href="~/Content/bootstrap-datepicker.min.css" rel="stylesheet" />
+    @Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+    @Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+    @Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+    @Scripts.Render("~/Scripts/bootstrap-datepicker.min.js")
+    @Scripts.Render("~/Scripts/bootstrap-datepicker.zh-CN.min.js")
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                代理订单查询
+                <small>Version 1.0</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+                <li class="active">代理订单查询</li>
+            </ol>
+        </section>
+        <section class="content">
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <div class="form-group">
+                                @Html.TextBox("dateFrom", "", new { @class = "form-control datepicker", placeholder = "开始日期" })
+                            </div>
+                            <div class="form-group">
+                                @Html.TextBox("dateTo", "", new { @class = "form-control datepicker", placeholder = "结束日期" })
+                            </div>
+                            <div class="form-group">
+                                @Html.DropDownList("roleId", new SelectList(new List<SelectListItem>() {
+                               new SelectListItem(){Text="全部",Value="-1",Selected=true},
+                               new SelectListItem(){Text="一级代理",Value="2"},
+                               new SelectListItem(){Text="二级代理",Value="3"},
+                               new SelectListItem(){Text="县级代理",Value="4"},
+                               new SelectListItem(){Text="市代理",Value="5"},
+                               new SelectListItem(){Text="省代理",Value="6"},
+                               new SelectListItem(){Text="总代理",Value="7"},
+                               new SelectListItem(){Text="董事",Value="8"},
+                           }, "Value", "Text"),
+                            htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "placeholder","级别" },
+                                        })
+                            </div>
+                            <div class="form-group">
+                                @Html.TextBox("mobileOrName", "", new { @class = "form-control", placeholder = "电话号码或姓名" })
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-default" type="button" id="btnSearch">查询</button>
+                            </div>
+
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-6"></div>
+                                    <div class="col-sm-6"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 table-responsive" id="MemberOrderSearchList">
+                                        @Html.Partial("MemberOrderSearchList", Model)
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+    <script type="text/javascript">
+        // Adding popstate event listener to handle browser back button
+        window.addEventListener("popstate", function (e) {
+            $.ajax({
+                url: location.href,
+                success: function (result) {
+                    $('#MemberOrderSearchList').html(result);
+                }
+            });
+        });
+
+        function getUrlVars() {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for (var i = 0; i < hashes.length; i++) {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        }
+
+        function search() {
+
+
+            var dateFrom = $('#dateFrom').val();
+            if (dateFrom == '') {
+                dateFrom = null;
+            }
+
+            var dateTo = $('#dateTo').val();
+            if (dateTo == '') {
+                dateTo = null;
+            }
+
+            var param = {
+                mobileOrName: $('#mobileOrName').val(),
+                dateFrom: dateFrom,
+                dateTo: dateTo,
+                roleId: $('#roleId').val()
+            };
+            var url = "@Url.Action("MemberOrderSearch", "Member")";
+            showMsg('正在查询，请稍后...');
+            $.post(url, param, function (result) {
+                closeMsg();
+                $('#MemberOrderSearchList').html(result);
+            });
+        }
+
+        addLoadEvent(function () {
+
+
+            $("#btnSearch").click(function () {
+                search();
+            });
+
+            $("#SearchString").keypress(function (e) {
+                if (e.keyCode == 13) {
+                    search();
+                }
+            });
+
+            var getPage = function () {
+                var random = '&random=' + new Date().getTime();
+                var search = '';
+                var search1 = $('#mobileOrName').val();
+                var search2 = $('#roleId').val();
+
+                if (search1 != '')
+                    search = '&mobileOrName=' + search1;
+                if (search2 != '') {
+                    if (search != '')
+                        search = search + '&roleId=' + search2;
+                    else
+                        search = '&roleId=' + search2;
+                }
+
+                var dateFrom = $('#dateFrom').val();
+                if (dateFrom != '')
+                {
+                    search = search + '&dateFrom=' + dateFrom;
+                }
+
+                var dateTo = $('#dateTo').val();
+                if (dateTo != '')
+                {
+                    search = search + '&dateTo=' + dateTo;
+                }
+
+                search += random;
+                var url = $(this).attr('href') + search;
+                showMsg('正在翻页，请稍后...');
+                $.ajax({
+                    url: url,
+                    success: function (result) {
+                        closeMsg();
+                        $('#MemberOrderSearchList').html(result);
+                    }
+                });
+
+                return false;
+            };
+
+            $('body').on('click', '#MemberOrderSearchList .pagination a', getPage);
+
+            $(".datepicker").datepicker({
+                language: "zh-CN",
+                autoclose: true,//选中之后自动隐藏日期选择框
+                clearBtn: true,//清除按钮
+                todayBtn: true,//今日按钮
+                format: "yyyy-mm-dd"
+            });
+
+        });
+
+    </script>

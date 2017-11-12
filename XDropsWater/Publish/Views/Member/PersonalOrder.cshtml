@@ -1,0 +1,282 @@
+﻿@{
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@using PagedList;
+@using XDropsWater.Model;
+@using PagedList.Mvc;
+@using System.Collections.Generic;
+@model Tuple<IPagedList<MemberOrderModel>, AddPersonalOrderModel>
+
+<style type="text/css">
+    .clear:after {
+        display: block;
+        clear: both;
+        content: ".";
+        visibility: hidden;
+        height: 0;
+    }
+
+    .clear {
+        zoom: "1";
+    }
+</style>
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            我的订单
+            <small>Version 1.0</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index","Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+            <li class="active">我的订单</li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <!-- /.row -->
+        <div class="row">
+
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                @Html.DropDownList("dlSearch", new SelectList(new List<SelectListItem>() {
+                               new SelectListItem(){Text="全部",Value="-1",Selected=true},
+                               new SelectListItem(){Text="已发货",Value="1"},
+                               new SelectListItem(){Text="未发货",Value="0"},
+                           }, "Value", "Text"),
+                            htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "placeholder","是否发货" },
+                                        })
+                                @*<input id="txtSearch" type="text" class="form-control" placeholder="电话号码或姓名">*@
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" id="btnSearch">查询</button>
+                                </span>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#memManageModal" type="button" style="margin-left: 5px; border-radius: 2px; -moz-border-radius: 2px;">添加</button>
+                                </span>
+                            </div>
+
+                            <!-- /input-group -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-6"></div>
+                                    <div class="col-sm-6"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 table-responsive" id="PersonalOrderList">
+                                        @Html.Partial("PersonalOrderList", Model.Item1)
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="memManageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="memManageModalLabel">添加订单</h4>
+                    </div>
+                    <div class="modal-body">
+                        @using (Html.BeginForm("AddPersonalOrder", "Member", FormMethod.Post, new Dictionary<string, object> { { "id", "frmAdd" } }))
+                        {
+                            <div class="form-horizontal">
+                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                @Html.HiddenFor(model => model.Item2.ID)
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @Html.LabelFor(model => model.Item2.Quantity, htmlAttributes: new { @class = "control-label" })
+                                        @Html.TextBoxFor(model => model.Item2.Quantity,
+                                        htmlAttributes: new Dictionary<string, object>
+                                        {
+                                            { "class", "form-control" },
+                                            { "data-bv-message","订货数量必须是有效的数字" },
+                                            { "required data-bv-notempty-message", "订货数量必填" },
+                                            {"pattern","^[1-9]{1}[0-9]*$" },
+                                            {"data-bv-regexp-message","订货数量必须是有效的数字"}
+                                        })
+                                        @Html.ValidationMessageFor(model => model.Item2.Quantity, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group has-error">
+                                    <div class="col-sm-offset-1  col-sm-10">
+                                        <span class="help-block" id="errors"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" id="btnAdd" class="btn btn-primary" onclick="$('#frmAdd').submit()">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</div>
+
+<script type="text/javascript">
+    // Adding popstate event listener to handle browser back button
+    window.addEventListener("popstate", function (e) {
+        $.ajax({
+            url: location.href,
+            success: function (result) {
+                $('#ProductList').html(result);
+            }
+        });
+    });
+
+    function getUrlVars() {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+    function search() {
+        
+        var search = '';
+        var dlSearch = $('#dlSearch').val();
+        var param = null;
+        if (dlSearch != "-1") {
+            if (dlSearch == "1")
+            { 
+                param = true;
+                search = '?isDeliverly=true';
+            }
+            else if (dlSearch == "0")
+            { 
+                param = false;
+                search = '?isDeliverly=false';
+            }
+        }
+        var url = "@Url.Action("PersonalOrder","Member")";
+        showMsg('正在查询，请稍后...');
+        $.post(url, { isDeliverly: param }, function (result) {
+            closeMsg();
+            $('#PersonalOrderList').html(result);
+        });
+    }
+
+    $('#memManageModal').on('shown.bs.modal', function (event) {
+        $('#frmAdd').bootstrapValidator('resetForm', true);
+        $('#errors').html('');
+        if ($(event.relatedTarget).attr('data-item')) {
+            var item = $(event.relatedTarget).attr('data-item');
+            var model = $.parseJSON(item);
+            $('#Item2_ID').val(model.ID);
+            $('#Item2_Quantity').val(model.Quantity);
+
+            $('#memManageModalLabel').html("修改订单");
+        }
+        else {
+            $('#Item2_Quantity').val('');
+            $('#memManageModalLabel').html("添加订单");
+        }
+
+    });
+
+    addLoadEvent(function () {
+
+
+        $("#btnSearch").click(function () {
+            search();
+        });
+
+        var getPage = function ()
+        {
+            var random = '&random=' + new Date().getTime();
+            var search = '';
+            var dlSearch = $('#dlSearch').val();
+
+            if (dlSearch == '1') {
+                search = "&isDeliverly=true";
+            }
+            else if (dlSearch == '0') {
+                search = "&isDeliverly=false";
+            }
+            search += random;
+            var url = $(this).attr('href') + search;
+            showMsg('正在翻页，请稍后...');
+            $.ajax({
+                url: url,
+                success: function (result) {
+                    closeMsg();
+                    $('#PersonalOrderList').html(result);
+                }
+            });
+        }
+
+        
+        $('body').on('click', '#PersonalOrderList .pagination a', getPage);
+
+        $('#frmAdd').bootstrapValidator().on('success.form.bv', function (e) {
+            // Prevent form submission
+            e.preventDefault();
+            $("#btnAdd").attr("disabled", "disabled");
+            $form = $('#frmAdd');
+            //string mobile, string memberName, string parentMobile, string roleID, string address
+            // Use Ajax to submit form data
+            var oParam = {
+                ID: $('#Item2_ID').val(),
+                Quantity: $('#Item2_Quantity').val(),
+
+            };
+            if ($('#memManageModalLabel').html() == "添加订单") {
+                showMsg('正在执行，请稍后...');
+                $.post($form.attr('action'), oParam, function (result) {
+                    closeMsg();
+                    setTimeout(function () { location.href = location.href; }, 1000);
+                }).fail(function (xhr, status, error) {
+                    closeMsg();
+                    $('#errors').html(xhr.responseJSON.message).removeClass('hide');
+                    $("#btnAdd").removeAttr('disabled');
+                });
+            }
+            else if ($('#memManageModalLabel').html() == "修改订单") {
+                showMsg('正在执行，请稍后...');
+                $.post('@Url.Action("UpdatePersonalOrder", "Member")', oParam, function (result) {
+                    closeMsg();
+                    setTimeout(function () { window.location.reload(); }, 1000);
+                }).fail(function (xhr, status, error) {
+                    closeMsg();
+                    $('#errors').html(xhr.responseJSON.message).removeClass('hide');
+                    $("#btnAdd").removeAttr('disabled');
+                });
+            }
+        });;
+
+    });
+
+
+</script>

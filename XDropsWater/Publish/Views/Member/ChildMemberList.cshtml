@@ -1,0 +1,88 @@
+﻿@using PagedList;
+@using PagedList;
+@using XDropsWater.Model;
+@using PagedList.Mvc;
+@using System.Web.Mvc;
+@using System.Web.Handlers;
+@model IPagedList<MemberModel>
+
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>手机号码</th>
+            <th>姓名</th>
+            <th>身份证号码</th>
+            <th>级别</th>
+            <th>注册时间</th>
+            <th>住址</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Mobile</td>
+                <td>@item.MemberName</td>
+                <td>@item.IdentityNo</td>
+                <td>@item.MemberRoleName</td>
+                <td>@item.CreateOn</td>
+                <td>@item.Address</td>
+                <td>
+                    <!--<button class="btn btn-primary" data-item="@Json.Encode(item)" data-toggle="modal" data-target="#modalChildMember">修改</button>-->
+                    <button class="btn btn-primary" onclick="deleteUser('@item.ID','@Html.Encode(item.MemberName)')">删除</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="page" style="margin-left: 10px">
+    第 @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) 页
+    共 @Model.PageCount 页
+
+    @Html.PagedListPager(Model, page => Url.Action("DirectChildMember", new { page }), new PagedListRenderOptions { LinkToFirstPageFormat = "第一页", LinkToPreviousPageFormat = "上一页", LinkToNextPageFormat = "下一页", LinkToLastPageFormat = "最后一页", MaximumPageNumbersToDisplay = 7 })
+</div>
+@Scripts.Render("~/Content/AdminLTE-2.3.6/bootstrap/js/bootbox.min.js")
+<script>
+
+    bootbox.addLocale("cn", {
+        OK: "确 定",
+        CANCEL: "取 消",
+        CONFIRM: '确 定'
+    });
+    bootbox.setLocale("cn");
+
+   
+    function deleteUser(id, username) {
+        var box = bootbox.confirm({
+            size: 'small',
+            onEscape: function () { },
+            closeButton: true,
+            message: '确定要删除[' + username + ']吗？删除之后，数据将不可恢复。',
+            callback: function (result) {
+                if (result) {
+                    $.post("@Url.Action("RemoveMember", "Member")",
+                        { id: id },
+                        function (data) {
+                            setTimeout(function () {
+                                bootbox.hideAll();
+                                bootbox.alert({
+                                    message: "删除成功！", size: 'small', callback: function () {
+                                        setTimeout(function () { location.reload(); }, 1000);
+                                    }
+                                });
+                            }, 2000);
+                        }).fail(function (xhr, statusText, errorThrown) {
+                            bootbox.alert({ message: xhr.responseJSON.message, size: 'small' });
+                        });
+                }
+                else {
+                    return;
+                }
+            }
+
+        });
+    }
+</script>

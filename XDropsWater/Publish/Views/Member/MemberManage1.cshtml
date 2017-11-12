@@ -1,0 +1,328 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper" id="app">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            代理管理
+            <small>Version 1.0</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+            <li class="active">代理管理</li>
+        </ol>
+    </section>
+    <section class="content">
+        <!-- /.row -->
+        <div class="row" id="members">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <input v-model="search.mobileOrName" id="txtSearch" type="text" class="form-control" placeholder="电话号码或姓名">
+                                <span class="input-group-btn">
+                                    <xdropswater-search-button></xdropswater-search-button>
+                                    @*<button v-on:click="getPages(1)" class="btn btn-default" type="button" id="btnSearch">查询</button>*@
+                                </span>
+                                @*@{
+                                        UserSummary user = Session["CurUser"] as UserSummary;
+                                        if (user.UserRoleID == (int)enmRoles.All)
+                                        {
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-primary" data-toggle="modal" data-target="#memManageModal" type="button" style="margin-left: 5px; border-radius: 2px; -moz-border-radius: 2px;">添加</button>
+                                            </span>
+                                        }
+                                    }*@
+                                <span class="input-group-btn" v-show="permission.add">
+                                    <xdropswater-add-button></xdropswater-add-button>
+                                </span>
+                            </div>
+                            <!-- /input-group -->
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <xdropswater-nodata v-show="!error.show" v-bind:total-count="totalCount"></xdropswater-nodata>
+                            <xdropswater-error v-bind:error="error"></xdropswater-error>
+                            
+                            <div class="row" v-show="totalCount>0">
+                                <div class="col-sm-12 table-responsive">
+                                    <table class="table table-striped table-hover table-xdropswater" id="members">
+                                        <thead>
+                                            <tr>
+                                                <th>手机号码</th>
+                                                <th>姓名</th>
+                                                <th>身份证号码</th>
+                                                <th>级别</th>
+                                                <th>角色金额</th>
+                                                <th>总金额</th>
+                                                <th>省代</th>
+                                                <th>总代</th>
+                                                <th>上级手机号码</th>
+                                                <th>上级姓名</th>
+                                                <th>注册时间</th>
+                                                <th>住址</th>
+                                                <th v-show="permission.operate">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody">
+                                            <tr v-for="(item, index) in members">
+                                                <td>{{item.Mobile}}</td>
+                                                <td>{{item.MemberName}}</td>
+                                                <td>{{item.IdentityNo}}</td>
+                                                <td>{{item.Role.RoleName}}</td>
+                                                <td>{{item.CurrentRoleAmount}}</td>
+                                                <td>{{item.TotalAmount}}</td>
+                                                <td v-show="item.ProvinceAvailable>0"><span class="glyphicon glyphicon-ok"></span></td>
+                                                <td v-show="item.ProvinceAvailable<=0"><span class="glyphicon glyphicon-remove"></span></td>
+                                                <td v-show="item.GeneralAvailable>0"><span class="glyphicon glyphicon-ok"></span></td>
+                                                <td v-show="item.GeneralAvailable<=0"><span class="glyphicon glyphicon-remove"></span></td>
+                                                <td>
+                                                    <span v-if="item.ParentMember">{{item.ParentMember.Mobile}}</span>
+                                                </td>
+                                                <td><span v-if="item.ParentMember">{{item.ParentMember.MemberName}}</span></td>
+                                                <td>{{item.CreateOn | formatDate}}</td>
+                                                <td>{{item.Address}}</td>
+                                                <td v-show="permission.operate">
+                                                    <button class="btn btn-success" v-bind:data-item="item" v-on:click="reset(index, item)">
+                                                        <i class="glyphicon glyphicon-edit"></i> 修改
+                                                    </button>
+                                                    <button class="btn btn-danger" v-on:click="deleteMember(index, item)">
+                                                        <i class="glyphicon glyphicon-remove"></i> 删除
+                                                    </button>
+                                                    <button class="btn btn-warning" v-on:click="resetPwd(item)">
+                                                        <i class="glyphicon glyphicon-pencil"></i> 重置密码
+                                                    </button>
+                                                    <button class="btn btn-warning" v-on:click="stock(item)">
+                                                        <i class="glyphicon glyphicon-pencil"></i> 库存
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <xdropswater-pagination v-bind:row-from="rowFrom"
+                                                            v-bind:row-to="rowTo"
+                                                            v-bind:total-count="totalCount"
+                                                            v-bind:current-page="currentPage"
+                                                            v-bind:total-pages="totalPages"
+                                                            v-bind:display-pages="displayPages">
+                                    </xdropswater-pagination>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="memManageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-bg-xdropswater">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="memManageModalLabel">{{addModel.OperationTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/Member/AddMember" id="frmAdd" method="post" v-on:submit="onSubmit">
+                            <div class="form-horizontal">
+
+                                <input v-model="addModel.ID" data-val="true" data-val-required="The ID field is required." id="Item2_ID" name="Item2.ID" type="hidden" />
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="Mobile">手机号码</label>
+                                        <input name="Mobile" v-model="addModel.Mobile" class="form-control" type="text" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="MemberName">姓名</label>
+                                        <input name="MemberName" v-model="addModel.MemberName" class="form-control" type="text" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="IdentityNo">身份证号码</label>
+                                        <input name="IdentityNo" v-model="addModel.IdentityNo" class="form-control" type="text" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="RoleID">级别</label>
+                                        <select name="RoleID" v-model="addModel.RoleID" class="form-control">
+                                            <option value=""></option>
+                                            <option value="1">顾客</option>
+                                            <option value="2">一级代理</option>
+                                            <option value="3">二级代理</option>
+                                            <option value="4">县级代理</option>
+                                            <option value="5">市代理</option>
+                                            <option value="6">省代理</option>
+                                            <option value="7">总代理</option>
+                                            <option value="8">董事</option>
+                                        </select>
+                                        <span class="field-validation-valid text-danger" data-valmsg-for="Item2.RoleList" data-valmsg-replace="true"></span>
+                                    </div>
+                                </div>
+
+                               
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="CurrentRoleAmount">角色金额</label>
+                                        <input name="CurrentRoleAmount" v-model="addModel.CurrentRoleAmount" class="form-control" type="text" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="TotalAmount">总金额</label>
+                                        <input name="TotalAmount" v-model="addModel.TotalAmount" class="form-control" type="text" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="Address">地址</label>
+                                        <textarea name="Address" v-model="addModel.Address" class="form-control" cols="20" rows="2"></textarea>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="ProvinceAvailable">是否有效省代</label>
+                                        <select name="ProvinceAvailable" v-model="addModel.ProvinceAvailable" class="form-control">
+                                            <option value=""></option>
+                                            <option value="0">无效</option>
+                                            <option value="1">有效</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="GeneralAvailable">是否有效总代</label>
+                                        <select name="GeneralAvailable" v-model="addModel.GeneralAvailable" class="form-control">
+                                            <option value=""></option>
+                                            <option value="0">无效</option>
+                                            <option value="1">有效</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="ParentMobile">上级手机号码</label>
+                                        <input name="ParentMobile" v-model="addModel.ParentMember.Mobile" class="form-control" v-on:keyup="getParentName(addModel.ParentMember.Mobile)" type="text" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="ParentMemberName">上级姓名</label>
+                                        <input name="ParentMemberName" v-model="addModel.ParentMember.MemberName" class="form-control" disabled="disabled" type="text" />
+                                    </div>
+                                </div>
+
+                                <xdropswater-error v-bind:error="error"></xdropswater-error>
+
+                                @*<div class="form-group has-error" v-show="error.show">
+                                    <div class="col-sm-offset-1  col-sm-10">
+                                        <span class="help-block">{{error.message}}</span>
+                                    </div>
+                                </div>*@
+
+                                <xdropswater-modal-footer></xdropswater-modal-footer>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="stock" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-bg-xdropswater">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="identityCodeModalLabel">{{title}}</h4>
+
+                    </div>
+                    <div class="modal-body modal-body-bg-xdropswater">
+
+
+                        <form id="stockForm">
+                            <div class="form-horizontal">
+                               
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <xdropswater-error v-bind:error="error"></xdropswater-error>
+                                        <div class="row" v-show="totalCount>0">
+                                            <div class="col-sm-12 table-responsive">
+                                                <table class="table table-striped table-hover table-xdropswater">
+                                                    <thead class="bg-aqua">
+                                                        <tr>
+                                                            <th>产品编号</th>
+                                                            <th>产品名称</th>
+                                                            <th>库存数量</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tableBody">
+                                                        <tr v-for="(item, index) in items">
+                                                            <td>{{item.Product.ID}}</td>
+                                                            <td>{{item.Product.Name}}</td>
+                                                            <td>{{item.Quantity}}</td>
+                                                            
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <xdropswater-pagination v-bind:row-from="rowFrom"
+                                                                        v-bind:row-to="rowTo"
+                                                                        v-bind:total-count="totalCount"
+                                                                        v-bind:current-page="currentPage"
+                                                                        v-bind:total-pages="totalPages"
+                                                                        v-bind:display-pages="displayPages">
+                                                </xdropswater-pagination>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group modal-footer modal-footer-bg-xdropswater">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> 关闭</button>
+                                </div>
+                            </div>
+                        </form>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+</div>
+<script src="~/Scripts/App/Member/memberManage1.js"></script>

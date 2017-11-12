@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using XDropsWater.Bll;
 using XDropsWater.Model;
 using XDropsWater.Bll.Interface;
-using Newtonsoft.Json;
 using System.IO;
 
 namespace XDropsWater.Web.Controllers

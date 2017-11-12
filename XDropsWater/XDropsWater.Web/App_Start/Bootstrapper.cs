@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
+using System.IO;
 
 namespace XDropsWater.Web
 {
@@ -39,7 +39,7 @@ namespace XDropsWater.Web
                 new Interceptor<InterfaceInterceptor>(),
                 new InterceptionBehavior<LoggingInterceptionBehavior>()
                 );
-            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
+
 
             return container;
         }

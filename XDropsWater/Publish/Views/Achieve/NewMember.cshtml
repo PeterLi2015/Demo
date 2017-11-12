@@ -1,0 +1,256 @@
+﻿<script>
+    $(function () {
+        $('#newMemberAchieveGrid').datagrid({
+            columns: [[
+                { field: 'ID', title: 'ID', hidden: true, width: 80 },
+        { field: 'MemberIdentityCardNo', title: '身份证号码', width: 200 },
+        { field: 'MemberName', title: '姓名', width: 100 },
+        { field: 'Amount', title: '业绩金额', width: 100 },
+            {
+                field: 'opt', title: '操作', width: 100, align: 'center',
+                formatter: function (value, rec) {
+                    var btn = '<a class="editcls" onclick="newMember_RemoveRow(\'' + rec.ID + '\',\'' + rec.MemberIdentityCardNo + '\',\'' + rec.MemberName + '\',\'' + rec.Amount + '\')" href="javascript:void(0)">删除</a>';
+                    return btn;
+                }
+            }
+            ]],
+            onLoadSuccess: function (data) {
+                $('.editcls').linkbutton({ text: '删除', iconCls: 'icon-remove' });
+            }
+        });
+        newMember_FindData();
+    });
+
+    function newMember_RemoveRow(id, cardNo, memberName, amount) {
+        $.messager.confirm('删除确认', '您确定要删除【' + cardNo + '】，' + '【' + memberName + '】，' + '【' + amount + '】吗？', function (r) {
+            if (r) {
+                $.post("/Achieve/Delete?random=" +
+            Math.random(), { id: id }, function (data) {
+                if (data == XDropsWaterSystem.executeResult.Success) {
+                    $.messager.alert('删除成功', '删除成功！', 'info');
+                    newMember_FindData();
+                }
+                else if (data == XDropsWaterSystem.executeResult.Exception) {
+                    $.messager.alert('删除失败', '系统出现异常，请联系管理员', 'error');
+                }
+                else if (data == XDropsWaterSystem.executeResult.Login) {
+                    $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                        window.location.href = "../Login/Logout";
+                    });
+                }
+                else {
+                    $.messager.alert('删除失败', data, 'error');
+                }
+            });
+            }
+
+        });
+    }
+
+    //查找数据，填充grid
+    function newMember_FindData() {
+
+        //check session expire
+        $.post("/Common/SessionExpire?random=" + Math.random(), {}, function (data) {
+            if (data == XDropsWaterSystem.executeResult.Success)
+            {
+                $('#newMemberAchieveGrid').datagrid('loadData', { total: 0, rows: [] });
+
+                $('#newMemberAchieveGrid').datagrid({
+                    url: '/Achieve/Get?&random=' +
+                    Math.random(),
+                    queryParams: { cardNo: $('#newMember_TextSearchCardNo').val(), type: 1 }//type 1新代理入单2老代理补单3老代理消费
+                    ,
+                    onLoadSuccess: function (data) {
+                        $('.editcls').linkbutton({ text: '删除', iconCls: 'icon-remove' });
+                    }
+                });
+
+                $.post('/Achieve/SumAchieve?random=' + Math.random(), { cardNo: $('#newMember_TextSearchCardNo').val(), type: 1 }, function (data) {
+                    if (data == XDropsWaterSystem.executeResult.Login) {
+                        window.location.href = "../Login/Logout";
+                    }
+                    else if (data == XDropsWaterSystem.executeResult.Exception) {
+                        $.messager.alert('获取业绩总额失败', '系统出现异常，请联系管理员', 'error');
+                    }
+                    else {
+                        $('#newMember_TextSumAchieve').html(data);
+                    }
+                });
+            }
+            else if (data == XDropsWaterSystem.executeResult.Login)
+            {
+                $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                    window.location.href = "../Login/Logout";
+                });
+            }
+        });
+        
+    }
+
+    //弹出添加业绩窗口
+    function newMember_AddAchieve() {
+        var dlg = $('#newMemberAchieveDialog');
+        dlg.dialog({ title: '新代理入单', modal: true, cache: false });
+        $('#newMember_TextIDCard').val('');
+        $('#newMember_TextIDCard').focus();
+        var vName = '';
+        $('#newMember_TextMemberName').val(vName);
+
+        dlg.dialog('open');
+        $('#newMember_TextIDCard').focus();
+    }
+
+    //保存业绩
+    function newMember_SaveAchieve() {
+
+        var cardNo = $('#newMember_TextIDCard').val().trim();
+        var memberName = $('#newMember_TextMemberName').val().trim();
+        var achieve = $('#newMember_SelectAchieve').val();
+        var score = 0;
+        if (achieve == 2800) score = 1;
+        else if (achieve == 16800) score = 6;
+        else if (achieve == 28000) score = 10;
+        if (cardNo == '') {
+            $.messager.alert('提示', '身份证号码不能为空', 'info');
+            return;
+        }
+        if (memberName == '') {
+            $.messager.alert('提示', '姓名不能为空', 'info');
+            return;
+        }
+
+        $.messager.confirm('请再确认一下身份证号码和姓名', '<span style="font-size:large">【' + cardNo.substr(0, 6) + '&nbsp;&nbsp;'
+            + cardNo.substr(6, 4) + '&nbsp;&nbsp;' + cardNo.substr(10, 4) + '&nbsp;&nbsp;' + cardNo.substr(14, 10) + '】</span>，<span style="font-size:large">【' + memberName + '】</span>', function (r) {
+                if (r) {
+                    $.post("/Achieve/NewMemberAchieveAdd?random=" + Math.random(), { cardNo: cardNo, memberName: memberName, achieve: $('#newMember_SelectAchieve').val(), score: score },
+                function (data) {
+                    if (data == XDropsWaterSystem.executeResult.Success) {
+                        $.messager.alert('保存成功', '保存成功', 'info', function () {
+                            $('#newMemberAchieveDialog').dialog('close');
+
+                            $('#newMember_TextIDCard').val('');
+                            $('#newMember_TextIDCard').focus();
+                            var vName = '';
+                            $('#newMember_TextMemberName').val(vName);
+                            newMember_AddAchieve();
+                            newMember_FindData();
+                        });
+                    }
+                    else if (data == XDropsWaterSystem.executeResult.Exception) {
+                        $.messager.alert('保存失败', '系统出现异常，请联系管理员', 'info');
+                    }
+                    else if (data == XDropsWaterSystem.executeResult.Login) {
+                        $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                            window.location.href = "../Login/Logout";
+                        });
+                    }
+                    else {
+                        $.messager.alert('保存失败', data, 'error');
+                    }
+                });
+                }
+            });
+    }
+
+    function newMember_DoSubmit() {
+        $.messager.confirm('提交确认', '提交之后不能更改，您确定要提交吗？', function (r) {
+            if (r) {
+                $.post("/Achieve/Submit?random=" + Math.random(), { type: 1 }, function (data) {
+                    if (data == XDropsWaterSystem.executeResult.Success) {
+                        $.messager.alert('提交成功', '提交成功！', 'info');
+                        oldMember_FindData();
+                    }
+                    else if (data == XDropsWaterSystem.executeResult.Exception) {
+                        $.messager.alert('提交失败', '系统出现异常，请联系管理员', 'error');
+                    }
+                    else if (data == XDropsWaterSystem.executeResult.Login) {
+                        $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                            window.location.href = "../Login/Logout";
+                        });
+                    }
+                    else {
+                        $.messager.alert('提交失败', data, 'error');
+                    }
+                });
+
+            }
+        });
+    }
+
+    function newMember_CountChar(textareaID, spanID, maxNum) {
+        //得到输入的字符的长度
+        var NowNum = document.getElementById(textareaID).value.length;
+        //判断输入的长度是否超过规定的长度
+        if (NowNum > maxNum) {
+            //如果超过就截取规定长度的内容
+            document.getElementById(textareaID).value = document.getElementById(textareaID).value.substring(0, maxNum);
+        }
+        else {
+            //得到当前的输入长度并且显示在页面上
+            document.getElementById(spanID).innerHTML = NowNum;
+        }
+    }
+
+</script>
+<div id="newMemberAchieveSearchTool">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    身份证号码：<input type="text" id="newMember_TextSearchCardNo" style="width:200px" onkeydown="if (event.keyCode == 13) { newMember_FindData(); }" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="javascript:void(0)" onclick="newMember_FindData()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="javascript:void(0)" onclick="newMember_AddAchieve()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    @*<a href="javascript:void(0)" onclick="RemoveAch()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a>*@
+    <a href="javascript:void(0)" onclick="newMember_DoSubmit()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">提交</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    业绩合计：<span id="newMember_TextSumAchieve"></span>
+</div>
+<table id="newMemberAchieveGrid" title="" toolbar="#newMemberAchieveSearchTool"
+       data-options="rownumbers:true,singleSelect:true,method:'get',
+        loadMsg:'正在查询，请稍候……'"></table>
+<div id="newMemberAchieveDialog" class="easyui-dialog" style="width: 500px; height: 250px" closed="true">
+    <form id="newMemberAchieveForm" method="post">
+        <table>
+            <tr>
+                <td>
+                    <input type="text" id="achID" name="id" style="display: none" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right"><span style="font-size:large">身份证号码：</span></td>
+                <td>
+                    <input id="newMember_TextIDCard" style="width: 250px; height:30px; font-size:large" type="text"
+                           onkeydown="newMember_CountChar('newMember_TextIDCard', 'newMember_IDCardLength', 500);" onkeyup="    newMember_CountChar('newMember_TextIDCard', 'newMember_IDCardLength', 500);" />
+                    <span style="font-size:large; color:red" id="newMember_IDCardLength">0</span><span style="font-size: large; color:red">位</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right"><span style="font-size:large">姓名：</span></td>
+                <td>
+                    <input id="newMember_TextMemberName" style="height:30px; font-size:large" type="text" />
+
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right"><span style="font-size:large">业绩金额：</span></td>
+                <td>
+                    <select id="newMember_SelectAchieve" style="height:30px; font-size:large">
+                        <option value="2800" selected="selected">2800</option>
+                        <option value="16800">16800</option>
+                        <option value="28000">28000</option>
+                    </select>
+                    <span style="font-size:large">元</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: right; padding-top: 10px">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnSave" iconcls="icon-ok" onclick="newMember_SaveAchieve()">确定</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#newMemberAchieveDialog').dialog('close')">关闭</a>
+                </td>
+            </tr>
+        </table>
+
+    </form>
+</div>
+

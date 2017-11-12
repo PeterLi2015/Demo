@@ -1,0 +1,176 @@
+﻿<script>
+    $(function () {
+        $('#updateMemberStore_Store').combogrid({
+            panelWidth: 450,
+            idField: 'StoreManagerName',
+            textField: 'StoreManagerName',
+            pagination: true,
+            pageSize: 10,
+            url: '/User/GetStoreForUpdateMember?random=' +
+            Math.random(),
+            queryParams: { account: $('#updateMemberStore_Store').val() },
+            columns: [[
+            { field: 'ID', title: 'ID', hidden: true },
+            { field: 'Account', title: '账号', width: 100 },
+            { field: 'Name', title: '店长姓名', width: 120 },
+            { field: 'StoreManagerName', title: '店长姓名和账号', width: 120 }
+            
+            ]]
+            ,
+            onSelect: function (index,record) {
+
+                $('#updateMemberStore_Account').val('');
+                $('#updateMemberStore_Account').val(record.Account);
+                $('#updateMemberStore_StoreManagerName').val('');
+                $('#updateMemberStore_StoreManagerName').val(record.Name);
+            }
+        });
+
+        $('#updateMemberStore_GridMember').datagrid({
+            url: '/Member/GetMemberForUpdateStore?random=' +
+            Math.random(),
+            queryParams: { cardNo: $('#updateMemberStore_TextCardNoSearch').val(), name: $('#updateMemberStore_TextMemberNameSearch').val() },
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30, 40],
+            columns: [[
+                { field: 'ID', title: 'ID', hidden: true },
+        { field: 'IdentityCardNo', title: '身份证号码', width: 150 },
+        { field: 'MemberName', title: '姓名', width: 80 },
+        { field: 'Account', title: '专卖店账号', hidden: true },
+        { field: 'StoreManagerName', title: '店长姓名', hidden: true },
+        { field: 'StoreName', title: '专卖店', width: 100 }
+            ]],
+
+            onDblClickRow: function (rowIndex, rowData) {
+                updateMemberStore_ShowEditDialog(rowData.ID, rowData.IdentityCardNo, rowData.MemberName, rowData.Account, rowData.StoreName, rowIndex);
+            }
+        });
+        //updateMemberStore_FindMember();
+    });
+    function updateMemberStore_ShowEditDialog(ID, IdentityCardNo, MemberName, Account, StoreName, rowIndex) {
+        $('#updateMemberStore_TextIndex').val('');
+        $('#updateMemberStore_TextIndex').val(rowIndex);
+        $('#updateMemberStore_TextID').val('');
+        $('#updateMemberStore_TextID').val(ID);
+        $('#updateMemberStore_TextCardNo').val(IdentityCardNo);
+        $('#updateMemberStore_TextMemberName').val(MemberName);
+        if (Account != '') {
+            $('#updateMemberStore_Store').combogrid({ value: StoreName });
+        }
+        $('#updateMemberStore_Account').val('');
+        $('#updateMemberStore_StoreManagerName').val('');
+        //$('#updateMemberStore_StoreManagerName').val(StoreManagerName);
+
+        var dlg = $('#updateMemberStore_MemberDialog');
+        dlg.dialog({ title: '修改代理专卖店', modal: true, cache: false });
+        dlg.dialog('open');
+
+    }
+    function updateMemberStore_FindMember() {
+        //check session expire
+        $.post("/Common/SessionExpire?random=" + Math.random(), {}, function (data) {
+            if (data == XDropsWaterSystem.executeResult.Success) {
+                $('#updateMemberStore_GridMember').datagrid({
+                    url: '/Member/GetMemberForUpdateStore?random=' +
+                    Math.random(),
+                    queryParams: { cardNo: $('#updateMemberStore_TextCardNoSearch').val(), name: $('#updateMemberStore_TextMemberNameSearch').val() },
+                    pagination: true,
+                    pageSize: 10,
+                    pageList: [10, 20, 30, 40]
+                });
+            }
+            else if (data == XDropsWaterSystem.executeResult.Login) {
+                $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                    window.location.href = "../Login/Logout";
+                });
+            }
+        });
+    }
+    function updateMemberStore_SaveMember() {
+        
+        if ($('#updateMemberStore_Account').val() == '') {
+            $.messager.alert('提示', '请选择专卖店', 'info', function () {
+                $('#updateMemberStore_Store').focus();
+            });
+            return;
+        }
+
+        $.post('/Member/UpdateStore?random=' +
+            Math.random(), { cardNo: $('#updateMemberStore_TextCardNo').val(), account: $('#updateMemberStore_Account').val() }, function (data) {
+                if (data == XDropsWaterSystem.executeResult.Success) {
+                    $.messager.alert('保存成功', '保存成功', 'info', function () {
+                        $('#updateMemberStore_GridMember').datagrid('updateRow', {
+                            index: $('#updateMemberStore_TextIndex').val(),
+                            row: {
+                                Account: $('#updateMemberStore_Account').val(),
+                                StoreName: $('#updateMemberStore_Account').val() + $('#updateMemberStore_StoreManagerName').val()
+                            }
+                        });
+                        $('#updateMemberStore_MemberDialog').dialog('close');
+                    });
+                }
+                else if (data == XDropsWaterSystem.executeResult.Exception) {
+                    $.messager.alert('保存失败', '操作异常，请联系管理员', 'error');
+                    return;
+                }
+                else if (data == XDropsWaterSystem.executeResult.Login) {
+                    $.messager.alert('重新登录', '由于您长时间未操作，系统需要重新登录', 'info', function () {
+                        window.location.href = "../Login/Logout";
+                    });
+                }
+                else {
+                    $.messager.alert('保存失败', data, 'error');
+                    return;
+                }
+            });
+    }
+</script>
+<table id="updateMemberStore_GridMember" class="easyui-datagrid" title="" toolbar="#updateMemberStore_GridMemberTool"
+    data-options="rownumbers:true,singleSelect:true,method:'get',
+        loadMsg:'正在查询，请稍候……'">
+</table>
+<div id="updateMemberStore_GridMemberTool">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    身份证号码：<input type="text" id="updateMemberStore_TextCardNoSearch" style="width: 200px" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    姓名：<input type="text" id="updateMemberStore_TextMemberNameSearch" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="javascript:void(0)" onclick="updateMemberStore_FindMember()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+</div>
+
+<div id="updateMemberStore_MemberDialog" class="easyui-dialog" style="width: 500px; height: 200px" closed="true">
+    <form id="updateMemberStore_MemberDialogForm">
+        <table>
+            <tr>
+                <td style="text-align: right"><span style="font-size: large">身份证号码：</span></td>
+                <td>
+                    <input id="updateMemberStore_TextCardNo" style="width: 250px; height: 30px; font-size: large;" disabled="disabled" />
+                    <input id="updateMemberStore_TextID" style="display: none" />
+                    <input id="updateMemberStore_TextIndex" style="display: none" />
+                    <input id="updateMemberStore_StoreManagerName" style="display: none" />
+                    <input id="updateMemberStore_Account" style="display: none" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right"><span style="font-size: large">姓名：</span></td>
+                <td>
+                    <input type="text" style="height: 30px; font-size: large" id="updateMemberStore_TextMemberName" disabled="disabled" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right"><span style="font-size: large">专卖店：</span></td>
+                <td>
+                    <select id="updateMemberStore_Store" style="width: 250px; height: 30px; font-size: large;"></select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: right; padding-top: 10px">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="updateMemberStore_ButtonMemberSave" iconcls="icon-ok" onclick="updateMemberStore_SaveMember()">确定</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#updateMemberStore_MemberDialog').dialog('close')">关闭</a>
+                </td>
+            </tr>
+        </table>
+
+    </form>
+</div>

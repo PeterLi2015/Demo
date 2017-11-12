@@ -74,4 +74,7 @@ Global
 		{A70DBB8B-51CC-4BDE-AB84-7729BDDB548C} = {02344ACB-4467-4DD6-9E24-0BD65043155B}
 		{67982515-08B5-4188-8B94-517EAD076AE8} = {40596A03-8143-4D80-AC50-6372DDF00AC3}
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35;packages\Unity.Interception.2.1.505.0\lib\NET35
+	EndGlobalSection
 EndGlobal
