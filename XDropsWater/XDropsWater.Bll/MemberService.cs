@@ -4580,6 +4580,14 @@ namespace XDropsWater.Bll
 
             bool HasIdentityCode = false;
 
+            var proDb = new Repository<ProductEntity>(uow);
+
+            //需要登记唯一识别码
+            if (proDb.FindBy(o => o.ID == model.ProductID).Any(o => o.HasIdentityCode == true))
+            {
+                HasIdentityCode = true;
+            }
+
             if (model.ID != Guid.Empty)
             {
 
@@ -4589,6 +4597,15 @@ namespace XDropsWater.Bll
                 entity.Quantity = model.Quantity;
                 entity.UpdateBy = currentUserID;
                 entity.UpdateOn = now;
+                //是否需要登记唯一识别码
+                if (HasIdentityCode)
+                {
+                    entity.Status = (int)OrderDetailsStatus.CodeNotFull;
+                }
+                else
+                {
+                    entity.Status = (int)OrderDetailsStatus.NoCode;
+                }
                 db.Update(entity);
 
             }
@@ -4614,17 +4631,18 @@ namespace XDropsWater.Bll
                     entity.ProductID = model.ProductID;
                     entity.Quantity = model.Quantity;
                     entity.OrderID = model.OrderID;
+                    //是否需要登记唯一识别码
+                    if (HasIdentityCode)
+                    {
+                        entity.Status = (int)OrderDetailsStatus.CodeNotFull;
+                    }
+                    else
+                    {
+                        entity.Status = (int)OrderDetailsStatus.NoCode;
+                    }
                     db.Add(entity);
 
-                    var proDb = new Repository<ProductEntity>(uow);
-
-                    //需要登记唯一识别码
-                    if (proDb.FindBy(o => o.ID == model.ProductID).Any(o => o.HasIdentityCode == true))
-                    {
-                        HasIdentityCode = true;
-                    }
-
-
+                    
                 }
 
             }

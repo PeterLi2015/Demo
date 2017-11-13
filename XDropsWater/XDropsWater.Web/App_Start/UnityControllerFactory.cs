@@ -19,6 +19,10 @@ namespace XDropsWater.Web
         protected override IController GetControllerInstance(RequestContext reqContext,
             Type controllerType)
         {
+            if (controllerType == null)
+            {
+                return null;
+            }
             return container.Resolve(controllerType) as IController;
 
         }
