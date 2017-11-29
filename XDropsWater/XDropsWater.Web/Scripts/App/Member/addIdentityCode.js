@@ -28,6 +28,7 @@ var orderDetailsRows = new Vue({
         },
         redirect: function (item) {
             sessionStorage.OrderDetailsID = item.ID;
+            sessionStorage.ProductID = item.ProductID;
             window.location = '/Member/NewIdentityCode';
         },
         backToOrder: function () {

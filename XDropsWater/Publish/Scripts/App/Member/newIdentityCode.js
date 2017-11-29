@@ -61,9 +61,97 @@ var addCode = new Vue({
     methods: {
         add: function () {
             newIdentityCode(this);
+        },
+        showSearch: function (type) {
+            showSelectCode(type);
         }
     }
 });
+
+
+function showAddModal(title) {
+    var model = addCode.model;
+    model.codeFrom = '';
+    model.codeTo = '';
+    addCode.title = title;
+    addCode.error.show = false;
+    showModal($('#addCode'));
+}
+
+// 显示选择识别码窗口
+function showSelectCode(type) {
+    selectCode.type = type;
+    selectCode.error.show = false;
+    getAvailableCodes(selectCode, 1);
+    showModal($('#selectCode'));
+}
+
+var selectCode = new Vue({
+    el: '#selectCode',
+    data: {
+        items: [],
+        title: '选择可用的识别码',
+        type: 0,
+        error: {
+            show: false,
+            message: ''
+        },
+        IsDeliverly: false,
+        displayPages: [],
+        totalPages: 0,
+        currentPage: 1,
+        totalCount: 0,
+        rowFrom: 0,
+        rowTo: 0
+    },
+    //mounted: function () {
+    //    this.getPages(1)
+    //},
+    methods: {
+        getPages: function (page) {
+            getAvailableCodes(this, page);
+        },
+        select: function (item) {
+            select(this.type, item);
+        }
+    }
+});
+
+// 选中一个识别码
+function select(type, item) {
+    if (type == 0) {
+        addCode.model.codeFrom = item.Code;
+    }
+    else if (type == 1) {
+        addCode.model.codeTo = item.Code;
+    }
+    //ev.cancelBubble = true;   /*阻止冒泡*/
+    hideModal($('#selectCode'));
+    //showModal($('#addCode'));
+}
+
+// 获取可用的识别码
+function getAvailableCodes(vm, page) {
+    showDialog('正在查询，请稍后...');
+    var url = '/Member/GetCodes';
+    var data = {
+        productId: sessionStorage.ProductID,
+        page: page,
+        rows: getRowsCount()
+    }
+    vm.$http.post(url, data).then(
+       function (result) {
+           if (relogin(result.data)) {
+               return;
+           }
+           vm.items = result.data.IdentityCodes;
+           CalculateTablePages(vm, page, result);
+       },
+       function (error) {
+           showError(error);
+       }
+       );
+}
 
 //删除所有识别码
 function removeAll(vm) {
