@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "小水滴代理系统";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Content/AdminLTE-2.3.6/plugins/datatables/dataTables.bootstrap.min.js")
+@Scripts.Render("~/Content/bootstrapvalidator/dist/js/bootstrapValidator.min.js")
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper" id="app">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            所有代理
+            <small>Version 1.0</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>主页</a></li>
+            <li class="active">所有代理</li>
+        </ol>
+    </section>
+    <section class="content">
+        <!-- /.row -->
+        <div class="row" id="subMembers">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <div class="col-lg-6">
+                            @*<div class="input-group">
+                                <select v-model="search.LevelID" class="form-control" placeholder="选择ABC">
+                                    <option value="-1"></option>
+                                    <option value="1">A</option>
+                                    <option value="2">B</option>
+                                    <option value="3">C</option>
+                                </select>
+                                <input v-model="search.MobileOrName" id="txtSearch" type="text" class="form-control" placeholder="电话号码或姓名">
+
+                                <span class="input-group-btn">
+                                    <xdropswater-search-button></xdropswater-search-button>
+                                </span>
+
+                            </div>*@
+                            <div class="form-group">
+                                <select v-model="search.LevelID" class="form-control" placeholder="选择类别">
+                                    <option value="-1">全部类别</option>
+                                    <option value="1">A类</option>
+                                    <option value="2">B类</option>
+                                    <option value="3">C类</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input v-model="search.MobileOrName" id="txtSearch" type="text" class="form-control" placeholder="电话号码或姓名">
+                            </div>
+                            <div class="form-group">
+                                <span class="input-group-btn">
+                                    <xdropswater-search-button></xdropswater-search-button>
+                                </span>
+                            </div>
+                            <!-- /input-group -->
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                            <xdropswater-nodata v-show="!error.show" v-bind:total-count="totalCount"></xdropswater-nodata>
+                            <xdropswater-error v-bind:error="error"></xdropswater-error>
+
+                            <div class="row" v-show="totalCount>0">
+                                <div class="col-sm-12 table-responsive">
+                                    <table class="table table-striped table-hover table-xdropswater" id="members">
+                                        <thead>
+                                            <tr>
+                                                <th>手机号码</th>
+                                                <th>姓名</th>
+                                                <th>级别</th>
+                                                <th>注册时间</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableBody">
+                                            <tr v-for="(item, index) in items" v-bind:style="{ background: item.BackgroundColor}">
+                                                <td>{{item.Mobile}}</td>
+                                                <td>{{item.MemberName}}</td>
+                                                <td>{{item.RoleName}}</td>
+                                                <td>{{item.CreateOn | formatDate}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <xdropswater-pagination v-bind:row-from="rowFrom"
+                                                            v-bind:row-to="rowTo"
+                                                            v-bind:total-count="totalCount"
+                                                            v-bind:current-page="currentPage"
+                                                            v-bind:total-pages="totalPages"
+                                                            v-bind:display-pages="displayPages">
+                                    </xdropswater-pagination>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+<script src="~/Scripts/App/Member/getAllSubMembers1.js"></script>

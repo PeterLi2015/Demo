@@ -913,6 +913,25 @@ namespace XDropsWater.Web.Controllers
                 : View(list.ToPagedList(page, rows));
         }
 
+        [HttpGet]
+        public ActionResult GetAllSubMembers1()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 所有下级
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetAllSubMembers1(string mobileOrName, int levelId = -1, int page = 1, int rows = 10)
+        {
+
+            var result = service.GetAllSubMembers1(page, rows, mobileOrName, levelId);
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult GetHighSubMembers(string mobileOrName, int page = 1, int rows = 10)
         {
             List<SubMemberModel> list = service.GetHighSubMembers(mobileOrName);

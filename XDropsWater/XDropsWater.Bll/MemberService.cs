@@ -1462,15 +1462,15 @@ namespace XDropsWater.Bll
 
                 // 总金额
                 var totalAmount = member.TotalAmount;
-                
+
                 // 市代金额
                 var cityAmount = unitAmount * cityCount;
 
                 // 总金额 < 市代金额
-                if(totalAmount < cityAmount)
+                if (totalAmount < cityAmount)
                 {
                     // 总金额 + 订单金额 >= 市代金额
-                    if(totalAmount + orderAmount >= cityAmount)
+                    if (totalAmount + orderAmount >= cityAmount)
                     {
                         newMember = CopyMember(member, (int)enmMemberRole.City);
 
@@ -3440,8 +3440,70 @@ namespace XDropsWater.Bll
             {
 
                 List<SubMemberModel> members = db.Database.SqlQuery<SubMemberModel>("EXEC [P_GetAllSubMembers] @MemberID, @MobileOrName, @LevelID", new SqlParameter("@MemberID", this.CurrentUser.MemberID), new SqlParameter("@MobileOrName", (mobileOrName ?? "")), new SqlParameter("@LevelID", levelId)).ToList();
+
+                // 3层以下的代理都算作第3层
+                if (members != null && members.Any())
+                {
+                    members.ForEach(o =>
+                    {
+                        if (o.LevelID > 3)
+                        {
+                            o.LevelID = 3;
+                        }
+                    });
+                }
                 return members;
             }
+        }
+
+        public SubMemberSummary GetAllSubMembers1(int page, int rows, string mobileOrName, int levelId)
+        {
+            SubMemberSummary model = new SubMemberSummary();
+            using (SimpleWebUnitOfWork db = new SimpleWebUnitOfWork())
+            {
+
+                var members = db.Database.SqlQuery<SubMemberModel>("EXEC [P_GetAllSubMembers] @MemberID, @MobileOrName, @LevelID", new SqlParameter("@MemberID", this.CurrentUser.MemberID), new SqlParameter("@MobileOrName", (mobileOrName ?? "")), new SqlParameter("@LevelID", levelId)).ToList();
+
+                // 3层以下的代理都算作第3层
+                if (members != null && members.Any())
+                {
+                    members.ForEach(o =>
+                    {
+                        if (o.LevelID > 3)
+                        {
+                            o.LevelID = 3;
+                        }
+                    });
+
+                    // 第1层代理人数
+                    if(members.Any(o=>o.LevelID==1))
+                    {
+                        model.A = members.Where(o => o.LevelID == 1).Count();
+                    }
+
+                    // 第2层代理人数
+                    if (members.Any(o => o.LevelID == 2))
+                    {
+                        model.B = members.Where(o => o.LevelID == 2).Count();
+                    }
+
+                    // 第3层即以下代理人数
+                    if (members.Any(o => o.LevelID == 3))
+                    {
+                        model.C = members.Where(o => o.LevelID == 3).Count();
+                    }
+
+                    var totalCount = members.Count();
+                    var totalPages = (int)Math.Ceiling((decimal)totalCount / rows);
+
+                    model.Members = members.OrderBy(o => o.LevelID).Skip((page - 1) * rows).Take(rows).ToList();
+
+                    CalculateRowNo(model, model.Members, page, rows, totalCount);
+
+                }
+            }
+
+            return model;
         }
 
         public List<SubMemberModel> GetHighSubMembers(string mobileOrName)
@@ -4642,7 +4704,7 @@ namespace XDropsWater.Bll
                     }
                     db.Add(entity);
 
-                    
+
                 }
 
             }
@@ -5066,7 +5128,7 @@ namespace XDropsWater.Bll
         public MemberProductSummary MyStock(int page, int rows)
         {
             return MemberStock(this.CurrentUser.MemberID, page, rows);
-           
+
         }
 
         /// <summary>

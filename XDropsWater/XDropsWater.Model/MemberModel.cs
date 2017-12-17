@@ -215,9 +215,8 @@ namespace XDropsWater.Model
         public string Name { get; set; }
     }
 
-    public class SubMemberModel
+    public class SubMemberModel : BaseModel<Guid>
     {
-        public Guid ID { get; set; }
 
         public string Mobile { get; set; }
 
@@ -235,11 +234,15 @@ namespace XDropsWater.Model
             }
         }
 
-        public DateTime CreateOn { get; set; }
 
         public string Address { get; set; }
 
         public int LevelID { get; set; }
+
+        /// <summary>
+        /// 背景颜色
+        /// </summary>
+        public string BackgroundColor { get; set; }
     }
 
     public class Member503020
@@ -347,5 +350,5 @@ namespace XDropsWater.Model
         typeCompany = 52
     }
 
-    
+
 }

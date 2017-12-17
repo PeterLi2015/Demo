@@ -254,6 +254,14 @@ namespace XDropsWater.Bll.Interface
 
         List<SubMemberModel> GetAllSubMembers(string mobileOrName, int levelId);
 
+        /// <summary>
+        /// 获取所有底下会员
+        /// </summary>
+        /// <param name="mobileOrName"></param>
+        /// <param name="levelId"></param>
+        /// <returns></returns>
+        SubMemberSummary GetAllSubMembers1(int page, int rows, string mobileOrName, int levelId);
+
         List<SubMemberModel> GetHighSubMembers(string mobileOrName);
 
         /// <summary>
