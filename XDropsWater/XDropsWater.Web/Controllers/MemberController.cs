@@ -1271,5 +1271,68 @@ namespace XDropsWater.Web.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// 发货信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Express()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 获取快递信息
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="status"></param>
+        /// <param name="mobileOrName"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetExpress(int page, int size, int status, string mobileOrName)
+        {
+            var result = service.GetExpress(page, size, status, mobileOrName);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// 添加发货记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult AddUpdateExpress(Express model)
+        {
+            service.AddUpdateExpress(model);
+            return new EmptyResult();
+        }
+
+        /// <summary>
+        /// 发货
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult SendExpress(Express model)
+        {
+            model.ExpressDate = DateTime.Now;
+            model.Status = 1;
+            service.AddUpdateExpress(model);
+            return new EmptyResult();
+        }
+
+        
+        /// <summary>
+        /// 删除发货记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult RemoveExpress(Guid id)
+        {
+            service.RemoveExpress(id);
+            return new EmptyResult();
+        }
     }
 }

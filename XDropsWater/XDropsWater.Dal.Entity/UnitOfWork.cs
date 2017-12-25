@@ -94,6 +94,11 @@ namespace XDropsWater.Dal.Entity
         /// </summary>
         public IDbSet<MemberProductCodeEntity> MemberProductCode { get; set; }
 
+        /// <summary>
+        /// 快递
+        /// </summary>
+        public IDbSet<ExpressEntity> Express { get; set; }
+
         //public IDbSet<LevelEntity> Levels { get; set; }
 
         public DatabaseGeneratedOption EntityIDDatabaseGeneratedOption { get; set; }

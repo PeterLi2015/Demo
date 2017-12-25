@@ -64,6 +64,7 @@ function setPermission(permission)
     sessionStorage.memberManageAdd = permission.MemberManageAdd ? "true" : "";
     sessionStorage.memberManageOperate = permission.MemberManageOperate ? "true" : "";
     sessionStorage.memberOrderManageOperate = permission.MemberOrderManageOperate ? "true" : "";
+    sessionStorage.isAdmin = permission.IsAdmin ? "true" : "";
 }
 
 $(document).ready(function () {

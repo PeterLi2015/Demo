@@ -70,6 +70,7 @@
     <Compile Include="Model\AddUpdateOrder.cs" />
     <Compile Include="Model\BaseInfo.cs" />
     <Compile Include="Model\CityAgent.cs" />
+    <Compile Include="Model\Express.cs" />
     <Compile Include="Model\MemberPassword.cs" />
     <Compile Include="Model\MemberProduct.cs" />
     <Compile Include="Model\OrderDetails.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Summary\IdentityCodeSummary.cs" />
     <Compile Include="Summary\MemberProductSummary.cs" />
+    <Compile Include="Summary\ExpressSummary.cs" />
     <Compile Include="Summary\SubMemberSummary.cs" />
     <Compile Include="Summary\MemberSummary.cs" />
     <Compile Include="Model\Product.cs" />

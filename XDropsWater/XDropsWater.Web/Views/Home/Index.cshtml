@@ -46,8 +46,23 @@
                             <div class="info-box">
                                 <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
                                 <div class="info-box-content">
-                                    <span class="info-box-text">未发货订单</span>
+                                    <span class="info-box-text">新订单</span>
                                     <span class="info-box-number">@ViewBag.NewOrderCount</span>
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                        </a>
+
+                        <!-- /.info-box -->
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <a href="@Url.Action("Express","Member")" style="cursor:pointer">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">未发货</span>
+                                    <span class="info-box-number">@ViewBag.NewExpressCount</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -159,6 +174,21 @@
                             </div>
                             <!-- /.info-box -->
                         </a>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <a href="@Url.Action("Express","Member")" style="cursor:pointer">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">未发货</span>
+                                    <span class="info-box-number">(@ViewBag.NewExpressCount)</span>
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                        </a>
+
+                        <!-- /.info-box -->
                     </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12">

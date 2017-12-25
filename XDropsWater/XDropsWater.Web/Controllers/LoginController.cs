@@ -64,6 +64,11 @@ namespace XDropsWater.Web.Controllers
             {
                 result.MemberOrderManageOperate = true;
             }
+            if (user.UserRoleID == (int)enmRoles.All ||
+                user.UserRoleID == (int)enmRoles.Admin)
+            {
+                result.IsAdmin = true;
+            }
             return result;
         }
 

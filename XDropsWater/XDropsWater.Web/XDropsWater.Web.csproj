@@ -2123,6 +2123,7 @@
     <Content Include="Images\logo.jpg" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\App\Login\login.js" />
+    <Content Include="Scripts\App\Member\express.js" />
     <Content Include="Scripts\App\Member\addIdentityCode.js" />
     <Content Include="Scripts\App\Member\childMemberOrder1.js" />
     <Content Include="Scripts\App\Member\directChildMember1.js" />
@@ -2259,6 +2260,7 @@
     <Content Include="Views\Member\DirectorBonus.cshtml" />
     <Content Include="Views\Member\DirectorBonusList.cshtml" />
     <Content Include="Views\Member\GetAllSubMembers1.cshtml" />
+    <Content Include="Views\Member\Express.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

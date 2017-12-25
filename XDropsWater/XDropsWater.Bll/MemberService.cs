@@ -254,6 +254,26 @@ namespace XDropsWater.Bll
         }
 
         /// <summary>
+        /// 发货记录
+        /// </summary>
+        /// <returns></returns>
+        public int GetNewExpress()
+        {
+            var db = new Repository<ExpressEntity>(uow);
+            int iRet = 0;
+            if (this.CurrentUser.UserRoleID == (int)enmRoles.Admin ||
+                this.CurrentUser.UserRoleID == (int)enmRoles.All)
+            {
+                iRet = db.FindBy(o => o.Status == 0).Count();
+            }
+            else if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
+            {
+                iRet = db.FindBy(o => o.Status == 0 && o.MemberID == this.CurrentUser.MemberID).Count();
+            }
+            return iRet;
+        }
+
+        /// <summary>
         /// 获取高号代理信息
         /// </summary>
         /// <param name="createBy"></param>
@@ -3476,7 +3496,7 @@ namespace XDropsWater.Bll
                     });
 
                     // 第1层代理人数
-                    if(members.Any(o=>o.LevelID==1))
+                    if (members.Any(o => o.LevelID == 1))
                     {
                         model.A = members.Where(o => o.LevelID == 1).Count();
                     }
@@ -5220,6 +5240,165 @@ namespace XDropsWater.Bll
                 result.Append(",");
             }
             return result.ToString().Substring(0, result.ToString().Length - 1);
+        }
+
+        /// <summary>
+        /// 获取快递信息
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="status"></param>
+        /// <param name="mobileOrName"></param>
+        /// <returns></returns>
+        public ExpressSummary GetExpress(int page, int size, int status, string mobileOrName)
+        {
+            status = status == -1 ? -1 : status;
+            var result = new ExpressSummary();
+            var db = new Repository<ExpressEntity>(uow);
+            Expression<Func<ExpressEntity, bool>> whereExp = o => o.ID != Guid.Empty;
+            if(status!=-1)
+            {
+                whereExp = whereExp.And(o => o.Status == status);
+            }
+            if(!string.IsNullOrWhiteSpace(mobileOrName))
+            {
+                whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
+                 || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                 );
+            }
+            if(this.CurrentUser.UserRoleID == (int)enmRoles.General)
+            {
+                whereExp = whereExp.And(o => o.MemberID == this.CurrentUser.MemberID);
+            }
+            var totalCount = db.Find(whereExp, o => o.CreateOn).Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
+            var items = db.Find(whereExp, o => o.CreateOn).OrderByDescending(o => o.CreateOn).Skip((page - 1) * size).Take(size).ToList();
+
+            Mapper.CreateMap<MemberRoleEntity, MemberRole>();
+            Mapper.CreateMap<MemberEntity, Member>();
+            Mapper.CreateMap<ExpressEntity, Express>();
+            result.ExpressList = Mapper.Map<IEnumerable<Express>>(items);
+            CalculateRowNo(result, result.ExpressList, page, size, totalCount);
+            return result;
+        }
+
+        /// <summary>
+        /// 新增修改快递信息
+        /// </summary>
+        /// <param name="express"></param>
+        public void AddUpdateExpress(Express express)
+        {
+            var db = new Repository<ExpressEntity>(uow);
+
+            if (string.IsNullOrWhiteSpace(express.RecipientName))
+            {
+                throw new Exception("收件人姓名必须输入");
+            }
+
+            if (string.IsNullOrWhiteSpace(express.RecipientMobile))
+            {
+                throw new Exception("收件人手机号码必须输入");
+            }
+
+            if (string.IsNullOrWhiteSpace(express.RecipientAddress))
+            {
+                throw new Exception("收件人地址必须输入");
+            }
+
+            if (string.IsNullOrWhiteSpace(express.Content))
+            {
+                throw new Exception("发货内容必须输入");
+            }
+
+            // 管理员操作必须填写快递信息
+            if (this.CurrentUser.UserRoleID != (int)enmRoles.General)
+            {
+                if (string.IsNullOrWhiteSpace(express.ExpressName))
+                {
+                    throw new Exception("快递名称必须输入");
+                }
+
+                if (string.IsNullOrWhiteSpace(express.ExpressNo))
+                {
+                    throw new Exception("快递单号必须输入");
+                }
+            }
+
+            var currentUserID = this.CurrentUser.ID;
+            var currentMemberID = this.CurrentUser.MemberID;
+            var now = DateTime.Now;
+
+            // Update express
+            if (express.ID != Guid.Empty)
+            {
+                //更新
+                var entity = db.FindBy(o => o.ID == express.ID).First();
+                if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
+                {
+                    entity.Content = express.Content;
+                    entity.UpdateBy = currentUserID;
+                    entity.UpdateOn = now;
+                    entity.RecipientAddress = express.RecipientAddress;
+                    entity.RecipientMobile = express.RecipientMobile;
+                    entity.RecipientName = express.RecipientName;
+                }
+                else
+                {
+
+                    entity.Content = express.Content;
+                    entity.UpdateBy = currentUserID;
+                    entity.UpdateOn = now;
+                    entity.RecipientAddress = express.RecipientAddress;
+                    entity.RecipientMobile = express.RecipientMobile;
+                    entity.RecipientName = express.RecipientName;
+                    entity.ExpressName = express.ExpressName;
+                    entity.ExpressNo = express.ExpressNo;
+                    entity.Status = express.Status;
+                    if (express.ExpressDate != null)
+                    {
+                        entity.ExpressDate = express.ExpressDate;
+                    }
+                    entity.Status = express.Status;
+                    if(entity.Status==0)
+                    {
+                        entity.ExpressDate = null;
+                    }
+                }
+                db.Update(entity);
+
+            }
+            else
+            {
+                //新加
+                var entity = new ExpressEntity();
+                entity.ID = Guid.NewGuid();
+                entity.CreateBy = currentUserID;
+                entity.CreateOn = now;
+                entity.Content = express.Content;
+                entity.MemberID = currentMemberID;
+                entity.RecipientAddress = express.RecipientAddress;
+                entity.RecipientMobile = express.RecipientMobile;
+                entity.RecipientName = express.RecipientName;
+                entity.Status = 0; // 未发货
+                db.Add(entity);
+
+            }
+
+            uow.Commit();
+        }
+
+        /// <summary>
+        /// 删除发货记录
+        /// </summary>
+        /// <param name="id"></param>
+        public void RemoveExpress(Guid id)
+        {
+            var db = new Repository<ExpressEntity>(uow);
+
+            var entity = db.FindBy(o => o.ID == id).First();
+            db.Remove(entity);
+
+            uow.Commit();
         }
 
     }

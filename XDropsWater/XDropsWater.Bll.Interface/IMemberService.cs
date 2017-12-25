@@ -457,5 +457,34 @@ namespace XDropsWater.Bll.Interface
         /// <param name="orderId"></param>
         /// <returns></returns>
         string GetOrderDetails(Guid orderId);
+
+        /// <summary>
+        /// 获取快递信息
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="status"></param>
+        /// <param name="mobileOrName"></param>
+        /// <returns></returns>
+        ExpressSummary GetExpress(int page, int size, int status, string mobileOrName);
+
+        /// <summary>
+        /// 新增修改快递信息
+        /// </summary>
+        /// <param name="express"></param>
+        void AddUpdateExpress(Express express);
+
+        /// <summary>
+        /// 新发货记录
+        /// </summary>
+        /// <returns></returns>
+        int GetNewExpress();
+
+        /// <summary>
+        /// 删除发货记录
+        /// </summary>
+        /// <param name="id"></param>
+        void RemoveExpress(Guid id);
+
     }
 }

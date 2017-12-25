@@ -24,6 +24,11 @@ namespace XDropsWater.Model
         /// 代理订单管理操作权限
         /// </summary>
         public bool MemberOrderManageOperate { get; set; }
+
+        /// <summary>
+        /// 是否管理员
+        /// </summary>
+        public bool IsAdmin { get; set; }
     }
 
     /// <summary>

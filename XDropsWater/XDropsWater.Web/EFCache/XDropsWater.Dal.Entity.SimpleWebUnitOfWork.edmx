@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <views>
-  <mapping-views hash="9425d8bfc39283822a17f764357c6cbbb31e57bc07b8f57cfbed6c700d47206a" conceptual-container="SimpleWebUnitOfWork" store-container="CodeFirstDatabase">
+  <mapping-views hash="7536c551c79b014bf9f842fa212e1396b204bd186a9df2d0096198c6c4ae851e" conceptual-container="SimpleWebUnitOfWork" store-container="CodeFirstDatabase">
     <view extent="CodeFirstDatabase.DirectorEntity"><![CDATA[
     SELECT VALUE -- Constructing DirectorEntity
         [CodeFirstDatabaseSchema.DirectorEntity](T1.DirectorEntity_ID, T1.DirectorEntity_MemberID, T1.DirectorEntity_DirectorNo, T1.DirectorEntity_CreateBy, T1.DirectorEntity_CreateOn, T1.DirectorEntity_UpdateBy, T1.DirectorEntity_UpdateOn)
@@ -68,6 +68,28 @@
             T.UpdateOn AS MemberRoleEntity_UpdateOn, 
             True AS _from0
         FROM SimpleWebUnitOfWork.MemberRoles AS T
+    ) AS T1]]></view>
+    <view extent="CodeFirstDatabase.ExpressEntity"><![CDATA[
+    SELECT VALUE -- Constructing ExpressEntity
+        [CodeFirstDatabaseSchema.ExpressEntity](T1.ExpressEntity_ID, T1.ExpressEntity_MemberID, T1.ExpressEntity_RecipientName, T1.ExpressEntity_RecipientMobile, T1.ExpressEntity_RecipientAddress, T1.ExpressEntity_ExpressName, T1.ExpressEntity_ExpressNo, T1.ExpressEntity_Content, T1.ExpressEntity_Status, T1.ExpressEntity_ExpressDate, T1.ExpressEntity_CreateBy, T1.ExpressEntity_CreateOn, T1.ExpressEntity_UpdateBy, T1.ExpressEntity_UpdateOn)
+    FROM (
+        SELECT 
+            T.ID AS ExpressEntity_ID, 
+            T.MemberID AS ExpressEntity_MemberID, 
+            T.RecipientName AS ExpressEntity_RecipientName, 
+            T.RecipientMobile AS ExpressEntity_RecipientMobile, 
+            T.RecipientAddress AS ExpressEntity_RecipientAddress, 
+            T.ExpressName AS ExpressEntity_ExpressName, 
+            T.ExpressNo AS ExpressEntity_ExpressNo, 
+            T.Content AS ExpressEntity_Content, 
+            T.Status AS ExpressEntity_Status, 
+            T.ExpressDate AS ExpressEntity_ExpressDate, 
+            T.CreateBy AS ExpressEntity_CreateBy, 
+            T.CreateOn AS ExpressEntity_CreateOn, 
+            T.UpdateBy AS ExpressEntity_UpdateBy, 
+            T.UpdateOn AS ExpressEntity_UpdateOn, 
+            True AS _from0
+        FROM SimpleWebUnitOfWork.Express AS T
     ) AS T1]]></view>
     <view extent="CodeFirstDatabase.IdentityCodeEntity"><![CDATA[
     SELECT VALUE -- Constructing IdentityCodeEntity
@@ -295,6 +317,28 @@
             T.UpdateOn AS MemberRoleEntity_UpdateOn, 
             True AS _from0
         FROM CodeFirstDatabase.MemberRoleEntity AS T
+    ) AS T1]]></view>
+    <view extent="SimpleWebUnitOfWork.Express"><![CDATA[
+    SELECT VALUE -- Constructing Express
+        [XDropsWater.Dal.Entity.ExpressEntity](T1.ExpressEntity_ID, T1.ExpressEntity_MemberID, T1.ExpressEntity_RecipientName, T1.ExpressEntity_RecipientMobile, T1.ExpressEntity_RecipientAddress, T1.ExpressEntity_ExpressName, T1.ExpressEntity_ExpressNo, T1.ExpressEntity_Content, T1.ExpressEntity_Status, T1.ExpressEntity_ExpressDate, T1.ExpressEntity_CreateBy, T1.ExpressEntity_CreateOn, T1.ExpressEntity_UpdateBy, T1.ExpressEntity_UpdateOn)
+    FROM (
+        SELECT 
+            T.ID AS ExpressEntity_ID, 
+            T.MemberID AS ExpressEntity_MemberID, 
+            T.RecipientName AS ExpressEntity_RecipientName, 
+            T.RecipientMobile AS ExpressEntity_RecipientMobile, 
+            T.RecipientAddress AS ExpressEntity_RecipientAddress, 
+            T.ExpressName AS ExpressEntity_ExpressName, 
+            T.ExpressNo AS ExpressEntity_ExpressNo, 
+            T.Content AS ExpressEntity_Content, 
+            T.Status AS ExpressEntity_Status, 
+            T.ExpressDate AS ExpressEntity_ExpressDate, 
+            T.CreateBy AS ExpressEntity_CreateBy, 
+            T.CreateOn AS ExpressEntity_CreateOn, 
+            T.UpdateBy AS ExpressEntity_UpdateBy, 
+            T.UpdateOn AS ExpressEntity_UpdateOn, 
+            True AS _from0
+        FROM CodeFirstDatabase.ExpressEntity AS T
     ) AS T1]]></view>
     <view extent="SimpleWebUnitOfWork.IdentityCode"><![CDATA[
     SELECT VALUE -- Constructing IdentityCode
