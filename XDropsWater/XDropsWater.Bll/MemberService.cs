@@ -5256,17 +5256,29 @@ namespace XDropsWater.Bll
             var result = new ExpressSummary();
             var db = new Repository<ExpressEntity>(uow);
             Expression<Func<ExpressEntity, bool>> whereExp = o => o.ID != Guid.Empty;
-            if(status!=-1)
+            if (status != -1)
             {
                 whereExp = whereExp.And(o => o.Status == status);
             }
-            if(!string.IsNullOrWhiteSpace(mobileOrName))
+            if (!string.IsNullOrWhiteSpace(mobileOrName))
             {
-                whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
-                 || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
-                 );
+                if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
+                {
+                    // 代理用收件人的用户名和手机号码查询
+                    whereExp = whereExp.And(o => (o.RecipientMobile.Contains(mobileOrName)
+                        || o.RecipientName.ToUpper().Contains(mobileOrName.ToUpper()))
+                        );
+                }
+                else
+                {
+                    // 管理员用代理的手机号码和姓名查询
+                    whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
+                        || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                        );
+                }
+
             }
-            if(this.CurrentUser.UserRoleID == (int)enmRoles.General)
+            if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
             {
                 whereExp = whereExp.And(o => o.MemberID == this.CurrentUser.MemberID);
             }
@@ -5359,7 +5371,7 @@ namespace XDropsWater.Bll
                         entity.ExpressDate = express.ExpressDate;
                     }
                     entity.Status = express.Status;
-                    if(entity.Status==0)
+                    if (entity.Status == 0)
                     {
                         entity.ExpressDate = null;
                     }
