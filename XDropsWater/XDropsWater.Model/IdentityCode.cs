@@ -29,5 +29,7 @@ namespace XDropsWater.Model
         /// 订单明细
         /// </summary>
         public OrderDetails OrderDetails { get; set; }
+
+        public bool Checked { get; set; }
     }
 }

@@ -57,7 +57,7 @@ function removeExpress(item, index, vm) {
             function (success) {
                 removeRecord(index, vm);
                 showDialog('删除成功', 1000);
-                
+
             },
             function (error) {
                 showAlert(error);
@@ -107,6 +107,7 @@ function clear(item) {
     model.RecipientAddress = '';
     model.Content = '';
     model.ID = '';
+    model.Title = '添加发货记录';
     addOrUpdateModal.error.show = false;
     addOrUpdateModal.error.message = '';
     showModal($('#addOrUpdateModal'));
@@ -178,7 +179,8 @@ var sendModal = new Vue({
             ExpressNo: '', // 快递单号
             ExpressDate: '', // 发货日期
             Index: 0, // 要修改的记录的索引
-            IsUpdate: false
+            IsUpdate: false,
+            Status: 0
         },
         error: {
             message: '',
@@ -234,10 +236,10 @@ function addOrUpdate(vm) {
             return;
         }
     }
-    
+
 
     if (vm.model.Title == '添加发货记录') {
-        
+
 
         showDialog('正在保存，请稍后...');
 
@@ -293,7 +295,10 @@ function UpdateExpress(vm, url) {
             vm.model.ExpressDate = new Date();
         }
         if (vm.model.Title == '修改发货记录') {
-            if (vm.model.Status == 0) {
+            if (!vm.model.Status) {
+                vm.model.Status = 0;
+            }
+            else if (vm.model.Status == 0) {
                 vm.model.ExpressDate = '';
             }
         }

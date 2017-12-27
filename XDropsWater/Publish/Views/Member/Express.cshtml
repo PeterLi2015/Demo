@@ -110,7 +110,7 @@
                                                     <button v-show="!admin && item.Status<1" class="btn btn-sm btn-success" v-on:click="update(item, index)">
                                                         <i class="glyphicon glyphicon-pencil"></i> 修改
                                                     </button>
-                                                    <button v-show="item.Status<1" class="btn btn-warning" v-on:click="removeExpress(item, index)">
+                                                    <button v-show="item.Status<1" class="btn btn-sm btn-warning" v-on:click="removeExpress(item, index)">
                                                         <i class="glyphicon glyphicon-remove"></i> 删除
                                                     </button>
                                                     <button v-show="admin && item.Status==0" class="btn btn-sm btn-info" v-on:click="sendConfirm(item, index)">

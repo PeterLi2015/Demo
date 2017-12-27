@@ -1192,6 +1192,13 @@ namespace XDropsWater.Web.Controllers
             return new EmptyResult();
         }
 
+        [HttpPost]
+        public ActionResult BulkAddCode(Guid orderDetailsId, IEnumerable<long> codeList)
+        {
+            service.BulkAddCode(orderDetailsId, codeList);
+            return new EmptyResult();
+        }
+
         /// <summary>
         /// 发货
         /// </summary>

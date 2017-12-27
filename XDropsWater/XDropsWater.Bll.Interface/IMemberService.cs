@@ -486,5 +486,7 @@ namespace XDropsWater.Bll.Interface
         /// <param name="id"></param>
         void RemoveExpress(Guid id);
 
+        void BulkAddCode(Guid orderDetailsId, IEnumerable<long> codeList);
+
     }
 }

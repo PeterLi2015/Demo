@@ -115,10 +115,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/13/2017 11:33:23</publishTime>
     </File>
     <File Include="bin/XDropsWater.Bll.dll">
-      <publishTime>12/25/2017 22:53:29</publishTime>
+      <publishTime>12/27/2017 22:24:28</publishTime>
     </File>
     <File Include="bin/XDropsWater.Bll.Interface.dll">
-      <publishTime>12/25/2017 22:53:28</publishTime>
+      <publishTime>12/27/2017 22:24:26</publishTime>
     </File>
     <File Include="bin/XDropsWater.CrossCutting.dll">
       <publishTime>11/11/2017 10:20:04</publishTime>
@@ -130,10 +130,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/11/2017 10:20:05</publishTime>
     </File>
     <File Include="bin/XDropsWater.Model.dll">
-      <publishTime>12/25/2017 22:53:28</publishTime>
+      <publishTime>12/27/2017 22:24:26</publishTime>
     </File>
     <File Include="bin/XDropsWater.Web.dll">
-      <publishTime>12/25/2017 22:53:30</publishTime>
+      <publishTime>12/27/2017 22:24:31</publishTime>
     </File>
     <File Include="Content/AdminLTE-2.3.6/.gitignore">
       <publishTime>02/13/2017 11:32:42</publishTime>
@@ -5923,7 +5923,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/02/2017 12:47:43</publishTime>
     </File>
     <File Include="Scripts/App/Member/express.js">
-      <publishTime>12/25/2017 20:03:41</publishTime>
+      <publishTime>12/26/2017 17:17:20</publishTime>
     </File>
     <File Include="Scripts/App/Member/getAllSubMembers1.js">
       <publishTime>12/17/2017 13:27:37</publishTime>
@@ -5944,7 +5944,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/23/2017 11:24:20</publishTime>
     </File>
     <File Include="Scripts/App/Member/newIdentityCode.js">
-      <publishTime>11/29/2017 19:53:14</publishTime>
+      <publishTime>12/27/2017 13:02:06</publishTime>
     </File>
     <File Include="Scripts/App/Member/personalInfo1.js">
       <publishTime>10/23/2017 11:24:20</publishTime>
@@ -6136,7 +6136,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/29/2017 12:47:14</publishTime>
     </File>
     <File Include="Views/Member/Express.cshtml">
-      <publishTime>12/25/2017 20:06:50</publishTime>
+      <publishTime>12/26/2017 09:58:26</publishTime>
     </File>
     <File Include="Views/Member/GetAllSubMembers.cshtml">
       <publishTime>10/23/2017 13:06:07</publishTime>
@@ -6205,7 +6205,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/23/2017 11:24:21</publishTime>
     </File>
     <File Include="Views/Member/NewIdentityCode.cshtml">
-      <publishTime>11/29/2017 19:52:51</publishTime>
+      <publishTime>12/27/2017 12:38:02</publishTime>
     </File>
     <File Include="Views/Member/PersonalInfo.cshtml">
       <publishTime>10/23/2017 13:06:07</publishTime>

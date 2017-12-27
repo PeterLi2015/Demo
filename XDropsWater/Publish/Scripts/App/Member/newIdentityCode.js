@@ -29,7 +29,14 @@ var codeRows = new Vue({
         add: function () {
 
             var title = '【' + this.header.ProductName + '】添加识别码，已添加' + this.totalCount + '还差' + (this.header.Quantity - this.totalCount);
-            showAddModal(title);
+            
+            if (sessionStorage.isAdmin) {
+                showAddModal(title);
+            }
+            else {
+                showAgentSelectCode(title);
+            }
+            
 
         },
         remove: function (item, index) {
@@ -68,6 +75,97 @@ var addCode = new Vue({
     }
 });
 
+var agentSelectCode = new Vue({
+    el: '#agentSelectCode',
+    data: {
+        items: [],
+        title: '选择可用的识别码',
+        type: 0,
+        error: {
+            show: false,
+            message: ''
+        },
+        IsDeliverly: false,
+        displayPages: [],
+        totalPages: 0,
+        currentPage: 1,
+        totalCount: 0,
+        rowFrom: 0,
+        rowTo: 0,
+        AllSelected: false
+    },
+    methods: {
+        getPages: function (page) {
+            getAvailableCodes(this, page);
+        },
+        add: function () {
+            //newIdentityCode(this);
+            BulkAddCode(this);
+        },
+        selectAll: function () {
+            //var aa = this.items;
+            var checked = this.AllSelected;
+            this.items.forEach(function (item) {
+                item.Checked = checked;
+            })
+            //for (item in this.items) {
+            //    item.Checked = this.AllSelected;
+            //}
+        }
+    }
+});
+
+
+//批量添加识别码
+function BulkAddCode(vm) {
+    var checked = false;
+    var codeList = [];
+    vm.items.forEach(function (item) {
+        if (item.Checked) {
+            checked = true;
+            codeList.push(item.Code);
+        }
+    });
+    if (!checked) {
+        var error = {
+            body: {
+                message: '请选择识别码'
+            }
+        }
+        showError(vm, error);
+        return;
+    }
+
+    var url = 'BulkAddCode';
+    var data = {
+        orderDetailsId: sessionStorage.OrderDetailsID,
+        codeList: codeList
+    }
+    showDialog('正在保存...');
+
+    vm.$http.post(url, data).then(
+        function (result) {
+            hideAllDialog();
+            if (relogin(result.data)) {
+                return;
+            }
+            hideModal($('#agentSelectCode'));
+            codeRows.getPages(1);
+        },
+        function (error) {
+            showError(vm, error);
+        }
+        );
+}
+
+function showAgentSelectCode(title) {
+    var model = agentSelectCode.model;
+    agentSelectCode.title = title;
+    agentSelectCode.error.show = false;
+    agentSelectCode.selected = [];
+    getAvailableCodes(agentSelectCode, 1);
+    showModal($('#agentSelectCode'));
+}
 
 function showAddModal(title) {
     var model = addCode.model;
@@ -207,6 +305,9 @@ function newIdentityCode(vm) {
 
         showDialog('正在保存...');
         vm.model.orderDetailsId = sessionStorage.OrderDetailsID;
+        if (!vm.model.codeTo) {
+            vm.model.codeTo = vm.model.codeFrom;
+        }
         vm.$http.post(url, vm.model).then(
             function (result) {
                 hideAllDialog();
@@ -296,9 +397,9 @@ function formValidator() {
             CodeTo: {
                 message: '唯一识别码验证失败',
                 validators: {
-                    notEmpty: {
-                        message: '唯一识别码不能是空'
-                    },
+                    //notEmpty: {
+                    //    message: '唯一识别码不能是空'
+                    //},
                     regexp: {
                         regexp: /^\d+$/,
                         message: '唯一识别码只能是数字'

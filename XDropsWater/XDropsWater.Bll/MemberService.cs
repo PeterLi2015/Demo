@@ -4976,7 +4976,9 @@ namespace XDropsWater.Bll
             {
                 if (db.FindBy(o => o.Code == model.Code).Any())
                 {
-                    throw new Exception("唯一识别码" + model.Code + "已被使用，不能添加");
+                    var memberName = db.FindBy(o => o.Code == model.Code).OrderBy(o => o.CreateOn).First().OrderDetails.Order.Member.MemberName;
+                    throw new Exception(string.Format("识别码{0}已被{1}使用", model.Code, memberName));
+                    //throw new Exception("唯一识别码" + model.Code + "已被使用，不能添加");
                 }
             }
 
@@ -5078,12 +5080,16 @@ namespace XDropsWater.Bll
 
                 if (unallowedCodes.Any())
                 {
+                    var distinctCodes = unallowedCodes.Distinct();
                     StringBuilder sb = new StringBuilder();
-                    unallowedCodes.Each(o =>
+                    foreach (var code in distinctCodes)
                     {
-                        sb.Append(o + ",");
-                    });
-                    throw new Exception("识别码" + sb.ToString() + "不可用，请重新添加");
+                        
+                        var memberName = db.FindBy(o => o.Code == code).OrderBy(o => o.CreateOn).First().OrderDetails.Order.Member.MemberName;
+                        sb.Append(string.Format("{0}已经被{1}使用, ", code, memberName));
+                    }
+                    
+                    throw new Exception(sb.ToString());
                 }
             }
             else
@@ -5092,12 +5098,16 @@ namespace XDropsWater.Bll
                 var unallowedCodes = db.FindBy(o => codes.Contains(o.Code) && o.OrderDetails.ProductID == productId).Select(o => o.Code).ToList();
                 if (unallowedCodes.Any())
                 {
+                    var distinctCodes = unallowedCodes.Distinct();
                     StringBuilder sb = new StringBuilder();
-                    unallowedCodes.Each(o =>
+                    foreach (var code in distinctCodes)
                     {
-                        sb.Append(o + ",");
-                    });
-                    throw new Exception("识别码" + sb.ToString() + "已被使用");
+
+                        var memberName = db.FindBy(o => o.Code == code).OrderBy(o => o.CreateOn).First().OrderDetails.Order.Member.MemberName;
+                        sb.Append(string.Format("{0}已经被{1}使用, ", code, memberName));
+                    }
+
+                    throw new Exception(sb.ToString());
                 }
             }
 
@@ -5411,6 +5421,34 @@ namespace XDropsWater.Bll
             db.Remove(entity);
 
             uow.Commit();
+        }
+
+        public void BulkAddCode(Guid orderDetailsId, IEnumerable<long> codeList)
+        {
+            var db = new Repository<IdentityCodeEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var orderDetails = odDb.FindBy(o => o.ID == orderDetailsId).First();
+
+            var currentCount = db.FindBy(o => o.OrderDetailsID == orderDetailsId).Count();
+            if (currentCount >= orderDetails.Quantity)
+            {
+                throw new Exception("该订单识别码已经添加完毕，不能再添加");
+            }
+
+            var orderQuantity = orderDetails.Quantity;
+            var codeQuantity = codeList.Count() + currentCount;
+            if (orderQuantity < codeQuantity)
+            {
+                throw new Exception(string.Format("识别码数量{0}超过订货数量{1}，请重新输入", codeQuantity, orderQuantity));
+            }
+
+            IdentityCode model = new IdentityCode();
+            model.OrderDetailsID = orderDetailsId;
+            foreach (var code in codeList)
+            {
+                model.Code = code;
+                CodeSingle(model);
+            }
         }
 
     }
