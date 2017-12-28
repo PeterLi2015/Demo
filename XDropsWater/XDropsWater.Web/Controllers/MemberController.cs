@@ -941,6 +941,29 @@ namespace XDropsWater.Web.Controllers
                 : View(list.ToPagedList(page, rows));
         }
 
+        /// <summary>
+        /// 级别>=我
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetHighSubMembers1()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 级别>=我
+        /// </summary>
+        /// <param name="mobileOrName"></param>
+        /// <param name="page"></param>
+        /// <param name="rows"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetHighSubMembers1(string mobileOrName, int page = 1, int rows = 10)
+        {
+            var result = service.GetHighSubMembers1(page, rows, mobileOrName);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult BackOfficeManage()
         {
             return View();

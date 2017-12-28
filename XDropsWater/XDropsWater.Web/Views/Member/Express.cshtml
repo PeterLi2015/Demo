@@ -92,7 +92,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="tableBody">
-                                            <tr v-for="(item, index) in items">
+                                            <tr v-for="(item, index) in items" v-bind:style="{ background: item.BackgroundColor}">
                                                 <td>{{item.No}}</td>
                                                 <td v-show="admin">{{item.Member.MemberName}}</td>
                                                 <td v-show="admin">{{item.Member.Mobile}}</td>

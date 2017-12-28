@@ -66,7 +66,7 @@ namespace XDropsWater.Web.Controllers
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="代理订单", Url="/Member/ChildMemberOrder1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="添加代理", Url="/Member/DirectChildMember1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="所有代理", Url="/Member/GetAllSubMembers1?SystemMenu=Menu"},
-                    new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="代理级别≥我", Url="/Member/GetHighSubMembers?SystemMenu=Menu"},
+                    new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="代理级别≥我", Url="/Member/GetHighSubMembers1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="我的库存", Url="/Member/MyStock?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="发货管理", Url="/Member/Express?SystemMenu=Menu"}
                 }

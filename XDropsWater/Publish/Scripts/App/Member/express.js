@@ -371,6 +371,11 @@ function getExpress(vm, page) {
         }
         hideAllDialog();
         vm.items = result.data.ExpressList; // 发货信息列表
+        for (var i = 0; i < vm.items.length; i++) {
+            if (vm.items[i].Status == 0) {
+                vm.items[i].BackgroundColor = 'lightpink';
+            }
+        }
         CalculateTablePages(vm, page, result);
     }, function (error) {
         showError(vm, error);

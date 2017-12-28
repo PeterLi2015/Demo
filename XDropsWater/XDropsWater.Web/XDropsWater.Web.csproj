@@ -2128,6 +2128,7 @@
     <Content Include="Scripts\App\Member\childMemberOrder1.js" />
     <Content Include="Scripts\App\Member\directChildMember1.js" />
     <Content Include="Scripts\App\Member\getAllSubMembers1.js" />
+    <Content Include="Scripts\App\Member\getHighSubMembers1.js" />
     <Content Include="Scripts\App\Member\memberManage1.js" />
     <Content Include="Scripts\App\Member\memberOrderManage1 - Copy.js" />
     <Content Include="Scripts\App\Member\memberOrderManage1.js" />
@@ -2261,6 +2262,7 @@
     <Content Include="Views\Member\DirectorBonusList.cshtml" />
     <Content Include="Views\Member\GetAllSubMembers1.cshtml" />
     <Content Include="Views\Member\Express.cshtml" />
+    <Content Include="Views\Member\GetHighSubMembers1.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

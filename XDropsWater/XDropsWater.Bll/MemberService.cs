@@ -3536,6 +3536,22 @@ namespace XDropsWater.Bll
             }
         }
 
+        public SubMemberSummary GetHighSubMembers1(int page, int rows, string mobileOrName)
+        {
+            SubMemberSummary model = new SubMemberSummary();
+            using (SimpleWebUnitOfWork db = new SimpleWebUnitOfWork())
+            {
+
+                List<SubMemberModel> members = db.Database.SqlQuery<SubMemberModel>("EXEC [P_GetHighSubMembers] @MemberID,@RoleID, @MobileOrName", new SqlParameter("@MemberID", this.CurrentUser.MemberID), new SqlParameter("@RoleID", this.CurrentUser.RoleID), new SqlParameter("@MobileOrName", (mobileOrName ?? ""))).ToList();
+                var totalCount = members.Count();
+                var totalPages = (int)Math.Ceiling((decimal)totalCount / rows);
+
+                model.Members = members.OrderBy(o => o.LevelID).Skip((page - 1) * rows).Take(rows).ToList();
+
+                CalculateRowNo(model, model.Members, page, rows, totalCount);
+            }
+            return model;
+        }
 
 
         public IEnumerable<MemberRoleModel> GetMemberRole()

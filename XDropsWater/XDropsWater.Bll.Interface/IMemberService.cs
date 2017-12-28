@@ -264,6 +264,8 @@ namespace XDropsWater.Bll.Interface
 
         List<SubMemberModel> GetHighSubMembers(string mobileOrName);
 
+        SubMemberSummary GetHighSubMembers1(int page, int rows, string mobileOrName);
+
         /// <summary>
         /// 后台管理员修改代理
         /// </summary>
