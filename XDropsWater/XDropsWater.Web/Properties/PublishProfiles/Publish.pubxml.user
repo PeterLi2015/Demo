@@ -115,7 +115,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/13/2017 11:33:23</publishTime>
     </File>
     <File Include="bin/XDropsWater.Bll.dll">
-      <publishTime>12/28/2017 18:20:07</publishTime>
+      <publishTime>01/02/2018 18:32:41</publishTime>
     </File>
     <File Include="bin/XDropsWater.Bll.Interface.dll">
       <publishTime>12/28/2017 18:20:03</publishTime>
@@ -133,7 +133,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>12/27/2017 22:24:26</publishTime>
     </File>
     <File Include="bin/XDropsWater.Web.dll">
-      <publishTime>12/28/2017 18:20:11</publishTime>
+      <publishTime>01/02/2018 18:32:42</publishTime>
     </File>
     <File Include="Content/AdminLTE-2.3.6/.gitignore">
       <publishTime>02/13/2017 11:32:42</publishTime>
@@ -5947,7 +5947,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/23/2017 11:24:20</publishTime>
     </File>
     <File Include="Scripts/App/Member/newIdentityCode.js">
-      <publishTime>12/27/2017 13:02:06</publishTime>
+      <publishTime>01/02/2018 17:47:59</publishTime>
     </File>
     <File Include="Scripts/App/Member/personalInfo1.js">
       <publishTime>10/23/2017 11:24:20</publishTime>
@@ -6211,7 +6211,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>10/23/2017 11:24:21</publishTime>
     </File>
     <File Include="Views/Member/NewIdentityCode.cshtml">
-      <publishTime>12/27/2017 12:38:02</publishTime>
+      <publishTime>01/02/2018 17:42:55</publishTime>
     </File>
     <File Include="Views/Member/PersonalInfo.cshtml">
       <publishTime>10/23/2017 13:06:07</publishTime>

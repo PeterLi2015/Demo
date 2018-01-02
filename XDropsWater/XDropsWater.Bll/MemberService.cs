@@ -4891,7 +4891,7 @@ namespace XDropsWater.Bll
             var totalCount = db.Find(whereExp, o => o.CreateOn).Count();
             var totalPages = (int)Math.Ceiling((decimal)totalCount / rows);
 
-            var list = db.Find(whereExp, o => o.Code).OrderBy(o => o.Code).Skip((page - 1) * rows).Take(rows).ToList();
+            var list = db.Find(whereExp, o => o.CreateOn).OrderByDescending(o => o.CreateOn).Skip((page - 1) * rows).Take(rows).ToList();
 
 
             Mapper.CreateMap<MemberRoleEntity, MemberRole>();

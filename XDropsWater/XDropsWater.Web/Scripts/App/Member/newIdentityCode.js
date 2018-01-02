@@ -163,6 +163,7 @@ function showAgentSelectCode(title) {
     agentSelectCode.title = title;
     agentSelectCode.error.show = false;
     agentSelectCode.selected = [];
+    agentSelectCode.AllSelected = false;
     getAvailableCodes(agentSelectCode, 1);
     showModal($('#agentSelectCode'));
 }
@@ -235,7 +236,7 @@ function getAvailableCodes(vm, page) {
     var data = {
         productId: sessionStorage.ProductID,
         page: page,
-        rows: getRowsCount()
+        rows: 1000
     }
     vm.$http.post(url, data).then(
        function (result) {
