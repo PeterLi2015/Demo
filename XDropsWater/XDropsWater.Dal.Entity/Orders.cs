@@ -74,6 +74,11 @@ namespace XDropsWater.Dal.Entity
         /// </summary>
         public int Status { get; set; }
 
+        /// <summary>
+        /// 0未收款，1已收款
+        /// </summary>
+        public int FinancialStatus { get; set; }
+
 
         public virtual MemberEntity Member { get; set; }
 

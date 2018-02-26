@@ -69,6 +69,10 @@ namespace XDropsWater.Web.Controllers
             {
                 result.IsAdmin = true;
             }
+            if(user.UserRoleID == (int)enmRoles.Financial)
+            {
+                result.IsFinancial = true;
+            }
             return result;
         }
 

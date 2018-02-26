@@ -121,7 +121,12 @@ namespace XDropsWater.Model
     {
         All = 0,
         Admin = 1,
-        General = 2
+        General = 2,
+
+        /// <summary>
+        /// 财务
+        /// </summary>
+        Financial = 3
     }
     public enum enmMemberRole
     {

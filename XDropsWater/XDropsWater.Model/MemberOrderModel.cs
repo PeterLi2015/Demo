@@ -81,6 +81,11 @@ namespace XDropsWater.Model
         public int Status { get; set; }
 
         /// <summary>
+        /// 0未收款，1已收款
+        /// </summary>
+        public int FinancialStatus { get; set; }
+
+        /// <summary>
         /// 是否有唯一识别码
         /// </summary>
         public bool HasIdentityCode { get; set; }

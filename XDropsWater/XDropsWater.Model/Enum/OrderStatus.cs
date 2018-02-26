@@ -27,4 +27,20 @@ namespace XDropsWater.Model
         /// </summary>
         CodeFull
     }
+
+    /// <summary>
+    /// 订单财务状态
+    /// </summary>
+    public enum OrderFinancialStatus
+    {
+        /// <summary>
+        /// 未付款
+        /// </summary>
+        Unpay,
+        /// <summary>
+        /// 已付款
+        /// </summary>
+        Paid,
+        
+    }
 }

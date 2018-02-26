@@ -158,6 +158,7 @@ namespace XDropsWater.Web.Controllers
             return Json(orderSummary, JsonRequestBehavior.AllowGet);
         }
 
+
         /// <summary>
         /// 获取产品唯一辨识码
         /// </summary>
@@ -1236,6 +1237,18 @@ namespace XDropsWater.Web.Controllers
         }
 
         /// <summary>
+        /// 确认收款
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult FinancialConfirm(Guid orderId)
+        {
+            service.FinancialConfirm(orderId);
+            return new EmptyResult();
+        }
+
+        /// <summary>
         /// 我的库存
         /// </summary>
         /// <returns></returns>
@@ -1352,7 +1365,7 @@ namespace XDropsWater.Web.Controllers
             return new EmptyResult();
         }
 
-        
+
         /// <summary>
         /// 删除发货记录
         /// </summary>
@@ -1363,6 +1376,32 @@ namespace XDropsWater.Web.Controllers
         {
             service.RemoveExpress(id);
             return new EmptyResult();
+        }
+
+        /// <summary>
+        /// 修改识别码
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult UpdateCodes()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 获取修改识别码
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="rows"></param>
+        /// <param name="mobileOrName"></param>
+        /// <param name="code"></param>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetUpdateCodes(int page, int rows, string mobileOrName = "", long code = -1, int productId = -1)
+        {
+            //var result = service.GetUpdateCodes(page, rows, mobileOrName, code, productId);
+            //return Json(result, JsonRequestBehavior.AllowGet);
+            return null;
         }
     }
 }

@@ -221,6 +221,10 @@ namespace XDropsWater.Bll
             {
                 orderList = orderRepo.FindBy(o => o.SendMemberID == Guid.Empty && !o.IsDeliverly && (o.Status != (int)OrderStatus.LessAmount));
             }
+            else if (this.CurrentUser.UserRoleID == (int)enmRoles.Financial)
+            {
+                orderList = orderRepo.FindBy(o => o.SendMemberID == Guid.Empty && !o.IsDeliverly && (o.FinancialStatus != (int)OrderFinancialStatus.Paid));
+            }
             return orderList.Count();
         }
 
@@ -1605,6 +1609,35 @@ namespace XDropsWater.Bll
             {
                 UpdateAwardParents(order.ID, member.ID);
             }
+        }
+
+        /// <summary>
+        /// 确认收款
+        /// </summary>
+        /// <param name="orderId"></param>
+        public void FinancialConfirm(Guid orderId)
+        {
+            Repository<OrderEntity> orderDb = new Repository<OrderEntity>(uow);
+            var order = orderDb.FindBy(o => o.ID == orderId).FirstOrDefault();
+            if (order == null)
+            {
+                throw new Exception("该订单不存在，请联系管理员");
+            }
+            if (order.FinancialStatus == (int)OrderFinancialStatus.Paid)
+            {
+                throw new Exception("该订单已经确认收款");
+            }
+            if (order.IsDeliverly)
+            {
+                throw new Exception("该订单已经发货，不允许确认收款");
+            }
+
+            order.FinancialStatus = (int)OrderFinancialStatus.Paid;
+            orderDb.Update(order);
+
+            uow.Commit();
+
+          
         }
 
         public void UpdateOrderExpress(Guid orderId, string expressContent)
@@ -4842,6 +4875,8 @@ namespace XDropsWater.Bll
             orderDb.Update(order);
 
             uow.Commit();
+
+            UpdateOrder(order.ID);
         }
 
         /// <summary>
@@ -5100,11 +5135,11 @@ namespace XDropsWater.Bll
                     StringBuilder sb = new StringBuilder();
                     foreach (var code in distinctCodes)
                     {
-                        
+
                         var memberName = db.FindBy(o => o.Code == code).OrderBy(o => o.CreateOn).First().OrderDetails.Order.Member.MemberName;
                         sb.Append(string.Format("{0}已经被{1}使用, ", code, memberName));
                     }
-                    
+
                     throw new Exception(sb.ToString());
                 }
             }
@@ -5465,6 +5500,81 @@ namespace XDropsWater.Bll
                 model.Code = code;
                 CodeSingle(model);
             }
+        }
+
+        ///// <summary>
+        ///// 获取编号
+        ///// </summary>
+        ///// <param name="page"></param>
+        ///// <param name="size"></param>
+        ///// <param name="mobileOrName"></param>
+        ///// <param name="code"></param>
+        ///// <param name="productId"></param>
+        ///// <returns></returns>
+        //public UpdateCodeSummary GetUpdateCodes(int page, int size, string mobileOrName = "", long code = -1, int productId = -1)
+        //{
+        //    var result = new UpdateCodeSummary();
+        //    var db = new Repository<IdentityCodeEntity>(uow);
+        //    Expression<Func<IdentityCodeEntity, bool>> whereExp = o => o.ID != Guid.Empty;
+        //    if (!string.IsNullOrWhiteSpace(mobileOrName))
+        //    {
+        //        whereExp = whereExp.And(o => (o.OrderDetails.Order.Member.Mobile.Contains(mobileOrName)
+        //        || o.OrderDetails.Order.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+        //        );
+        //    }
+        //    if (code != -1)
+        //    {
+        //        whereExp = whereExp.And(co => co.Code == code);
+        //    }
+        //    if (productId != -1)
+        //    {
+        //        whereExp = whereExp.And(o => o.OrderDetails.ProductID == productId);
+        //    }
+        //    var list = db.Find(whereExp, o => o.CreateOn).Select(o => 
+        //        new {
+        //            Code = o.Code,
+        //            ProductID = o.OrderDetails.ProductID,
+        //            ProductName = o.OrderDetails.Product.Name
+        //        }).Distinct();
+        //    var totalCount = list.Count();
+        //    var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
+        //    var items = list.OrderByDescending(o => o.Code).Skip((page - 1) * size).Take(size).ToList();
+        //    var updateCodeList = new List<UpdateCode>();
+        //    var updateCode = new UpdateCode();
+        //    foreach(var item in items)
+        //    {
+        //        updateCode = new UpdateCode();
+        //        updateCode.Code = item.Code;
+        //        updateCode.ProductID = item.ProductID;
+        //        updateCode.ProductName = item.ProductName;
+        //        updateCodeList.Add(updateCode);
+        //    }
+        //    result.UpdateCodeList = updateCodeList;
+        //    CalculateRowNo(result, result.UpdateCodeList, page, size, totalCount);
+        //    return result;
+        //}
+
+        /// <summary>
+        /// 更改编号
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="productId"></param>
+        public void UpdateCode(long newCode, long oldCode, int productId)
+        {
+            var db = new Repository<IdentityCodeEntity>(uow);
+            // check whether the newCode is used
+            if (db.FindBy(o => o.Code == newCode && o.OrderDetails.ProductID == productId).Any())
+            {
+                var memberName = db.FindBy(o => o.Code == newCode).OrderBy(o => o.CreateOn).First().OrderDetails.Order.Member.MemberName;
+                throw new Exception(string.Format("识别码{0}已被{1}使用", newCode, memberName));
+            }
+            var list = db.FindBy(o => o.Code == oldCode && o.OrderDetails.ProductID == productId).ToList();
+            foreach (var item in list)
+            {
+                item.Code = newCode;
+                db.Update(item);
+            }
+            uow.Commit();
         }
 
     }

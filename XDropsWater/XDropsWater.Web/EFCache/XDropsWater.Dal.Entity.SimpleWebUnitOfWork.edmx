@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <views>
-  <mapping-views hash="7536c551c79b014bf9f842fa212e1396b204bd186a9df2d0096198c6c4ae851e" conceptual-container="SimpleWebUnitOfWork" store-container="CodeFirstDatabase">
+  <mapping-views hash="0671fa37374cbb5a133c9ffcf0e4b500930197891c3405fff2c4c04cacac851b" conceptual-container="SimpleWebUnitOfWork" store-container="CodeFirstDatabase">
     <view extent="CodeFirstDatabase.DirectorEntity"><![CDATA[
     SELECT VALUE -- Constructing DirectorEntity
         [CodeFirstDatabaseSchema.DirectorEntity](T1.DirectorEntity_ID, T1.DirectorEntity_MemberID, T1.DirectorEntity_DirectorNo, T1.DirectorEntity_CreateBy, T1.DirectorEntity_CreateOn, T1.DirectorEntity_UpdateBy, T1.DirectorEntity_UpdateOn)
@@ -126,7 +126,7 @@
     ) AS T1]]></view>
     <view extent="CodeFirstDatabase.OrderEntity"><![CDATA[
     SELECT VALUE -- Constructing OrderEntity
-        [CodeFirstDatabaseSchema.OrderEntity](T1.OrderEntity_ID, T1.OrderEntity_OrderNo, T1.OrderEntity_MemberID, T1.OrderEntity_Quantity, T1.OrderEntity_BonusQuantity, T1.OrderEntity_IsDeliverly, T1.OrderEntity_SendMemberID, T1.OrderEntity_Description, T1.OrderEntity_Total, T1.OrderEntity_Express, T1.OrderEntity_GeneralAgent1ID, T1.OrderEntity_GeneralAgent2ID, T1.OrderEntity_GeneralAgent3ID, T1.OrderEntity_DirectorID, T1.OrderEntity_SendDate, T1.OrderEntity_Status, T1.OrderEntity_CreateBy, T1.OrderEntity_CreateOn, T1.OrderEntity_UpdateBy, T1.OrderEntity_UpdateOn)
+        [CodeFirstDatabaseSchema.OrderEntity](T1.OrderEntity_ID, T1.OrderEntity_OrderNo, T1.OrderEntity_MemberID, T1.OrderEntity_Quantity, T1.OrderEntity_BonusQuantity, T1.OrderEntity_IsDeliverly, T1.OrderEntity_SendMemberID, T1.OrderEntity_Description, T1.OrderEntity_Total, T1.OrderEntity_Express, T1.OrderEntity_GeneralAgent1ID, T1.OrderEntity_GeneralAgent2ID, T1.OrderEntity_GeneralAgent3ID, T1.OrderEntity_DirectorID, T1.OrderEntity_SendDate, T1.OrderEntity_Status, T1.OrderEntity_FinancialStatus, T1.OrderEntity_CreateBy, T1.OrderEntity_CreateOn, T1.OrderEntity_UpdateBy, T1.OrderEntity_UpdateOn)
     FROM (
         SELECT 
             T.ID AS OrderEntity_ID, 
@@ -145,6 +145,7 @@
             T.DirectorID AS OrderEntity_DirectorID, 
             T.SendDate AS OrderEntity_SendDate, 
             T.Status AS OrderEntity_Status, 
+            T.FinancialStatus AS OrderEntity_FinancialStatus, 
             T.CreateBy AS OrderEntity_CreateBy, 
             T.CreateOn AS OrderEntity_CreateOn, 
             T.UpdateBy AS OrderEntity_UpdateBy, 
@@ -375,7 +376,7 @@
     ) AS T1]]></view>
     <view extent="SimpleWebUnitOfWork.Orders"><![CDATA[
     SELECT VALUE -- Constructing Orders
-        [XDropsWater.Dal.Entity.OrderEntity](T1.OrderEntity_ID, T1.OrderEntity_OrderNo, T1.OrderEntity_MemberID, T1.OrderEntity_Quantity, T1.OrderEntity_BonusQuantity, T1.OrderEntity_IsDeliverly, T1.OrderEntity_SendMemberID, T1.OrderEntity_Description, T1.OrderEntity_Total, T1.OrderEntity_Express, T1.OrderEntity_GeneralAgent1ID, T1.OrderEntity_GeneralAgent2ID, T1.OrderEntity_GeneralAgent3ID, T1.OrderEntity_DirectorID, T1.OrderEntity_SendDate, T1.OrderEntity_Status, T1.OrderEntity_CreateBy, T1.OrderEntity_CreateOn, T1.OrderEntity_UpdateBy, T1.OrderEntity_UpdateOn)
+        [XDropsWater.Dal.Entity.OrderEntity](T1.OrderEntity_ID, T1.OrderEntity_OrderNo, T1.OrderEntity_MemberID, T1.OrderEntity_Quantity, T1.OrderEntity_BonusQuantity, T1.OrderEntity_IsDeliverly, T1.OrderEntity_SendMemberID, T1.OrderEntity_Description, T1.OrderEntity_Total, T1.OrderEntity_Express, T1.OrderEntity_GeneralAgent1ID, T1.OrderEntity_GeneralAgent2ID, T1.OrderEntity_GeneralAgent3ID, T1.OrderEntity_DirectorID, T1.OrderEntity_SendDate, T1.OrderEntity_Status, T1.OrderEntity_FinancialStatus, T1.OrderEntity_CreateBy, T1.OrderEntity_CreateOn, T1.OrderEntity_UpdateBy, T1.OrderEntity_UpdateOn)
     FROM (
         SELECT 
             T.ID AS OrderEntity_ID, 
@@ -394,6 +395,7 @@
             T.DirectorID AS OrderEntity_DirectorID, 
             T.SendDate AS OrderEntity_SendDate, 
             T.Status AS OrderEntity_Status, 
+            T.FinancialStatus AS OrderEntity_FinancialStatus, 
             T.CreateBy AS OrderEntity_CreateBy, 
             T.CreateOn AS OrderEntity_CreateOn, 
             T.UpdateBy AS OrderEntity_UpdateBy, 

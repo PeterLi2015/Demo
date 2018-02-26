@@ -73,6 +73,17 @@ namespace XDropsWater.Web.Controllers
                 });
                 ViewBag.SelfNewOrderCount = service.GetSelfNewOrderCount();
             }
+            else if (user.UserRoleID == (int)enmRoles.Financial)
+            {
+                menuGroups.Add(new MenuGroup()
+                {
+                    Name = "系统管理",
+                    MenuItems = new List<MenuItem>() {
+                    new MenuItem(){  Icon = "icon-sys",Id="MemberOrderManage", Name="总代订单", Url="/Member/MemberOrderManage1?SystemMenu=Menu"},
+                }
+                });
+                ViewBag.SelfNewOrderCount = service.GetSelfNewOrderCount();
+            }
 
             Session["Menu"] = menuGroups;
             return View();

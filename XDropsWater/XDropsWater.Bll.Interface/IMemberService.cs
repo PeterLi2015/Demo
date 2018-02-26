@@ -421,6 +421,12 @@ namespace XDropsWater.Bll.Interface
         void SendMemberOrder1(Guid orderId, string expressContent);
 
         /// <summary>
+        /// 确认收款
+        /// </summary>
+        /// <param name="orderId"></param>
+        void FinancialConfirm(Guid orderId);
+
+        /// <summary>
         /// 获取我的库存
         /// </summary>
         /// <param name="page"></param>
@@ -489,6 +495,25 @@ namespace XDropsWater.Bll.Interface
         void RemoveExpress(Guid id);
 
         void BulkAddCode(Guid orderDetailsId, IEnumerable<long> codeList);
+
+        /// <summary>
+        /// 获取要修改的识别码
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="mobileOrName"></param>
+        /// <param name="code"></param>
+        /// <param name="productId"></param>
+        /// <returns></returns>
+        //UpdateCodeSummary GetUpdateCodes(int page, int size, string mobileOrName = "", long code = -1, int productId = -1);
+
+        /// <summary>
+        /// 修改识别码
+        /// </summary>
+        /// <param name="newCode">新识别码</param>
+        /// <param name="oldCode">老识别码</param>
+        /// <param name="productId">产品ID</param>
+        void UpdateCode(long newCode, long oldCode, int productId);
 
     }
 }

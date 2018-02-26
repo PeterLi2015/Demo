@@ -20,7 +20,8 @@ var rows = new Vue({
         totalCount: 0, //总行数
 
         permission: {
-            operate: sessionStorage.memberOrderManageOperate
+            operate: sessionStorage.memberOrderManageOperate,
+            isFinancial: sessionStorage.isFinancial
         },
 
         error: {
@@ -47,6 +48,10 @@ var rows = new Vue({
         updateReset: function (order, index) {
             updateReset(order, index);
         },
+        financialConfirm: function (order, index) {
+            financialConfirm(order, index);
+        },
+        
         //calculatePages: function (current, length, displayLength) {
         //    var indexes = calculatePages(current, length, displayLength);
         //    //if (this.currentPage > indexes.length && displayLength > indexes.length > 1) {
@@ -56,6 +61,45 @@ var rows = new Vue({
         //},
     }
 });
+
+
+/*
+功能: 财务确认
+参数:
+    item: 唯一识别码信息
+    index: 唯一识别码索引
+    orderIndex: 订单索引
+*/
+function financialConfirm(model, index) {
+    var sTotal = model.Total + '';
+    var title = '您确定收到[' + model.Member.MemberName + ': ' + sTotal.bold() + ']元订单款吗？'
+    showConfirm(title, function () {
+        showDialog('正在确认...');
+        var url = '/Member/FinancialConfirm';
+        var data = {
+            orderId: model.ID
+        }
+        rows.$http.post(url, data).then(
+            function (success) {
+                hideAllDialog();
+                updateRecordForFinancial(index);
+                showDialog('确定收款成功', 500);
+            },
+            function (error) {
+                hideAllDialog();
+                showAlert(error)
+            });
+    });
+}
+
+/*
+功能: 更新记录
+*/
+function updateRecordForFinancial(index) {
+    rows.items[index].FinancialStatus = 1;
+}
+
+
 
 
 //发货或修改快递
@@ -263,6 +307,8 @@ function sendReset(order, index) {
     //});
 
 }
+
+
 
 /*
 功能: 修改快递信息，重置数据
@@ -519,6 +565,9 @@ function SendOrUpdate(model, operateType) {
     else if (operateType == '发货') {
         send(model);
     }
+    else if (operateType == '确认收款') {
+        financialConfirm(model);
+    }
 }
 
 function updateExpress(model) {
@@ -566,6 +615,7 @@ function send(model) {
     });
 
 }
+
 
 
 /*

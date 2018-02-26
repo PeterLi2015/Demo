@@ -29,7 +29,7 @@
         </h1>
         <ol class="breadcrumb">
             <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i>主页</a></li>
-            <li class="active">代理订单</li>
+            <li class="active">修改识别码</li>
         </ol>
     </section>
     <section class="content">
@@ -39,18 +39,21 @@
                 <div class="box">
                     <div class="box-header">
                         <div class="form-group">
-                            <select v-model="search.isDelivery" class="form-control" placeholder="是否发货">
-                                <option value="">全部</option>
-                                <option value="true">已发货</option>
-                                <option value="false">未发货</option>
+                            <select v-model="search.ProductID" class="form-control" placeholder="选择产品">
+                                <option value="-1">全部</option>
+                                <option value="4">小水滴304不锈钢Y1饮水宝</option>
+                                <option value="5">小水滴304不锈钢M1沐浴宝</option>
+                                <option value="6">小水滴304不锈钢L1龙头宝</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <input v-model="search.mobileOrName" class="form-control" placeholder="电话号码或姓名" type="text">
+                            <input v-model="search.Code" class="form-control" placeholder="识别码" type="text">
                         </div>
                         <div class="form-group">
-                            <button v-on:click="getPages(1)" class="btn btn-info" type="button">
-                                <i class="glyphicon glyphicon-search"></i> 查询</button>
+                            <input v-model="search.MobileOrName" class="form-control" placeholder="电话号码或姓名" type="text">
+                        </div>
+                        <div class="form-group">
+                            <xdropswater-search-button></xdropswater-search-button>
                         </div>
 
                     </div>
@@ -65,61 +68,22 @@
                                         <thead>
                                             <tr>
                                                 <th>序号</th>
-                                                <th>订单编号</th>
-                                                <th>手机号码</th>
-                                                <th>姓名</th>
-                                                <th>级别</th>
-                                                <th>订货数量</th>
-                                                <th>是否发货</th>
-                                                <th>收货地址</th>
-                                                <th>订货时间</th>
-                                                <th>总价</th>
-                                                <th>备注</th>
-                                                <th>快递信息</th>
-                                                <th>操作</th>
+                                                <th>识别码</th>
+                                                <th>产品名称</th>
+                                                <th v-show="permission.operate">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tableBody">
                                             <tr v-for="(item, index) in items">
                                                 <td>{{item.No}}</td>
-                                                <td>{{item.OrderNo}}</td>
-                                                <td>{{item.Member.Mobile}}</td>
-                                                <td>{{item.Member.MemberName}}</td>
-                                                <td>{{item.Member.Role.RoleName}}</td>
-                                                <td>{{item.Quantity}}</td>
-                                                <td v-show="item.IsDeliverly"><span class="glyphicon glyphicon-ok"></span></td>
-                                                <td v-show="!item.IsDeliverly"><span class="glyphicon glyphicon-remove"></span></td>
-                                                <td>{{item.Member.Address}}</td>
-                                                <td>{{item.CreateOn | formatDate}}</td>
-                                                <td>{{item.Total}}</td>
-                                                <td>{{item.Description}}</td>
-                                                <td>{{item.Express}}</td>
-                                                <td v-show="permission.operate">
-                                                    <button v-show="!item.IsDeliverly && item.FinancialStatus==1 && (item.Status==0 || item.Status==3)" class="btn btn-sm btn-danger" v-on:click="sendReset(item, index)">
-                                                        <i class="glyphicon glyphicon-plane"></i> 发货
-                                                    </button>
-                                                    <button v-show="!item.IsDeliverly && item.FinancialStatus==1 && (item.Status==2 || item.Status==3)" class="btn btn-sm btn-warning" v-on:click="addCode(item)">
-                                                        <i class="glyphicon glyphicon-pencil"></i> <span v-show="item.Status==2">添加</span><span v-show="item.Status==3">修改</span>识别码
-                                                    </button>
-                                                    <button v-show="item.IsDeliverly" class="btn btn-sm btn-success" v-on:click="updateReset(item, index)">
+                                                <td>{{item.Code}}</td>
+                                                <td>{{item.ProductName}}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" v-on:click="update(item, index)">
                                                         <i class="glyphicon glyphicon-edit"></i> 修改
                                                     </button>
-                                                    <button v-show="item.IsDeliverly && item.Status==3" class="btn btn-sm btn-info" v-on:click="addCode(item)">
-                                                        <i class="glyphicon glyphicon-search"></i> 查看识别码
-                                                    </button>
-                                                    <button v-show="!item.IsDeliverly && (item.FinancialStatus==0)" class="btn btn-sm btn-primary" disabled v-on:click="financialConfirm(item, index)">
-                                                        <i class="glyphicon glyphicon-yen"></i> 未付款
-                                                    </button>
-                                                </td>
-                                                <td v-show="permission.isFinancial">
-                                                    <button v-show="!item.IsDeliverly && (item.FinancialStatus==0)" class="btn btn-sm btn-warning" v-on:click="financialConfirm(item, index)">
-                                                        <i class="glyphicon glyphicon-yen"></i> 确认收款
-                                                    </button>
-                                                    <button v-show="!item.IsDeliverly && (item.FinancialStatus==1)" class="btn btn-sm btn-success" disabled>
-                                                        <i class="glyphicon glyphicon-yen"></i> 已付款
-                                                    </button>
-                                                    <button v-show="item.IsDeliverly" class="btn btn-sm btn-success" disabled>
-                                                        <i class="glyphicon glyphicon-plane"></i> 已发货
+                                                    <button class="btn btn-sm btn-info" v-on:click="showMember(item)">
+                                                        <i class="glyphicon glyphicon-search"></i> 查看使用代理
                                                     </button>
                                                 </td>
                                             </tr>
@@ -139,7 +103,7 @@
                         </div>
                         <!-- /.box-body -->
                     </div>
-                
+
                 </div>
             </div>
         </div>
@@ -173,9 +137,9 @@
                                 </div>
                                 <xdropswater-modal-footer></xdropswater-modal-footer>
                                 @*<div class="form-group modal-footer modal-footer-bg-xdropswater">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                    <button type="submit" class="btn btn-primary">保存</button>
-                                </div>*@
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        <button type="submit" class="btn btn-primary">保存</button>
+                                    </div>*@
                             </div>
                         </form>
 
@@ -291,9 +255,9 @@
                                 </div>
                                 <xdropswater-modal-footer></xdropswater-modal-footer>
                                 @*<div class="form-group modal-footer modal-footer-bg-xdropswater">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                    <button type="submit" id="btnAdd" class="btn btn-primary">保存</button>
-                                </div>*@
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        <button type="submit" id="btnAdd" class="btn btn-primary">保存</button>
+                                    </div>*@
                             </div>
                         </form>
                     </div>
@@ -333,9 +297,9 @@
                                 </div>
                                 <xdropswater-modal-footer></xdropswater-modal-footer>
                                 @*<div class="form-group modal-footer modal-footer-bg-xdropswater">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                    <button type="submit" id="btnAdd" class="btn btn-primary">保存</button>
-                                </div>*@
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        <button type="submit" id="btnAdd" class="btn btn-primary">保存</button>
+                                    </div>*@
                             </div>
                         </form>
                     </div>
