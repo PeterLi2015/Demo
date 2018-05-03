@@ -1,11 +1,12 @@
 ﻿using XDropsWater.Bll;
 using XDropsWater.Bll.Interface;
 using XDropsWater.Model;
-using Microsoft.Practices.Unity.InterceptionExtension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Unity.Interception.InterceptionBehaviors;
+using Unity.Interception.PolicyInjection.Pipeline;
 
 namespace XDropsWater.Web
 {
@@ -26,9 +27,13 @@ namespace XDropsWater.Web
 
         public IMethodReturn Invoke(IMethodInvocation input, GetNextInterceptionBehaviorDelegate getNext)
         {
-            var user = HttpContext.Current.Session["CurUser"] as UserSummary;
-            var service = input.Target as IService;
-            service.CurrentUser = user;
+            UserSummary user = null;
+            if (HttpContext.Current.Session != null)
+            {
+                user = HttpContext.Current.Session["CurUser"] as UserSummary;
+                var service = input.Target as IService;
+                service.CurrentUser = user;
+            }
 
             var result = getNext()(input, getNext);
 

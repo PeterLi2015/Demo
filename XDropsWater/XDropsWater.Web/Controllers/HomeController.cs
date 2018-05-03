@@ -6,11 +6,17 @@ using System.Web.Mvc;
 using XDropsWater.Model;
 using XDropsWater.Bll;
 using XDropsWater.Bll.Interface;
+using Unity.Attributes;
 
 namespace XDropsWater.Web.Controllers
 {
     public class HomeController : BaseController
     {
+        [Dependency]
+        public IMemberService Service { get; set; }
+
+        [Dependency]
+        public IUserLogService LogService { get; set; }
         //
         // GET: /Home/
 
@@ -35,10 +41,9 @@ namespace XDropsWater.Web.Controllers
             ViewBag.Account = (this.Session["CurUser"] as UserSummary).Account;
             UserSummary user = Session["CurUser"] as UserSummary;
             var menuGroups = new List<MenuGroup>();
-            var service = this.GetService<IMemberService>();
-            ViewBag.NewOrderCount = service.GetNewOrderCount();
-            ViewBag.MemberCount = service.GetMemberCount();
-            ViewBag.NewExpressCount = service.GetNewExpress();
+            ViewBag.NewOrderCount = Service.GetNewOrderCount();
+            ViewBag.MemberCount = Service.GetMemberCount();
+            ViewBag.NewExpressCount = Service.GetNewExpress();
             if (user.UserRoleID == (int)enmRoles.Admin || user.UserRoleID == (int)enmRoles.All)
             {
                 MenuGroup menu = new MenuGroup();
@@ -58,20 +63,27 @@ namespace XDropsWater.Web.Controllers
             }
             else if (user.UserRoleID == (int)enmRoles.General)
             {
-                menuGroups.Add(new MenuGroup()
+                var menuList = new List<MenuItem>()
                 {
-                    Name = "系统管理",
-                    MenuItems = new List<MenuItem>() { 
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="我的订单", Url="/Member/PersonalOrder1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="代理订单", Url="/Member/ChildMemberOrder1?SystemMenu=Menu"},
-                    new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="添加代理", Url="/Member/DirectChildMember1?SystemMenu=Menu"},
+                    //new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="添加代理", Url="/Member/DirectChildMember1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="所有代理", Url="/Member/GetAllSubMembers1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="代理级别≥我", Url="/Member/GetHighSubMembers1?SystemMenu=Menu"},
                     new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="我的库存", Url="/Member/MyStock?SystemMenu=Menu"},
-                    new MenuItem(){  Icon = "icon-sys",Id="manusl", Name="发货管理", Url="/Member/Express?SystemMenu=Menu"}
-                }
+                };
+                menuGroups.Add(new MenuGroup()
+                {
+                    Name = "系统管理",
+                    MenuItems = menuList
                 });
-                ViewBag.SelfNewOrderCount = service.GetSelfNewOrderCount();
+                if (user.RoleID >= (int)enmMemberRole.GeneralAgent)
+                {
+                    menuList.Add(
+                        new MenuItem() { Icon = "icon-sys", Id = "manusl", Name = "发货管理", Url = "/Member/Express?SystemMenu=Menu" }
+                        );
+                }
+                ViewBag.SelfNewOrderCount = Service.GetSelfNewOrderCount();
             }
             else if (user.UserRoleID == (int)enmRoles.Financial)
             {
@@ -82,7 +94,7 @@ namespace XDropsWater.Web.Controllers
                     new MenuItem(){  Icon = "icon-sys",Id="MemberOrderManage", Name="总代订单", Url="/Member/MemberOrderManage1?SystemMenu=Menu"},
                 }
                 });
-                ViewBag.SelfNewOrderCount = service.GetSelfNewOrderCount();
+                ViewBag.SelfNewOrderCount = Service.GetSelfNewOrderCount();
             }
 
             Session["Menu"] = menuGroups;
@@ -178,7 +190,7 @@ namespace XDropsWater.Web.Controllers
 
         public ActionResult Logout()
         {
-            this.GetService<IUserLogService>().AddLog(UserOperations.Logout);
+            LogService.AddLog(UserOperations.Logout);
             this.Session.Clear();
             return RedirectToAction("Login", "Login");
         }

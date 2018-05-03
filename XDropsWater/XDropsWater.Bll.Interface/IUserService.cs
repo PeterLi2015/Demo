@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.Attributes;
+using XDropsWater.Dal.Entity;
+using XDropsWater.DataAccess.Interface;
 using XDropsWater.Model;
 
 namespace XDropsWater.Bll.Interface
 {
     public interface IUserService : IService
     {
+        //[Dependency]
+        //IUnitOfWork Uow { get; set; }
+
+        //[Dependency]
+        //IRepository<UserEntity> UserDb { get; set; }
+
         string SaveNewPassword(string oldPassword, string newPassword);
         string IsValidUser(string password);
         List<UserSummary> GetAll();

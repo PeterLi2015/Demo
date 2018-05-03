@@ -1,6 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <views>
-  <mapping-views hash="0671fa37374cbb5a133c9ffcf0e4b500930197891c3405fff2c4c04cacac851b" conceptual-container="SimpleWebUnitOfWork" store-container="CodeFirstDatabase">
+  <mapping-views hash="911c13499bcefb66fbe72b2511338cfd347aeed3510dfb508cef1078aaf7b2e0" conceptual-container="SimpleWebUnitOfWork" store-container="CodeFirstDatabase">
+    <view extent="CodeFirstDatabase.AddressEntity"><![CDATA[
+    SELECT VALUE -- Constructing AddressEntity
+        [CodeFirstDatabaseSchema.AddressEntity](T1.AddressEntity_ID, T1.AddressEntity_Province, T1.AddressEntity_ProvinceCode, T1.AddressEntity_JsonValue, T1.AddressEntity_CreateBy, T1.AddressEntity_CreateOn, T1.AddressEntity_UpdateBy, T1.AddressEntity_UpdateOn)
+    FROM (
+        SELECT 
+            T.ID AS AddressEntity_ID, 
+            T.Province AS AddressEntity_Province, 
+            T.ProvinceCode AS AddressEntity_ProvinceCode, 
+            T.JsonValue AS AddressEntity_JsonValue, 
+            T.CreateBy AS AddressEntity_CreateBy, 
+            T.CreateOn AS AddressEntity_CreateOn, 
+            T.UpdateBy AS AddressEntity_UpdateBy, 
+            T.UpdateOn AS AddressEntity_UpdateOn, 
+            True AS _from0
+        FROM SimpleWebUnitOfWork.Address AS T
+    ) AS T1]]></view>
+    <view extent="SimpleWebUnitOfWork.Address"><![CDATA[
+    SELECT VALUE -- Constructing Address
+        [XDropsWater.Dal.Entity.AddressEntity](T1.AddressEntity_ID, T1.AddressEntity_Province, T1.AddressEntity_ProvinceCode, T1.AddressEntity_JsonValue, T1.AddressEntity_CreateBy, T1.AddressEntity_CreateOn, T1.AddressEntity_UpdateBy, T1.AddressEntity_UpdateOn)
+    FROM (
+        SELECT 
+            T.ID AS AddressEntity_ID, 
+            T.Province AS AddressEntity_Province, 
+            T.ProvinceCode AS AddressEntity_ProvinceCode, 
+            T.JsonValue AS AddressEntity_JsonValue, 
+            T.CreateBy AS AddressEntity_CreateBy, 
+            T.CreateOn AS AddressEntity_CreateOn, 
+            T.UpdateBy AS AddressEntity_UpdateBy, 
+            T.UpdateOn AS AddressEntity_UpdateOn, 
+            True AS _from0
+        FROM CodeFirstDatabase.AddressEntity AS T
+    ) AS T1]]></view>
     <view extent="CodeFirstDatabase.DirectorEntity"><![CDATA[
     SELECT VALUE -- Constructing DirectorEntity
         [CodeFirstDatabaseSchema.DirectorEntity](T1.DirectorEntity_ID, T1.DirectorEntity_MemberID, T1.DirectorEntity_DirectorNo, T1.DirectorEntity_CreateBy, T1.DirectorEntity_CreateOn, T1.DirectorEntity_UpdateBy, T1.DirectorEntity_UpdateOn)
@@ -530,6 +562,52 @@
             T.UpdateOn AS LogEntity_UpdateOn, 
             True AS _from0
         FROM CodeFirstDatabase.LogEntity AS T
+    ) AS T1]]></view>
+    <view extent="CodeFirstDatabase.MemberAddressEntity"><![CDATA[
+    SELECT VALUE -- Constructing MemberAddressEntity
+        [CodeFirstDatabaseSchema.MemberAddressEntity](T1.MemberAddressEntity_ID, T1.MemberAddressEntity_MemberID, T1.MemberAddressEntity_ProvinceName, T1.MemberAddressEntity_ProvinceCode, T1.MemberAddressEntity_CityName, T1.MemberAddressEntity_CityCode, T1.MemberAddressEntity_DistrictName, T1.MemberAddressEntity_DistrictCode, T1.MemberAddressEntity_StreetName, T1.MemberAddressEntity_StreetCode, T1.MemberAddressEntity_Description, T1.MemberAddressEntity_CreateBy, T1.MemberAddressEntity_CreateOn, T1.MemberAddressEntity_UpdateBy, T1.MemberAddressEntity_UpdateOn)
+    FROM (
+        SELECT 
+            T.ID AS MemberAddressEntity_ID, 
+            T.MemberID AS MemberAddressEntity_MemberID, 
+            T.ProvinceName AS MemberAddressEntity_ProvinceName, 
+            T.ProvinceCode AS MemberAddressEntity_ProvinceCode, 
+            T.CityName AS MemberAddressEntity_CityName, 
+            T.CityCode AS MemberAddressEntity_CityCode, 
+            T.DistrictName AS MemberAddressEntity_DistrictName, 
+            T.DistrictCode AS MemberAddressEntity_DistrictCode, 
+            T.StreetName AS MemberAddressEntity_StreetName, 
+            T.StreetCode AS MemberAddressEntity_StreetCode, 
+            T.Description AS MemberAddressEntity_Description, 
+            T.CreateBy AS MemberAddressEntity_CreateBy, 
+            T.CreateOn AS MemberAddressEntity_CreateOn, 
+            T.UpdateBy AS MemberAddressEntity_UpdateBy, 
+            T.UpdateOn AS MemberAddressEntity_UpdateOn, 
+            True AS _from0
+        FROM SimpleWebUnitOfWork.MemberAddress AS T
+    ) AS T1]]></view>
+    <view extent="SimpleWebUnitOfWork.MemberAddress"><![CDATA[
+    SELECT VALUE -- Constructing MemberAddress
+        [XDropsWater.Dal.Entity.MemberAddressEntity](T1.MemberAddressEntity_ID, T1.MemberAddressEntity_MemberID, T1.MemberAddressEntity_ProvinceName, T1.MemberAddressEntity_ProvinceCode, T1.MemberAddressEntity_CityName, T1.MemberAddressEntity_CityCode, T1.MemberAddressEntity_DistrictName, T1.MemberAddressEntity_DistrictCode, T1.MemberAddressEntity_StreetName, T1.MemberAddressEntity_StreetCode, T1.MemberAddressEntity_Description, T1.MemberAddressEntity_CreateBy, T1.MemberAddressEntity_CreateOn, T1.MemberAddressEntity_UpdateBy, T1.MemberAddressEntity_UpdateOn)
+    FROM (
+        SELECT 
+            T.ID AS MemberAddressEntity_ID, 
+            T.MemberID AS MemberAddressEntity_MemberID, 
+            T.ProvinceName AS MemberAddressEntity_ProvinceName, 
+            T.ProvinceCode AS MemberAddressEntity_ProvinceCode, 
+            T.CityName AS MemberAddressEntity_CityName, 
+            T.CityCode AS MemberAddressEntity_CityCode, 
+            T.DistrictName AS MemberAddressEntity_DistrictName, 
+            T.DistrictCode AS MemberAddressEntity_DistrictCode, 
+            T.StreetName AS MemberAddressEntity_StreetName, 
+            T.StreetCode AS MemberAddressEntity_StreetCode, 
+            T.Description AS MemberAddressEntity_Description, 
+            T.CreateBy AS MemberAddressEntity_CreateBy, 
+            T.CreateOn AS MemberAddressEntity_CreateOn, 
+            T.UpdateBy AS MemberAddressEntity_UpdateBy, 
+            T.UpdateOn AS MemberAddressEntity_UpdateOn, 
+            True AS _from0
+        FROM CodeFirstDatabase.MemberAddressEntity AS T
     ) AS T1]]></view>
     <view extent="CodeFirstDatabase.MemberRoleConfigEntity"><![CDATA[
     SELECT VALUE -- Constructing MemberRoleConfigEntity

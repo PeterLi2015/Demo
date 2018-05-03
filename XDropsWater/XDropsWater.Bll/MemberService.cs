@@ -13,12 +13,20 @@ using System.Data.Entity.Validation;
 using System.Configuration;
 using AutoMapper;
 using System.Text;
+using Unity.Attributes;
 
 namespace XDropsWater.Bll
 {
-    public class MemberService : BaseService, IMemberService
+    public class MemberService : BaseService, IMemberService, IRegisterObserver
     {
-        private IUnitOfWork uow = new SimpleWebUnitOfWork();
+        [Dependency]
+        public IUnitOfWork Uow { get; set; }
+
+        [Dependency]
+        public IRepository<MemberEntity> MemDb { get; set; }
+
+        [Dependency]
+        public IRepository<ShoppingCartEntity> shoppingCartDb { get; set; }
 
         /// <summary>
         /// 添加不存在的代理
@@ -27,7 +35,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public ErrorCodes AddNoExistsMember(MemberModel model)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var member = repo.FindBy(p => p.Mobile == model.Mobile).FirstOrDefault();
             if (member == null)
             {
@@ -37,7 +45,7 @@ namespace XDropsWater.Bll
         }
         public ErrorCodes Add(MemberModel model)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             if (!IDCardUtil.CheckIDCard(model.IdentityCardNo))
             {
                 return ErrorCodes.IDCardError;
@@ -49,7 +57,7 @@ namespace XDropsWater.Bll
             member.MemberName = model.MemberName;
             member.Mobile = model.Mobile;
             repo.Add(member);
-            uow.Commit();
+            Uow.Commit();
             return ErrorCodes.Successed;
         }
 
@@ -58,7 +66,7 @@ namespace XDropsWater.Bll
             MemberModel m = new MemberModel();
             m.MemberName = "";
 
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var mem = repo.FindBy(p => p.Mobile == mobile).FirstOrDefault();
             if (mem == null)
             {
@@ -77,7 +85,7 @@ namespace XDropsWater.Bll
         /// <returns>代理对象</returns>
         public Member GetMemberByMobile(string mobile)
         {
-            var db = new Repository<MemberEntity>(uow);
+            var db = new Repository<MemberEntity>(Uow);
             var entity = db.FindBy(p => p.Mobile == mobile).FirstOrDefault();
             Mapper.CreateMap<MemberRoleEntity, MemberRole>();
             Mapper.CreateMap<MemberEntity, Member>();
@@ -86,7 +94,7 @@ namespace XDropsWater.Bll
 
         public List<MemberModel> Get(string idCardNo, string name, ref int total, int page = 1, int rows = 10)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var list = repo.FindBy(p => p.CreateBy == this.CurrentUser.ID);
             var all = list.ToList();
             if (!string.IsNullOrWhiteSpace(idCardNo))
@@ -132,7 +140,7 @@ namespace XDropsWater.Bll
 
         public List<MemberModel> GetDirectChildMember(string mobileOrName)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var list = repo.FindBy(m => m.ParentMemberID == this.CurrentUser.MemberID);
             if (!string.IsNullOrWhiteSpace(mobileOrName))
                 list = list.Where(p => p.Mobile.Contains(mobileOrName) || p.MemberName.Contains(mobileOrName));
@@ -177,7 +185,7 @@ namespace XDropsWater.Bll
         public MemberSummary GetDirectChildMember1(int page, int size, string mobileOrName)
         {
             var result = new MemberSummary();
-            var db = new Repository<MemberEntity>(uow);
+            var db = new Repository<MemberEntity>(Uow);
 
             Expression<Func<MemberEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.ParentMemberID == this.CurrentUser.MemberID;
             whereExp = whereExp.Or(o => o.CreateBy == this.CurrentUser.ID);
@@ -208,7 +216,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public int GetNewOrderCount()
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
 
             IQueryable<OrderEntity> orderList = null;
 
@@ -230,7 +238,7 @@ namespace XDropsWater.Bll
 
         public int GetSelfNewOrderCount()
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
 
             IQueryable<OrderEntity> orderList = null;
 
@@ -243,7 +251,7 @@ namespace XDropsWater.Bll
 
         public int GetMemberCount()
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             int iRet = 0;
             if (this.CurrentUser.UserRoleID == (int)enmRoles.Admin ||
                 this.CurrentUser.UserRoleID == (int)enmRoles.All)
@@ -263,7 +271,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public int GetNewExpress()
         {
-            var db = new Repository<ExpressEntity>(uow);
+            var db = new Repository<ExpressEntity>(Uow);
             int iRet = 0;
             if (this.CurrentUser.UserRoleID == (int)enmRoles.Admin ||
                 this.CurrentUser.UserRoleID == (int)enmRoles.All)
@@ -289,7 +297,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public List<MemberModel> GetMember(string search)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var list = repo.FindBy(o => o.RoleID > 0);
             if (!string.IsNullOrWhiteSpace(search))
                 list = list.Where(p => p.Mobile.Contains(search) || p.MemberName.ToUpper().Contains(search.ToUpper()));
@@ -343,7 +351,7 @@ namespace XDropsWater.Bll
         {
             var result = new MemberSummary();
 
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             Expression<Func<MemberEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.RoleID > 0;
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -372,7 +380,7 @@ namespace XDropsWater.Bll
         public IdentityCodeSummary GetCodePages(int page, int size, Guid orderDetailsId)
         {
             var result = new IdentityCodeSummary();
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
             Expression<Func<IdentityCodeEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.OrderDetailsID == orderDetailsId;
             var totalCount = db.Find(whereExp, o => o.CreateOn).Count();
             var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
@@ -389,7 +397,7 @@ namespace XDropsWater.Bll
 
         public int GetMembersCount()
         {
-            var repo = new Repository<MemberEntity>(uow);
+            var repo = new Repository<MemberEntity>(Uow);
             return repo.FindBy(o => o.RoleID > 0).Count();
         }
 
@@ -407,8 +415,8 @@ namespace XDropsWater.Bll
         {
             List<MemberOrderModel> list = new List<MemberOrderModel>();
             MemberOrderModel model = null;
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
 
             List<MemberEntity> memberList = null;
             if (!string.IsNullOrWhiteSpace(mobileOrName))
@@ -472,7 +480,7 @@ namespace XDropsWater.Bll
         /// <param name="Id"></param>
         public void RemoveCode(Guid Id)
         {
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
             var entity = db.FindBy(o => o.ID == Id).First();
             var code = entity.Code;
             var productId = entity.OrderDetails.ProductID;
@@ -486,19 +494,19 @@ namespace XDropsWater.Bll
             }
 
             //设置订单明细识别码未填满
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var od = odDb.FindBy(o => o.ID == entity.OrderDetailsID).First();
             od.Status = (int)OrderDetailsStatus.CodeNotFull;
             odDb.Update(od);
 
             //设置订单识别码未填满
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == entity.OrderDetails.OrderID).First();
             order.Status = (int)OrderStatus.CodeNotFull;
             orderDb.Update(order);
 
             db.Remove(entity);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -513,7 +521,7 @@ namespace XDropsWater.Bll
         public OrderSummary GetMemberOrder1(int page, int size, string mobileOrName, bool? isDelivery, enmOrderLevel orderLevel)
         {
             var result = new OrderSummary();
-            var repo = new Repository<OrderEntity>(uow);
+            var repo = new Repository<OrderEntity>(Uow);
             Expression<Func<OrderEntity, bool>> whereExp = o => o.ID != Guid.Empty;
             whereExp = whereExp.And(o => (o.Status != (int)OrderStatus.LessAmount));
             if (!string.IsNullOrWhiteSpace(mobileOrName))
@@ -560,8 +568,8 @@ namespace XDropsWater.Bll
         {
             List<MemberModel> list = new List<MemberModel>();
             MemberModel model = null;
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
 
             List<MemberEntity> memberList = memberRepo.GetAll().ToList();
             if (!string.IsNullOrWhiteSpace(mobileOrName))
@@ -615,9 +623,9 @@ namespace XDropsWater.Bll
         {
             List<MemberOrderModel> list = new List<MemberOrderModel>();
             MemberOrderModel model = null;
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             var companyMember = memberRepo.FindBy(o => o.RoleID == 0).First();
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
             var orderList = orderRepo.FindBy(o => o.MemberID == this.CurrentUser.MemberID).OrderByDescending(o => o.CreateOn);
             if (isDeliverly.HasValue)
             {
@@ -659,7 +667,7 @@ namespace XDropsWater.Bll
         {
             var result = new OrderSummary();
 
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
 
             Expression<Func<OrderEntity, bool>> whereExp = o => o.MemberID == this.CurrentUser.MemberID;
             if (isDeliverly.HasValue)
@@ -702,8 +710,8 @@ namespace XDropsWater.Bll
         {
             List<MemberOrderModel> list = new List<MemberOrderModel>();
             MemberOrderModel model = null;
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<ChildOrderEntity> orderRepo = new Repository<ChildOrderEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<ChildOrderEntity> orderRepo = new Repository<ChildOrderEntity>(Uow);
             if (!string.IsNullOrWhiteSpace(mobile))
             {
                 var member = memberRepo.FindBy(m => m.Mobile == mobile).FirstOrDefault();
@@ -796,7 +804,7 @@ namespace XDropsWater.Bll
 
         public ErrorCodes Update(MemberModel model)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             if (!IDCardUtil.CheckIDCard(model.IdentityCardNo))
             {
                 return ErrorCodes.IDCardError;
@@ -813,13 +821,13 @@ namespace XDropsWater.Bll
             member.Mobile = model.Mobile;
             member.MemberName = model.MemberName;
             repo.Update(member);
-            uow.Commit();
+            Uow.Commit();
             return ErrorCodes.Successed;
         }
 
         public ErrorCodes CheckedByOperator(Guid memberId)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
 
             var member = repo.FindBy(p => p.ID == memberId).FirstOrDefault();
             if (member == null)
@@ -827,7 +835,7 @@ namespace XDropsWater.Bll
                 return ErrorCodes.NotExist;
             }
             repo.Update(member);
-            uow.Commit();
+            Uow.Commit();
             return ErrorCodes.Successed;
         }
 
@@ -838,7 +846,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string IsNewMember(string cardNo)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
 
             var member = repo.FindBy(m => m.Mobile == cardNo).FirstOrDefault();
             if (member == null) return "IsNewMember";
@@ -878,9 +886,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string AddMemberOrder(string mobile, string quantity)
         {
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             //判断手机号是不是存在
             var member = memberRepo.FindBy(p => p.Mobile == mobile).FirstOrDefault();
             if (member == null)
@@ -916,7 +924,7 @@ namespace XDropsWater.Bll
             order.MemberID = member.ID;
             order.Quantity = iQuantity;
             repo.Add(order);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -926,9 +934,9 @@ namespace XDropsWater.Bll
         /// <param name="model"></param>
         public void AddPersonalOrder(AddPersonalOrderModel model)
         {
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
 
             var currentUserMember = memberRepo.FindBy(m => m.ID == this.CurrentUser.MemberID).FirstOrDefault();
             Guid sendMemberId = Guid.Empty;
@@ -961,7 +969,7 @@ namespace XDropsWater.Bll
             order.Description = Common.GetTotalAmountDescription(memberRole.Price, memberRole.RoleRiseDescription, model.Quantity, currentUserMember.RoleID, (int)currentUserMember.CurrentRoleQuantity, out totalAmount);
             order.Total = totalAmount;
             repo.Add(order);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -972,9 +980,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string AddChildMemberOrder(string mobile, string quantity)
         {
-            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             //判断手机号是不是存在
             var member = memberRepo.FindBy(p => p.Mobile == mobile).FirstOrDefault();
             if (member == null)
@@ -1006,7 +1014,7 @@ namespace XDropsWater.Bll
             order.MemberID = member.ID;
             order.Quantity = iQuantity;
             repo.Add(order);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -1142,7 +1150,7 @@ namespace XDropsWater.Bll
         /// <param name="memberId"></param>
         private void UpdateAwardParents(Guid orderId, Guid memberId)
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
             var parentIds = GetThreeGeneralAgent(memberId);
             if (parentIds != null && parentIds.Any())
             {
@@ -1179,7 +1187,7 @@ namespace XDropsWater.Bll
                     order.DirectorID = directorId;
                 }
                 orderRepo.Update(order);
-                uow.Commit();
+                Uow.Commit();
             }
         }
 
@@ -1197,10 +1205,10 @@ namespace XDropsWater.Bll
                 throw new Exception("快递信息不能为空");
             }
 
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
-            Repository<RoleUpgradeEntity> ruRepo = new Repository<RoleUpgradeEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
+            Repository<RoleUpgradeEntity> ruRepo = new Repository<RoleUpgradeEntity>(Uow);
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1286,7 +1294,7 @@ namespace XDropsWater.Bll
             }
             memberRepo.Update(member);
 
-            uow.Commit();
+            Uow.Commit();
 
             if (memberRoleId >= (int)enmMemberRole.GeneralAgent && generalAvailable > 0 && sendMemberId == Guid.Empty)
             {
@@ -1342,10 +1350,10 @@ namespace XDropsWater.Bll
                 throw new Exception("快递信息不能为空");
             }
 
-            Repository<OrderEntity> orderDb = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberDb = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> roleDb = new Repository<MemberRoleEntity>(uow);
-            Repository<RoleUpgradeEntity> ruDb = new Repository<RoleUpgradeEntity>(uow);
+            Repository<OrderEntity> orderDb = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberDb = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> roleDb = new Repository<MemberRoleEntity>(Uow);
+            Repository<RoleUpgradeEntity> ruDb = new Repository<RoleUpgradeEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1365,10 +1373,10 @@ namespace XDropsWater.Bll
                 throw new Exception("该代理不存在，请联系管理员");
             }
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
 
             //检查库存是否够用
-            var mpDb = new Repository<MemberProductEntity>(uow);
+            var mpDb = new Repository<MemberProductEntity>(Uow);
             MemberProductEntity sendMp = null;
             MemberProductEntity buyMp = null;
 
@@ -1463,7 +1471,7 @@ namespace XDropsWater.Bll
             var orderAmount = odDb.FindBy(o => o.OrderID == orderId).Sum(o => o.Quantity * o.Product.Price);
 
             // 单位金额
-            var scDb = new Repository<SystemConfigEntity>(uow);
+            var scDb = new Repository<SystemConfigEntity>(Uow);
             var unitAmount = decimal.Parse(scDb.FindBy(o => o.Name == SystemSettingConstants.Price).First().ConfigValue);
 
             // 省代数量
@@ -1553,29 +1561,23 @@ namespace XDropsWater.Bll
                     UpdateDirector(new List<MemberEntity>() { newMember });
                 }
 
-                int iRoleID = 0;
+                int iRoleID = (int)enmMemberRole.Customer;
 
                 iRoleID = Common.GetRoleID1(memberRole.RoleRiseDescription, orderAmount + member.CurrentRoleAmount, unitAmount, minusAmount, member.RoleID, out roleAmount);
 
-                if (iRoleID != 0)
+                if(member.RoleID != iRoleID)
                 {
-                    if (member.RoleID != iRoleID)
-                    {
-                        RoleUpgradeEntity ruEntity = new RoleUpgradeEntity();
-                        ruEntity.CreateBy = this.CurrentUser.ID;
-                        ruEntity.CreateOn = DateTime.Now;
-                        ruEntity.CurrentRoleId = iRoleID;
-                        ruEntity.OriginalRoleId = member.RoleID;
-                        ruEntity.MemberId = member.ID;
-                        ruDb.Add(ruEntity);
-                        member.RoleID = iRoleID;
-                    }
-                    member.CurrentRoleAmount = roleAmount;
+                    RoleUpgradeEntity ruEntity = new RoleUpgradeEntity();
+                    ruEntity.CreateBy = this.CurrentUser.ID;
+                    ruEntity.CreateOn = DateTime.Now;
+                    ruEntity.CurrentRoleId = iRoleID;
+                    ruEntity.OriginalRoleId = member.RoleID;
+                    ruEntity.MemberId = member.ID;
+                    ruDb.Add(ruEntity);
                 }
-                else
-                {
-                    member.CurrentRoleAmount += orderAmount;
-                }
+
+                member.RoleID = iRoleID;
+                member.CurrentRoleAmount = roleAmount;
 
             }
 
@@ -1602,7 +1604,7 @@ namespace XDropsWater.Bll
                 database.Database.ExecuteSqlCommand("EXEC [P_UpdateCodes] @orderId", parameters.ToArray());
             }
 
-            uow.Commit();
+            Uow.Commit();
 
             // 更新奖金
             if (memberRoleId >= (int)enmMemberRole.GeneralAgent && generalAvailable > 0 && sendMemberId == Guid.Empty)
@@ -1617,7 +1619,7 @@ namespace XDropsWater.Bll
         /// <param name="orderId"></param>
         public void FinancialConfirm(Guid orderId)
         {
-            Repository<OrderEntity> orderDb = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderDb = new Repository<OrderEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1635,9 +1637,9 @@ namespace XDropsWater.Bll
             order.FinancialStatus = (int)OrderFinancialStatus.Paid;
             orderDb.Update(order);
 
-            uow.Commit();
+            Uow.Commit();
 
-          
+
         }
 
         public void UpdateOrderExpress(Guid orderId, string expressContent)
@@ -1646,14 +1648,14 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("快递信息不能为空");
             }
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
 
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             order.UpdateBy = this.CurrentUser.ID;
             order.UpdateOn = DateTime.Now;
             order.Express = expressContent;
             repo.Update(order);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -1665,9 +1667,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string SendChildMemberOrder(Guid orderId)
         {
-            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1733,7 +1735,7 @@ namespace XDropsWater.Bll
                 memberRepo.Update(member);
             }
 
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
 
         }
@@ -1746,9 +1748,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string UpdateMemberOrder(Guid orderId, string quantity)
         {
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1786,7 +1788,7 @@ namespace XDropsWater.Bll
             order.UpdateOn = DateTime.Now;
             order.Quantity = iQuantity;
             repo.Update(order);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -1798,9 +1800,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string UpdateChildMemberOrder(Guid orderId, string quantity)
         {
-            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1838,7 +1840,7 @@ namespace XDropsWater.Bll
             order.UpdateOn = DateTime.Now;
             order.Quantity = iQuantity;
             repo.Update(order);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -1849,9 +1851,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public void RemoveMemberOrder(Guid orderId)
         {
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1868,7 +1870,7 @@ namespace XDropsWater.Bll
                 throw new Exception("该代理不存在，请联系管理员");
             }
             repo.Remove(order);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -1878,9 +1880,9 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string RemoveChildMemberOrder(Guid orderId)
         {
-            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<ChildOrderEntity> repo = new Repository<ChildOrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
             var order = repo.FindBy(o => o.ID == orderId).FirstOrDefault();
             if (order == null)
             {
@@ -1901,7 +1903,7 @@ namespace XDropsWater.Bll
             member.RoleID = member.PreviousRoleID;
             member.TotalQuantity -= order.Quantity;
             memberRepo.Update(member);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -1931,7 +1933,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("姓名必须输入");
             }
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             MemberEntity parent = null;
             if (!string.IsNullOrWhiteSpace(model.ParentMember.Mobile))
             {
@@ -1987,7 +1989,7 @@ namespace XDropsWater.Bll
 
             repo.Add(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             if (userRepo.FindBy(u => u.Account == member.Mobile).FirstOrDefault() != null)
             {
                 throw new Exception("该手机号码已经存在，请重新输入");
@@ -2002,7 +2004,7 @@ namespace XDropsWater.Bll
             user.UserName = member.MemberName;
             user.UserRoleID = (int)enmRoles.General;
             userRepo.Add(user);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2030,7 +2032,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("姓名必须输入");
             }
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             MemberEntity parent = null;
             if (!string.IsNullOrWhiteSpace(model.ParentMember.Mobile))
             {
@@ -2086,7 +2088,7 @@ namespace XDropsWater.Bll
 
             repo.Add(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             if (userRepo.FindBy(u => u.Account == member.Mobile).FirstOrDefault() != null)
             {
                 throw new Exception("该手机号码已经存在，请重新输入");
@@ -2101,7 +2103,7 @@ namespace XDropsWater.Bll
             user.UserName = member.MemberName;
             user.UserRoleID = (int)enmRoles.General;
             userRepo.Add(user);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2122,7 +2124,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("结束唯一识别码不能小于起始唯一识别码");
             }
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
 
             //需要插入的唯一识别码
             var codes = new List<long>();
@@ -2131,7 +2133,7 @@ namespace XDropsWater.Bll
                 codes.Add(i);
             }
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var orderDetails = odDb.FindBy(o => o.ID == model.OrderDetailsID).First();
 
             var currentCount = db.FindBy(o => o.OrderDetailsID == model.OrderDetailsID).Count();
@@ -2199,7 +2201,7 @@ namespace XDropsWater.Bll
                 database.Database.ExecuteSqlCommand("EXEC [P_BulkAddCodes] @codeFrom, @codeTo, @createBy, @orderDetailsId, @codeFull", parameters.ToArray());
             }
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2212,7 +2214,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("唯一识别码不能为空");
             }
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
 
             var entity = new IdentityCodeEntity();
 
@@ -2239,7 +2241,7 @@ namespace XDropsWater.Bll
                 }
             }
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var odEntity = odDb.FindBy(o => o.ID == model.OrderDetailsID).First();
 
             var currentCount = db.FindBy(o => o.OrderDetailsID == model.OrderDetailsID).Count();
@@ -2270,7 +2272,7 @@ namespace XDropsWater.Bll
                 var count = odDb.FindBy(o => o.OrderID == odEntity.OrderID && o.Status == (int)OrderDetailsStatus.CodeNotFull).Count();
                 if (count <= 1)
                 {
-                    var orderDb = new Repository<OrderEntity>(uow);
+                    var orderDb = new Repository<OrderEntity>(Uow);
                     var order = orderDb.FindBy(o => o.ID == odEntity.OrderID).First();
                     order.Status = (int)OrderDetailsStatus.CodeFull;
                     order.UpdateBy = currentId;
@@ -2282,7 +2284,7 @@ namespace XDropsWater.Bll
 
 
 
-            uow.Commit();
+            Uow.Commit();
 
         }
 
@@ -2294,7 +2296,7 @@ namespace XDropsWater.Bll
         public string AddChildMember(string mobile, string memberName, string parentMobile, string address)
         {
 
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             //判断手机号是不是存在
             var idCardNo = repo.FindBy(p => p.Mobile == mobile).FirstOrDefault();
             if (idCardNo != null)
@@ -2330,7 +2332,7 @@ namespace XDropsWater.Bll
             member.Address = address;
             repo.Add(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             if (userRepo.FindBy(u => u.Account == member.Mobile).FirstOrDefault() != null)
             {
                 return "该手机号码已经存在，请重新输入";
@@ -2345,7 +2347,7 @@ namespace XDropsWater.Bll
             user.UserName = member.MemberName;
             user.UserRoleID = (int)enmRoles.General;
             userRepo.Add(user);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -2376,7 +2378,7 @@ namespace XDropsWater.Bll
                 throw new Exception("手机号码长度必须是11位");
             }
 
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             MemberEntity parent = null;
             if (!string.IsNullOrWhiteSpace(model.ParentMobile))
             {
@@ -2418,7 +2420,7 @@ namespace XDropsWater.Bll
 
             member.Address = model.Address;
             repo.Update(member);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2449,9 +2451,9 @@ namespace XDropsWater.Bll
                 }
             }
 
-            var db = new Repository<MemberEntity>(uow);
+            var db = new Repository<MemberEntity>(Uow);
 
-            Repository<RoleUpgradeEntity> ruRepo = new Repository<RoleUpgradeEntity>(uow);
+            Repository<RoleUpgradeEntity> ruRepo = new Repository<RoleUpgradeEntity>(Uow);
 
             var member = db.FindBy(p => p.ID == model.ID).FirstOrDefault();
             if (member == null)
@@ -2521,14 +2523,14 @@ namespace XDropsWater.Bll
             member.CurrentRoleQuantity = model.CurrentRoleQuantity;
             db.Update(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             var user = userRepo.FindBy(u => u.MemberID == member.ID).FirstOrDefault();
             user.Account = member.Mobile;
             user.UpdateBy = this.CurrentUser.ID;
             user.UpdateOn = DateTime.Now;
             userRepo.Update(user);
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2559,9 +2561,9 @@ namespace XDropsWater.Bll
                 }
             }
 
-            var db = new Repository<MemberEntity>(uow);
+            var db = new Repository<MemberEntity>(Uow);
 
-            Repository<RoleUpgradeEntity> ruRepo = new Repository<RoleUpgradeEntity>(uow);
+            Repository<RoleUpgradeEntity> ruRepo = new Repository<RoleUpgradeEntity>(Uow);
 
             var member = db.FindBy(p => p.ID == model.ID).FirstOrDefault();
             if (member == null)
@@ -2631,14 +2633,14 @@ namespace XDropsWater.Bll
             member.TotalAmount = model.TotalAmount; // 总金额
             db.Update(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             var user = userRepo.FindBy(u => u.MemberID == member.ID).FirstOrDefault();
             user.Account = member.Mobile;
             user.UpdateBy = this.CurrentUser.ID;
             user.UpdateOn = DateTime.Now;
             userRepo.Update(user);
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2662,7 +2664,7 @@ namespace XDropsWater.Bll
                 throw new Exception("手机号码长度必须是11位");
             }
 
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
 
             var member = repo.FindBy(p => p.ID == model.ID).FirstOrDefault();
             if (member == null)
@@ -2691,7 +2693,7 @@ namespace XDropsWater.Bll
             member.Address = model.Address;
             member.IdentityNo = model.IdentityNo;
             repo.Update(member);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2701,7 +2703,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public void UpdateCurrentRoleStock(AddMemberModel model)
         {
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
 
             var member = repo.FindBy(p => p.ID == model.ID).FirstOrDefault();
             if (member == null)
@@ -2710,7 +2712,7 @@ namespace XDropsWater.Bll
             member.CurrentRoleQuantity = model.CurrentRoleQuantity;
             member.TotalQuantity = model.TotalQuantity;
             repo.Update(member);
-            uow.Commit();
+            Uow.Commit();
         }
 
         public List<MemberModel> GetMemberForUpdateStore(string cardNo, string name, ref int total, int page = 1, int rows = 10)
@@ -2767,7 +2769,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public void RemoveMember(Guid memberId)
         {
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
 
             var member = memberRepo.FindBy(p => p.ID == memberId).FirstOrDefault();
             if (member == null)
@@ -2775,7 +2777,7 @@ namespace XDropsWater.Bll
                 throw new Exception("该代理不存在，请联系管理员");
             }
             //判断该代理是否已经有订单记录
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
             var order = orderRepo.FindBy(o => o.MemberID == memberId).FirstOrDefault();
             if (order != null)
             {
@@ -2793,7 +2795,7 @@ namespace XDropsWater.Bll
             memberRepo.Remove(member);
 
             //remove from users
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             userRepo.Remove(userRepo.FindBy(u => u.MemberID == memberId).FirstOrDefault());
 
             //上级库存加1
@@ -2811,7 +2813,7 @@ namespace XDropsWater.Bll
 
             }
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2821,7 +2823,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public void RemoveMember1(Guid memberId)
         {
-            var memberDb = new Repository<MemberEntity>(uow);
+            var memberDb = new Repository<MemberEntity>(Uow);
 
             var member = memberDb.FindBy(p => p.ID == memberId).FirstOrDefault();
             if (member == null)
@@ -2829,7 +2831,7 @@ namespace XDropsWater.Bll
                 throw new Exception("该代理不存在，请联系管理员");
             }
             //判断该代理是否已经有订单记录
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
             var order = orderRepo.FindBy(o => o.MemberID == memberId).FirstOrDefault();
             if (order != null)
             {
@@ -2846,23 +2848,23 @@ namespace XDropsWater.Bll
             memberDb.Remove(member);
 
             //删除用户
-            var userDb = new Repository<UserEntity>(uow);
+            var userDb = new Repository<UserEntity>(Uow);
             var userEntity = userDb.FindBy(u => u.MemberID == memberId).First();
             userDb.Remove(userEntity);
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         public void ResetPassword(Guid memberId)
         {
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
 
             var member = memberRepo.FindBy(p => p.ID == memberId).FirstOrDefault();
             if (member == null)
             {
                 throw new Exception("该用户在代理表中不存在，请联系管理员");
             }
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             var user = userRepo.FindBy(u => u.MemberID == memberId).FirstOrDefault();
             if (user == null)
             {
@@ -2870,7 +2872,7 @@ namespace XDropsWater.Bll
             }
             user.Password = user.SwitchEncryptDecrypt(GlobalConstants.InitialPassword);
             userRepo.Update(user);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -2911,7 +2913,7 @@ namespace XDropsWater.Bll
                 throw new Exception("发货地址必须输入");
             }
 
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             if (memberRepo.FindBy(m => m.Mobile == model.Mobile).FirstOrDefault() != null)
             {
                 throw new Exception("该手机号码已经存在，请重新输入");
@@ -2950,7 +2952,7 @@ namespace XDropsWater.Bll
             memberRepo.Add(member);
             #endregion
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             if (userRepo.FindBy(u => u.Account == member.Mobile).FirstOrDefault() != null)
             {
                 throw new Exception("该手机号码已经存在于用户表中，请重新输入");
@@ -2973,7 +2975,7 @@ namespace XDropsWater.Bll
             memberRepo.Update(curUser);
             #endregion
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -3020,7 +3022,7 @@ namespace XDropsWater.Bll
 
             #region mobile should be unique in member table
 
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             if (memberRepo.FindBy(m => m.Mobile == model.Mobile).FirstOrDefault() != null)
             {
                 throw new Exception("手机号码已被使用，请重新输入");
@@ -3090,7 +3092,7 @@ namespace XDropsWater.Bll
 
 
             #region mobile should be unique in user table
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             if (userRepo.FindBy(u => u.Account == member.Mobile).FirstOrDefault() != null)
             {
                 throw new Exception("手机号码已被使用，请重新输入");
@@ -3111,7 +3113,7 @@ namespace XDropsWater.Bll
             #endregion
 
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -3120,7 +3122,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public ProductSummary GetProducts()
         {
-            var productDb = new Repository<ProductEntity>(uow);
+            var productDb = new Repository<ProductEntity>(Uow);
             var products = productDb.GetAll().ToList();
             var result = new ProductSummary();
             Mapper.CreateMap<ProductEntity, Product>();
@@ -3136,7 +3138,7 @@ namespace XDropsWater.Bll
             }
             DateTime now = DateTime.Now;
 
-            var roleDb = new Repository<MemberRoleEntity>(uow);
+            var roleDb = new Repository<MemberRoleEntity>(Uow);
             Guid sendMemberId = Guid.Empty;
             var memberRole = roleDb.FindBy(mr => mr.ID == this.CurrentUser.RoleID).FirstOrDefault();
             if (!memberRole.AllowedDirectOrder)
@@ -3151,7 +3153,7 @@ namespace XDropsWater.Bll
                 }
 
             }
-            var productRoleDb = new Repository<ProductMemberRoleEntity>(uow);
+            var productRoleDb = new Repository<ProductMemberRoleEntity>(Uow);
             foreach (var product in products.Where(o => o.Quantity > 0))
             {
                 var productRole = productRoleDb.FindBy(o => o.MemberRoleID == this.CurrentUser.RoleID && o.ProductID == product.ProductID).Single();
@@ -3165,7 +3167,7 @@ namespace XDropsWater.Bll
 
 
 
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             var orderEntity = new OrderEntity();
             orderEntity.ID = Guid.NewGuid();
             orderEntity.Status = (int)OrderStatus.CodeFull;
@@ -3177,12 +3179,13 @@ namespace XDropsWater.Bll
             orderEntity.OrderNo = GetOrderNo();
             orderEntity.SendDate = now;
             orderEntity.SendMemberID = sendMemberId;
+
             orderDb.Add(orderEntity);
             #endregion
 
             #region add to order details
 
-            var orderDetailsDb = new Repository<OrderDetailsEntity>(uow);
+            var orderDetailsDb = new Repository<OrderDetailsEntity>(Uow);
             OrderDetailsEntity orderDetailsEntity = null;
             foreach (var product in products.Where(o => o.Quantity > 0))
             {
@@ -3206,7 +3209,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public ProductMemberRoleSummary GetProductMemberRole()
         {
-            var productDb = new Repository<ProductMemberRoleEntity>(uow);
+            var productDb = new Repository<ProductMemberRoleEntity>(Uow);
             var products = productDb.FindBy(o => o.MemberRoleID == this.CurrentUser.RoleID).ToList();
             var result = new ProductMemberRoleSummary();
             Mapper.CreateMap<ProductEntity, Product>();
@@ -3243,7 +3246,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("发货地址必须输入");
             }
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
 
             var member = memberRepo.FindBy(p => p.ID == this.CurrentUser.MemberID).FirstOrDefault();
             if (member == null)
@@ -3275,12 +3278,12 @@ namespace XDropsWater.Bll
             member.IdentityNo = model.IdentityNo;
             memberRepo.Update(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             var user = userRepo.FindBy(u => u.ID == this.CurrentUser.ID).FirstOrDefault();
             user.UserName = model.MemberName.Trim();
             user.Account = model.Mobile.Trim();
             userRepo.Update(user);
-            uow.Commit();
+            Uow.Commit();
         }
 
         public void SavePersonalInfo(MemberModel model)
@@ -3306,7 +3309,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("发货地址必须输入");
             }
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
 
             var member = memberRepo.FindBy(p => p.ID == this.CurrentUser.MemberID).FirstOrDefault();
             if (member == null)
@@ -3338,26 +3341,26 @@ namespace XDropsWater.Bll
             member.IdentityNo = model.IdentityNo;
             memberRepo.Update(member);
 
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             var user = userRepo.FindBy(u => u.ID == this.CurrentUser.ID).FirstOrDefault();
             user.UserName = model.MemberName.Trim();
             user.Account = model.Mobile.Trim();
             userRepo.Update(user);
-            uow.Commit();
+            Uow.Commit();
         }
 
         public MemberModel GetPersonalInfo()
         {
-            Repository<UserEntity> repoUser = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repoUser = new Repository<UserEntity>(Uow);
             var user = repoUser.FindBy(m => m.MemberID == this.CurrentUser.MemberID).FirstOrDefault();
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var member = repo.FindBy(m => m.ID == this.CurrentUser.MemberID).FirstOrDefault();
             MemberModel model = new MemberModel();
             if (user.UserRoleID != (int)enmRoles.Admin &&
                 user.UserRoleID != (int)enmRoles.All)
             {
 
-                Repository<MemberRoleEntity> roleRepo = new Repository<MemberRoleEntity>(uow);
+                Repository<MemberRoleEntity> roleRepo = new Repository<MemberRoleEntity>(Uow);
                 var role = roleRepo.FindBy(r => r.ID == member.RoleID).FirstOrDefault();
                 int riseQuantity = Common.GetRiseQuantity(role.RoleRiseDescription, (int)member.CurrentRoleQuantity);
                 if (member.DirectorCount > 0)
@@ -3389,18 +3392,18 @@ namespace XDropsWater.Bll
 
         public BaseInfo GetPersonalInfo1()
         {
-            Repository<UserEntity> repoUser = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repoUser = new Repository<UserEntity>(Uow);
             var user = repoUser.FindBy(m => m.MemberID == this.CurrentUser.MemberID).FirstOrDefault();
-            Repository<MemberEntity> repo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> repo = new Repository<MemberEntity>(Uow);
             var member = repo.FindBy(m => m.ID == this.CurrentUser.MemberID).FirstOrDefault();
             BaseInfo model = new BaseInfo();
             if (user.UserRoleID != (int)enmRoles.Admin &&
                 user.UserRoleID != (int)enmRoles.All)
             {
 
-                Repository<MemberRoleEntity> roleRepo = new Repository<MemberRoleEntity>(uow);
+                Repository<MemberRoleEntity> roleRepo = new Repository<MemberRoleEntity>(Uow);
                 var role = roleRepo.FindBy(r => r.ID == member.RoleID).FirstOrDefault();
-                var scDb = new Repository<SystemConfigEntity>(uow);
+                var scDb = new Repository<SystemConfigEntity>(Uow);
                 var strUnitAmount = scDb.FindBy(o => o.Name == SystemSettingConstants.Price).First().ConfigValue;
                 var unitAmount = decimal.Parse(strUnitAmount);
 
@@ -3446,9 +3449,9 @@ namespace XDropsWater.Bll
 
         public void UpdatePersonalOrder(AddPersonalOrderModel model)
         {
-            Repository<OrderEntity> repo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(uow);
+            Repository<OrderEntity> repo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<MemberRoleEntity> memberRoleRepo = new Repository<MemberRoleEntity>(Uow);
 
             var currentUserMember = memberRepo.FindBy(m => m.ID == this.CurrentUser.MemberID).FirstOrDefault();
             Guid sendMemberId = Guid.Empty;
@@ -3484,7 +3487,7 @@ namespace XDropsWater.Bll
             order.Description = Common.GetTotalAmountDescription(memberRole.Price, memberRole.RoleRiseDescription, model.Quantity, currentUserMember.RoleID, (int)currentUserMember.CurrentRoleQuantity, out totalAmount);
             order.Total = totalAmount;
             repo.Update(order);
-            uow.Commit();
+            Uow.Commit();
         }
 
         public List<SubMemberModel> GetAllSubMembers(string mobileOrName, int levelId)
@@ -3589,7 +3592,7 @@ namespace XDropsWater.Bll
 
         public IEnumerable<MemberRoleModel> GetMemberRole()
         {
-            Repository<MemberRoleEntity> repo = new Repository<MemberRoleEntity>(uow);
+            Repository<MemberRoleEntity> repo = new Repository<MemberRoleEntity>(Uow);
             var roles = repo.GetAll();
             MemberRoleModel model = null;
             var models = new List<MemberRoleModel>();
@@ -3609,7 +3612,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("确认密码和新密码不一致");
             }
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var curUser = repo.FindBy(o => o.ID == this.CurrentUser.ID).FirstOrDefault();
             if (curUser.Password != (new UserEntity()).SwitchEncryptDecrypt(model.OldPassword))
             {
@@ -3617,7 +3620,7 @@ namespace XDropsWater.Bll
             }
             curUser.Password = (new UserEntity()).SwitchEncryptDecrypt(model.NewPassword);
             repo.Update(curUser);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -3630,7 +3633,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("确认密码和新密码不一致");
             }
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var curUser = repo.FindBy(o => o.ID == this.CurrentUser.ID).FirstOrDefault();
             if (curUser.Password != (new UserEntity()).SwitchEncryptDecrypt(model.OldPassword))
             {
@@ -3638,7 +3641,7 @@ namespace XDropsWater.Bll
             }
             curUser.Password = (new UserEntity()).SwitchEncryptDecrypt(model.NewPassword);
             repo.Update(curUser);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -3682,7 +3685,7 @@ namespace XDropsWater.Bll
         /// </summary>
         public void UpdateParentChild()
         {
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             var validAgentList = memberRepo.FindBy(o => o.RoleID >= (int)enmMemberRole.Province && (o.ProvinceAvailable > 0 || o.GeneralAvailable > 0 || o.ValidRole > 0)).ToList();
             foreach (var validAgent in validAgentList)
             {
@@ -3710,7 +3713,7 @@ namespace XDropsWater.Bll
             //更新上下级关系表
             UpdateParentChild(memberList);
 
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             List<Guid> allParents = new List<Guid>();
 
             using (SimpleWebUnitOfWork db = new SimpleWebUnitOfWork())
@@ -3725,8 +3728,8 @@ namespace XDropsWater.Bll
                 }
 
             }
-            Repository<ParentChildEntity> parentRepo = new Repository<ParentChildEntity>(uow);
-            Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(uow);
+            Repository<ParentChildEntity> parentRepo = new Repository<ParentChildEntity>(Uow);
+            Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(Uow);
             if (parentRepo.FindBy(o => allParents.Any(m => m == o.ChildMemberID)).Any())
             {
                 var parentList = parentRepo.FindBy(o => allParents.Any(m => m == o.ParentMemberID)).GroupBy(o => o.ParentMemberID);
@@ -3824,7 +3827,7 @@ namespace XDropsWater.Bll
                         }
                     }
                 }
-                uow.Commit();
+                Uow.Commit();
                 if (result.Any())
                 {
                     UpdateParentChild(result);
@@ -3840,7 +3843,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         private List<CityAgent> GetCityAgent()
         {
-            var scDb = new Repository<SystemConfigEntity>(uow);
+            var scDb = new Repository<SystemConfigEntity>(Uow);
             var xml = scDb.FindBy(o => o.Name == SystemSettingConstants.CityAgent).First().ConfigValue;
             return Common.GetCityAgent(xml);
         }
@@ -3855,7 +3858,7 @@ namespace XDropsWater.Bll
             //更新上下级关系表
             UpdateParentChild(memberList);
 
-            var memberDb = new Repository<MemberEntity>(uow);
+            var memberDb = new Repository<MemberEntity>(Uow);
             List<Guid> allParents = new List<Guid>();
 
             using (SimpleWebUnitOfWork db = new SimpleWebUnitOfWork())
@@ -3870,8 +3873,8 @@ namespace XDropsWater.Bll
                 }
 
             }
-            Repository<ParentChildEntity> parentRepo = new Repository<ParentChildEntity>(uow);
-            Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(uow);
+            Repository<ParentChildEntity> parentRepo = new Repository<ParentChildEntity>(Uow);
+            Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(Uow);
             if (parentRepo.FindBy(o => allParents.Any(m => m == o.ChildMemberID) && o.CityAgentCount > 0).Any())
             {
                 // 查找所有市级代理数量大于0的记录
@@ -3906,7 +3909,7 @@ namespace XDropsWater.Bll
                     }
 
                 }
-                uow.Commit();
+                Uow.Commit();
             }
         }
 
@@ -3915,8 +3918,8 @@ namespace XDropsWater.Bll
         /// </summary>
         public void UpdateDirector()
         {
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
-            Repository<ParentChildEntity> parentRepo = new Repository<ParentChildEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            Repository<ParentChildEntity> parentRepo = new Repository<ParentChildEntity>(Uow);
             var parentList = parentRepo.GetAll().GroupBy(o => o.ParentMemberID).ToList();
             MemberEntity member = null;
             int childListCount = 0;
@@ -3951,7 +3954,7 @@ namespace XDropsWater.Bll
                     }
                 }
             }
-            uow.Commit();
+            Uow.Commit();
             if (result.Any())
             {
                 UpdateParentChild(result);
@@ -4019,8 +4022,8 @@ namespace XDropsWater.Bll
 
         private List<Member503020> Calculate50(List<Member503020> member503020List, DateTime? dateFrom, DateTime? dateTo)
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             Member503020 member503020 = null;
             var orderListForGeneral1 = orderRepo.FindBy(o => o.GeneralAgent1ID != null && o.IsDeliverly && o.SendMemberID == Guid.Empty);
             if (dateFrom.HasValue)
@@ -4070,8 +4073,8 @@ namespace XDropsWater.Bll
 
         private List<Member503020> Calculate30(List<Member503020> member503020List, DateTime? dateFrom, DateTime? dateTo)
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             Member503020 member503020 = null;
             var orderListForGeneral2 = orderRepo.FindBy(o => o.GeneralAgent2ID != null && o.IsDeliverly && o.SendMemberID == Guid.Empty);
             if (dateFrom.HasValue)
@@ -4121,8 +4124,8 @@ namespace XDropsWater.Bll
 
         private List<Member503020> Calculate20(List<Member503020> member503020List, DateTime? dateFrom, DateTime? dateTo)
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             Member503020 member503020 = null;
             var orderListForGeneral3 = orderRepo.FindBy(o => o.GeneralAgent3ID != null && o.IsDeliverly && o.SendMemberID == Guid.Empty);
             if (dateFrom.HasValue)
@@ -4190,7 +4193,7 @@ namespace XDropsWater.Bll
         private List<DetailsModel> Details(IEnumerable<OrderEntity> orderList, DateTime? dateFrom, DateTime? dateTo)
         {
             List<DetailsModel> result = new List<DetailsModel>();
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             if (dateFrom.HasValue)
             {
                 DateTime dtFrom = new DateTime(dateFrom.Value.Year, dateFrom.Value.Month, dateFrom.Value.Day, 0, 0, 0);
@@ -4225,8 +4228,8 @@ namespace XDropsWater.Bll
         public List<DetailsModel> Details503020(int detailsType, Guid memberId, DateTime? dateFrom, DateTime? dateTo)
         {
             List<DetailsModel> result = new List<DetailsModel>();
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
 
             switch (detailsType)
             {
@@ -4268,7 +4271,7 @@ namespace XDropsWater.Bll
 
         private void CalculateDirectorSelf(List<DirectorBonusModel> directorBonusList, IEnumerable<MemberEntity> memberList, string mobileOrName, DateTime dateFrom, DateTime dateTo)
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
             if (memberList.Any())
             {
                 if (!string.IsNullOrWhiteSpace(mobileOrName))
@@ -4321,8 +4324,8 @@ namespace XDropsWater.Bll
 
         private void CalculateDirectorCompany(List<DirectorBonusModel> directorBonusList, IEnumerable<MemberEntity> memberList, string mobileOrName, DateTime dateFrom, DateTime dateTo)
         {
-            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(uow);
-            Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(uow);
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
+            Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(Uow);
             int totalBounsCount = directorRepo.FindBy(o => memberList.Any(m => m.ID == o.MemberID) && o.CreateOn < dateFrom).Count();
             var directorList = directorRepo.FindBy(o => o.CreateOn < dateFrom).ToList();
             if (!string.IsNullOrWhiteSpace(mobileOrName))
@@ -4392,14 +4395,14 @@ namespace XDropsWater.Bll
         public int CalcualteCompanyBonusMemberCount(string yearMonth)
         {
             int result = 0;
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             int year = int.Parse(yearMonth.Substring(0, 4));
             int month = int.Parse(yearMonth.Substring(4, 2));
             DateTime dateTo = new DateTime(year, month, 1);
             var memberList = memberRepo.FindBy(o => o.DirectorDate < dateTo && o.RoleID == (int)enmMemberRole.Director).ToList();
             if (memberList.Any())
             {
-                Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(uow);
+                Repository<DirectorEntity> directorRepo = new Repository<DirectorEntity>(Uow);
                 result = directorRepo.FindBy(o => memberList.Any(m => m.ID == o.MemberID) && o.CreateOn < dateTo).Count();
             }
             return result;
@@ -4413,7 +4416,7 @@ namespace XDropsWater.Bll
             int month = int.Parse(yearMonth.Substring(4, 2));
             DateTime date = new DateTime(year, month, 1);
             List<DirectorBonusModel> result = new List<DirectorBonusModel>();
-            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
             var memberList = memberRepo.FindBy(o => o.DirectorDate < date && o.RoleID == (int)enmMemberRole.Director);
             if (!memberList.Any())
             {
@@ -4435,7 +4438,6 @@ namespace XDropsWater.Bll
         {
             var result = new ShoppingCartSummary();
 
-            var shoppingCartDb = new Repository<ShoppingCartEntity>(uow);
 
             Expression<Func<ShoppingCartEntity, bool>> whereExp = o => o.MemberID == this.CurrentUser.MemberID;
 
@@ -4452,7 +4454,7 @@ namespace XDropsWater.Bll
             result.ShoppingCarts = Mapper.Map<IEnumerable<ShoppingCart>>(shoppingCarts);
             CalculateRowNo(result, result.ShoppingCarts, page, rows, totalCount);
 
-            var roleDb = new Repository<MemberRoleEntity>(uow);
+            var roleDb = new Repository<MemberRoleEntity>(Uow);
             var role = roleDb.FindBy(o => o.ID == this.CurrentUser.RoleID).Single();
 
             if (shoppingCarts.Any())
@@ -4462,7 +4464,7 @@ namespace XDropsWater.Bll
                 {
                     total += cart.Product.Price * cart.Quantity;
                 }
-                var settingDb = new Repository<SystemConfigEntity>(uow);
+                var settingDb = new Repository<SystemConfigEntity>(Uow);
                 var price = settingDb.FindBy(o => o.Name == SystemSettingConstants.Price).Single();
                 var totalQuantity = total / decimal.Parse(price.ConfigValue);
                 totalQuantity = decimal.Round(totalQuantity, 6);
@@ -4477,7 +4479,7 @@ namespace XDropsWater.Bll
 
         public void AddUpdateShoppingCart(ShoppingCart model)
         {
-            var db = new Repository<ShoppingCartEntity>(uow);
+            var db = new Repository<ShoppingCartEntity>(Uow);
 
             if (model.ID != Guid.Empty)
             {
@@ -4514,20 +4516,20 @@ namespace XDropsWater.Bll
                 }
             }
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         public void RemoveShoppingCart(Guid ID)
         {
-            var db = new Repository<ShoppingCartEntity>(uow);
+            var db = new Repository<ShoppingCartEntity>(Uow);
             var entity = db.FindBy(o => o.ID == ID).Single();
             db.Remove(entity);
-            uow.Commit();
+            Uow.Commit();
         }
 
         public void AddOrder1()
         {
-            var db = new Repository<ShoppingCartEntity>(uow);
+            var db = new Repository<ShoppingCartEntity>(Uow);
             var list = db.FindBy(o => o.MemberID == this.CurrentUser.MemberID).ToList();
             if (!list.Any())
             {
@@ -4538,7 +4540,7 @@ namespace XDropsWater.Bll
             var createOn = DateTime.Now;
 
             Guid sendMemberId = Guid.Empty;
-            var roleDb = new Repository<MemberRoleEntity>(uow);
+            var roleDb = new Repository<MemberRoleEntity>(Uow);
             var role = roleDb.FindBy(o => o.ID == this.CurrentUser.RoleID).First();
             if (!role.AllowedDirectOrder)
             {
@@ -4555,7 +4557,7 @@ namespace XDropsWater.Bll
 
 
             var orderNo = "DD" + DateTime.Now.ToString("yyyyMMddHHmmssfff");
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             OrderEntity orderEntity = new OrderEntity();
             orderEntity.CreateBy = createBy;
             orderEntity.CreateOn = createOn;
@@ -4564,6 +4566,10 @@ namespace XDropsWater.Bll
             orderEntity.MemberID = this.CurrentUser.MemberID;
             orderEntity.OrderNo = orderNo;
             orderEntity.SendMemberID = sendMemberId;
+            if (this.CurrentUser.RoleID < (int)enmMemberRole.GeneralAgent)
+            {
+                orderEntity.FinancialStatus = (int)OrderFinancialStatus.Paid;
+            }
 
             int quantity = 0;
             decimal total = 0m;
@@ -4572,7 +4578,7 @@ namespace XDropsWater.Bll
                 total += cart.Product.Price * cart.Quantity;
                 quantity += cart.Quantity;
             }
-            var settingDb = new Repository<SystemConfigEntity>(uow);
+            var settingDb = new Repository<SystemConfigEntity>(Uow);
             var price = settingDb.FindBy(o => o.Name == SystemSettingConstants.Price).Single();
             var totalQuantity = total / decimal.Parse(price.ConfigValue);
             totalQuantity = decimal.Round(totalQuantity, 6);
@@ -4597,7 +4603,7 @@ namespace XDropsWater.Bll
 
             orderDb.Add(orderEntity);
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             OrderDetailsEntity odEntity = null;
             foreach (var entity in list)
             {
@@ -4623,14 +4629,14 @@ namespace XDropsWater.Bll
                 db.Remove(entity);
             }
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         public OrderDetailsSummary OrderDetails(Guid orderId, int page, int rows)
         {
             var result = new OrderDetailsSummary();
 
-            var db = new Repository<OrderDetailsEntity>(uow);
+            var db = new Repository<OrderDetailsEntity>(Uow);
 
             Expression<Func<OrderDetailsEntity, bool>> whereExp = o => o.OrderID == orderId;
 
@@ -4650,7 +4656,7 @@ namespace XDropsWater.Bll
 
             if (!result.OrderDetails.Any()) return result;
 
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == orderId).First();
 
             if (!order.IsDeliverly)
@@ -4660,15 +4666,15 @@ namespace XDropsWater.Bll
                 {
                     //删除订单
                     orderDb.Remove(order);
-                    uow.Commit();
+                    Uow.Commit();
                     return result;
                 }
             }
 
 
-            result.OrderNo = result.OrderDetails.First().Order.OrderNo;
+            result.OrderNo = order.OrderNo;
 
-            var roleDb = new Repository<MemberRoleEntity>(uow);
+            var roleDb = new Repository<MemberRoleEntity>(Uow);
             //订单所有者的角色
             var role = roleDb.FindBy(o => o.ID == order.Member.RoleID).First();
 
@@ -4704,14 +4710,14 @@ namespace XDropsWater.Bll
         /// <param name="model"></param>
         public void AddUpdateOrderDetails(OrderDetails model)
         {
-            var db = new Repository<OrderDetailsEntity>(uow);
+            var db = new Repository<OrderDetailsEntity>(Uow);
 
             var currentUserID = this.CurrentUser.ID;
             var now = DateTime.Now;
 
             bool HasIdentityCode = false;
 
-            var proDb = new Repository<ProductEntity>(uow);
+            var proDb = new Repository<ProductEntity>(Uow);
 
             //需要登记唯一识别码
             if (proDb.FindBy(o => o.ID == model.ProductID).Any(o => o.HasIdentityCode == true))
@@ -4779,7 +4785,7 @@ namespace XDropsWater.Bll
             }
 
 
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == model.OrderID).First();
 
             if (!HasIdentityCode)
@@ -4800,7 +4806,7 @@ namespace XDropsWater.Bll
             orderDb.Update(order);
 
 
-            uow.Commit();
+            Uow.Commit();
 
             UpdateOrder(order.ID);
         }
@@ -4811,13 +4817,13 @@ namespace XDropsWater.Bll
         /// <param name="orderId"></param>
         private void UpdateOrder(Guid orderId)
         {
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == orderId).First();
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var list = odDb.FindBy(o => o.OrderID == orderId).ToList();
 
-            var roleDb = new Repository<MemberRoleEntity>(uow);
+            var roleDb = new Repository<MemberRoleEntity>(Uow);
             var role = roleDb.FindBy(o => o.ID == this.CurrentUser.RoleID).First();
 
             int quantity = 0;
@@ -4827,7 +4833,7 @@ namespace XDropsWater.Bll
                 total += cart.Product.Price * cart.Quantity;
                 quantity += cart.Quantity;
             }
-            var settingDb = new Repository<SystemConfigEntity>(uow);
+            var settingDb = new Repository<SystemConfigEntity>(Uow);
             var price = settingDb.FindBy(o => o.Name == SystemSettingConstants.Price).Single();
             var totalQuantity = total / decimal.Parse(price.ConfigValue);
             totalQuantity = decimal.Round(totalQuantity, 6);
@@ -4843,7 +4849,7 @@ namespace XDropsWater.Bll
             order.Quantity = totalQuantity;
 
             orderDb.Update(order);
-            uow.Commit();
+            Uow.Commit();
 
 
         }
@@ -4854,10 +4860,10 @@ namespace XDropsWater.Bll
         /// <param name="ID"></param>
         public void RemoveOrderDetails(Guid ID)
         {
-            var db = new Repository<OrderDetailsEntity>(uow);
+            var db = new Repository<OrderDetailsEntity>(Uow);
             var entity = db.FindBy(o => o.ID == ID).Single();
 
-            var orderDb = new Repository<OrderEntity>(uow);
+            var orderDb = new Repository<OrderEntity>(Uow);
             var order = orderDb.FindBy(o => o.ID == entity.OrderID).First();
 
             //是否需要登记唯一识别码
@@ -4874,7 +4880,7 @@ namespace XDropsWater.Bll
 
             orderDb.Update(order);
 
-            uow.Commit();
+            Uow.Commit();
 
             UpdateOrder(order.ID);
         }
@@ -4885,16 +4891,16 @@ namespace XDropsWater.Bll
         /// <param name="orderId"></param>
         public void RemoveOrder(Guid orderId)
         {
-            var detailsDb = new Repository<OrderDetailsEntity>(uow);
+            var detailsDb = new Repository<OrderDetailsEntity>(Uow);
             var list = detailsDb.FindBy(o => o.OrderID == orderId).ToList();
             foreach (var details in list)
             {
                 detailsDb.Remove(details);
             }
-            var db = new Repository<OrderEntity>(uow);
+            var db = new Repository<OrderEntity>(Uow);
             var order = db.FindBy(o => o.ID == orderId).First();
             db.Remove(order);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -4902,7 +4908,7 @@ namespace XDropsWater.Bll
         /// </summary>
         public void SaveOrder(decimal amount)
         {
-            var roleDb = new Repository<MemberRoleEntity>(uow);
+            var roleDb = new Repository<MemberRoleEntity>(Uow);
             var role = roleDb.FindBy(o => o.ID == this.CurrentUser.RoleID).First();
             if (amount < role.OneTimeAmount)
             {
@@ -4919,7 +4925,7 @@ namespace XDropsWater.Bll
         {
 
             var result = new IdentityCodeSummary();
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
 
             Expression<Func<IdentityCodeEntity, bool>> whereExp = o => o.OrderDetailsID == orderDetailsId;
 
@@ -4939,7 +4945,7 @@ namespace XDropsWater.Bll
             result.IdentityCodes = Mapper.Map<IEnumerable<IdentityCode>>(list);
             CalculateRowNo(result, result.IdentityCodes, page, rows, totalCount);
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var od = odDb.FindBy(o => o.ID == orderDetailsId).First();
 
             result.ProductName = od.Product.Name;
@@ -4993,14 +4999,14 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("唯一识别码不能为空");
             }
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
 
             var entity = new IdentityCodeEntity();
 
             var currentId = this.CurrentUser.ID;
             var now = DateTime.Now;
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var odEntity = odDb.FindBy(o => o.ID == model.OrderDetailsID).First();
 
             var currentCount = db.FindBy(o => o.OrderDetailsID == model.OrderDetailsID).Count();
@@ -5055,7 +5061,7 @@ namespace XDropsWater.Bll
                 var count = odDb.FindBy(o => o.OrderID == odEntity.OrderID && o.Status == (int)OrderDetailsStatus.CodeNotFull).Count();
                 if (count == 0)
                 {
-                    var orderDb = new Repository<OrderEntity>(uow);
+                    var orderDb = new Repository<OrderEntity>(Uow);
                     var order = orderDb.FindBy(o => o.ID == odEntity.OrderID).First();
                     order.Status = (int)OrderStatus.CodeFull;
                     order.UpdateBy = currentId;
@@ -5065,7 +5071,7 @@ namespace XDropsWater.Bll
 
             }
 
-            uow.Commit();
+            Uow.Commit();
 
         }
 
@@ -5087,7 +5093,7 @@ namespace XDropsWater.Bll
             {
                 throw new Exception("结束唯一识别码不能小于起始唯一识别码");
             }
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
 
             //需要插入的唯一识别码
             var codes = new List<long>();
@@ -5096,7 +5102,7 @@ namespace XDropsWater.Bll
                 codes.Add(i);
             }
 
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var orderDetails = odDb.FindBy(o => o.ID == model.OrderDetailsID).First();
 
             var currentCount = db.FindBy(o => o.OrderDetailsID == model.OrderDetailsID).Count();
@@ -5182,7 +5188,7 @@ namespace XDropsWater.Bll
                 database.Database.ExecuteSqlCommand("EXEC [P_BulkAddCodes] @codeFrom, @codeTo, @createBy, @orderDetailsId, @status", parameters.ToArray());
             }
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -5222,7 +5228,7 @@ namespace XDropsWater.Bll
         {
             var result = new MemberProductSummary();
 
-            var db = new Repository<MemberProductEntity>(uow);
+            var db = new Repository<MemberProductEntity>(Uow);
 
             Expression<Func<MemberProductEntity, bool>> whereExp = o => o.MemberID == memberId;
 
@@ -5249,11 +5255,11 @@ namespace XDropsWater.Bll
         /// <param name="quantity"></param>
         public void SaveStock(Guid memberProductId, int quantity)
         {
-            var db = new Repository<MemberProductEntity>(uow);
+            var db = new Repository<MemberProductEntity>(Uow);
             var entity = db.FindBy(o => o.ID == memberProductId).First();
             entity.Quantity = quantity;
             db.Update(entity);
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -5266,7 +5272,7 @@ namespace XDropsWater.Bll
         public IdentityCodeSummary GetCodes(int productId, int page, int size)
         {
             var result = new IdentityCodeSummary();
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
             Expression<Func<IdentityCodeEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.Status == (int)CodeStatus.Available && o.OrderDetails.ProductID == productId && o.OrderDetails.Order.MemberID == this.CurrentUser.MemberID;
             var totalCount = db.Find(whereExp, o => o.CreateOn).Count();
             var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
@@ -5290,7 +5296,7 @@ namespace XDropsWater.Bll
         {
             var result = new StringBuilder();
 
-            var db = new Repository<OrderDetailsEntity>(uow);
+            var db = new Repository<OrderDetailsEntity>(Uow);
             Expression<Func<OrderDetailsEntity, bool>> whereExp = o => o.OrderID == orderId;
             var items = db.Find(whereExp, o => o.CreateOn).ToList();
             foreach (var item in items)
@@ -5315,7 +5321,7 @@ namespace XDropsWater.Bll
         {
             status = status == -1 ? -1 : status;
             var result = new ExpressSummary();
-            var db = new Repository<ExpressEntity>(uow);
+            var db = new Repository<ExpressEntity>(Uow);
             Expression<Func<ExpressEntity, bool>> whereExp = o => o.ID != Guid.Empty;
             if (status != -1)
             {
@@ -5361,7 +5367,7 @@ namespace XDropsWater.Bll
         /// <param name="express"></param>
         public void AddUpdateExpress(Express express)
         {
-            var db = new Repository<ExpressEntity>(uow);
+            var db = new Repository<ExpressEntity>(Uow);
 
             if (string.IsNullOrWhiteSpace(express.RecipientName))
             {
@@ -5457,7 +5463,7 @@ namespace XDropsWater.Bll
 
             }
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         /// <summary>
@@ -5466,18 +5472,18 @@ namespace XDropsWater.Bll
         /// <param name="id"></param>
         public void RemoveExpress(Guid id)
         {
-            var db = new Repository<ExpressEntity>(uow);
+            var db = new Repository<ExpressEntity>(Uow);
 
             var entity = db.FindBy(o => o.ID == id).First();
             db.Remove(entity);
 
-            uow.Commit();
+            Uow.Commit();
         }
 
         public void BulkAddCode(Guid orderDetailsId, IEnumerable<long> codeList)
         {
-            var db = new Repository<IdentityCodeEntity>(uow);
-            var odDb = new Repository<OrderDetailsEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
+            var odDb = new Repository<OrderDetailsEntity>(Uow);
             var orderDetails = odDb.FindBy(o => o.ID == orderDetailsId).First();
 
             var currentCount = db.FindBy(o => o.OrderDetailsID == orderDetailsId).Count();
@@ -5561,7 +5567,7 @@ namespace XDropsWater.Bll
         /// <param name="productId"></param>
         public void UpdateCode(long newCode, long oldCode, int productId)
         {
-            var db = new Repository<IdentityCodeEntity>(uow);
+            var db = new Repository<IdentityCodeEntity>(Uow);
             // check whether the newCode is used
             if (db.FindBy(o => o.Code == newCode && o.OrderDetails.ProductID == productId).Any())
             {
@@ -5574,8 +5580,154 @@ namespace XDropsWater.Bll
                 item.Code = newCode;
                 db.Update(item);
             }
-            uow.Commit();
+            Uow.Commit();
         }
 
+        /// <summary>
+        /// 获取总代订单
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <returns></returns>
+        public GeneralOrderSummary GeneralOrder(int page, int size, DateTime? dateFrom, DateTime? dateTo)
+        {
+            var result = new GeneralOrderSummary();
+            var orderList = new List<GeneralOrderModel>();
+            Repository<OrderEntity> orderRepo = new Repository<OrderEntity>(Uow);
+            Repository<MemberEntity> memberRepo = new Repository<MemberEntity>(Uow);
+            var orderListForGeneral1 = orderRepo.FindBy(o => o.GeneralAgent1ID == this.CurrentUser.MemberID && o.IsDeliverly && o.SendMemberID == Guid.Empty);
+            var orderListForGeneral2 = orderRepo.FindBy(o => o.GeneralAgent2ID == this.CurrentUser.MemberID && o.IsDeliverly && o.SendMemberID == Guid.Empty);
+            var orderListForGeneral3 = orderRepo.FindBy(o => o.GeneralAgent3ID == this.CurrentUser.MemberID && o.IsDeliverly && o.SendMemberID == Guid.Empty);
+            if (dateFrom.HasValue)
+            {
+                DateTime dtFrom = new DateTime(dateFrom.Value.Year, dateFrom.Value.Month, dateFrom.Value.Day, 0, 0, 0);
+                orderListForGeneral1 = orderListForGeneral1.Where(o => o.CreateOn >= dtFrom);
+                orderListForGeneral2 = orderListForGeneral2.Where(o => o.CreateOn >= dtFrom);
+                orderListForGeneral3 = orderListForGeneral3.Where(o => o.CreateOn >= dtFrom);
+            }
+            if (dateTo.HasValue)
+            {
+                DateTime dtTo = new DateTime(dateTo.Value.Year, dateTo.Value.Month, dateTo.Value.Day, 23, 59, 59);
+                orderListForGeneral1 = orderListForGeneral1.Where(o => o.CreateOn <= dtTo);
+                orderListForGeneral2 = orderListForGeneral2.Where(o => o.CreateOn <= dtTo);
+                orderListForGeneral3 = orderListForGeneral3.Where(o => o.CreateOn <= dtTo);
+            }
+            if (orderListForGeneral1 != null && orderListForGeneral1.Any())
+            {
+                var general1List = orderListForGeneral1.GroupBy(o => o.MemberID)
+                    .Select(g => new
+                    {
+                        key = g.Key,
+                        sum = g.Sum(a => a.Quantity)
+                    }).ToList();
+
+
+
+                if (memberRepo.FindBy(o => general1List.Any(g => g.key == o.ID)).Any())
+                {
+                    var memberList = memberRepo.FindBy(o => general1List.Any(g => g.key == o.ID)).ToList();
+                    foreach (var member in memberList)
+                    {
+                        orderList.Add(new GeneralOrderModel()
+                        {
+                            Level = 1,
+                            MemberName = member.MemberName,
+                            Quantity = general1List.Where(o => o.key == member.ID).First().sum
+                        });
+                    }
+                }
+            }
+
+            if (orderListForGeneral2 != null && orderListForGeneral2.Any())
+            {
+                var general2List = orderListForGeneral2.GroupBy(o => o.MemberID)
+                    .Select(g => new
+                    {
+                        key = g.Key,
+                        sum = g.Sum(a => a.Quantity)
+                    }).ToList();
+
+
+
+                if (memberRepo.FindBy(o => general2List.Any(g => g.key == o.ID)).Any())
+                {
+                    var memberList = memberRepo.FindBy(o => general2List.Any(g => g.key == o.ID)).ToList();
+                    foreach (var member in memberList)
+                    {
+                        orderList.Add(new GeneralOrderModel()
+                        {
+                            Level = 2,
+                            MemberName = member.MemberName,
+                            Quantity = general2List.Where(o => o.key == member.ID).First().sum
+                        });
+                    }
+                }
+            }
+
+            if (orderListForGeneral3 != null && orderListForGeneral3.Any())
+            {
+                var general3List = orderListForGeneral3.GroupBy(o => o.MemberID)
+                    .Select(g => new
+                    {
+                        key = g.Key,
+                        sum = g.Sum(a => a.Quantity)
+                    }).ToList();
+
+
+
+                if (memberRepo.FindBy(o => general3List.Any(g => g.key == o.ID)).Any())
+                {
+                    var memberList = memberRepo.FindBy(o => general3List.Any(g => g.key == o.ID)).ToList();
+                    foreach (var member in memberList)
+                    {
+                        orderList.Add(new GeneralOrderModel()
+                        {
+                            Level = 3,
+                            MemberName = member.MemberName,
+                            Quantity = general3List.Where(o => o.key == member.ID).First().sum
+                        });
+                    }
+                }
+            }
+
+            var totalCount = orderList.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
+
+            result.GeneralOrderList = orderList;
+            CalculateRowNo(result, result.GeneralOrderList, page, size, totalCount);
+
+            return result;
+
+        }
+
+        public void Register(RegisterModel model)
+        {
+            var member = new MemberEntity();
+            member.ID = model.Member.MemberId;
+            member.Mobile = model.Member.Mobile;
+            member.MemberName = model.Member.MemberName;
+            member.CreateBy = model.User.Id;
+            member.CreateOn = DateTime.Now;
+            member.ParentMemberID = model.Member.ParentId;
+            member.MemberName = model.Member.MemberName;
+            member.Address = model.Member.Address;
+            member.IdentityNo = model.Member.IdentityNo;
+            member.Address = GetAddress(model);
+            member.ProvinceAvailable = model.Member.ProvinceAvailable;
+            member.GeneralAvailable = model.Member.GeneralAvailable;
+            member.TotalAmount = model.Member.TotalAmount;
+            member.CurrentRoleAmount = model.Member.CurrentRoleAmount;
+            member.RoleID = model.Member.RoleId;
+            MemDb.Add(member);
+        }
+        private string GetAddress(RegisterModel model)
+        {
+            var address = model.MemberAddress;
+            return address.Province.ProvinceName +
+                address.City.CityName +
+                address.District.DistrictName +
+                address.Street.StreetName +
+                address.Description;
+        }
     }
 }

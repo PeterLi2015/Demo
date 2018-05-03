@@ -566,11 +566,12 @@ function formValidator() {
                 validators: {
                     notEmpty: {
                         message: '身份证号码不能为空'
-                    },
-                    regexp: {
-                        regexp: /^(\d{14}(X|x)|\d{18})$/,
-                        message: '身份证号码只能是15或18位数字'
                     }
+                    //,
+                    //regexp: {
+                    //    regexp: /^(\d{14}(X|x)|\d{18})$/,
+                    //    message: '身份证号码只能是15或18位数字'
+                    //}
                 }
             },
             

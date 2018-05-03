@@ -99,6 +99,10 @@ namespace XDropsWater.Dal.Entity
         /// </summary>
         public IDbSet<ExpressEntity> Express { get; set; }
 
+        public IDbSet<AddressEntity> Address { get; set; }
+
+        public IDbSet<MemberAddressEntity> MemberAddress { get; set; }
+
         //public IDbSet<LevelEntity> Levels { get; set; }
 
         public DatabaseGeneratedOption EntityIDDatabaseGeneratedOption { get; set; }

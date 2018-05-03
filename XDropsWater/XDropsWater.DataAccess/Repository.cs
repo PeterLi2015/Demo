@@ -18,7 +18,6 @@ namespace XDropsWater.DataAccess
     {
         private IUnitOfWork unitOfWork;
 
-
         /// <summary>
         /// Constrcutor
         /// </summary>

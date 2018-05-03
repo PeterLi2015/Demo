@@ -1403,5 +1403,25 @@ namespace XDropsWater.Web.Controllers
             //return Json(result, JsonRequestBehavior.AllowGet);
             return null;
         }
+
+        /// <summary>
+        /// 总代订单
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GeneralOrder()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// 总代订单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GeneralOrder(int page, int size, DateTime? dateFrom, DateTime? dateTo)
+        {
+            var result = service.GeneralOrder(page, size, dateFrom, dateTo);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
     }
 }

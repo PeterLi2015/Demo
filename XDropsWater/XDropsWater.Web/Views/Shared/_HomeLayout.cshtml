@@ -95,8 +95,12 @@
             bootbox.setLocale("cn");
             $('#ulMenu').html('');
             var sMenu = '';
-        @{
+            @{
             var oMenuGroup = Session["Menu"] as List<MenuGroup>;
+            if (oMenuGroup == null)
+            {
+                Html.RenderAction("Logout", "Login"); 
+            }
             foreach (var oMenu in oMenuGroup)
             {
             <text>
@@ -108,18 +112,18 @@
             sMenu += '</span>';
             sMenu += '</a>';
             sMenu += '<ul class="treeview-menu">';
-                @foreach (var oItem in oMenu.MenuItems)
+            @foreach (var oItem in oMenu.MenuItems)
                 {
                         <text>
             sMenu += '<li><a href=' + '"@oItem.Url">';
             sMenu += '<i class="fa fa-circle-o"></i> @oItem.Name</a></li>';
-                            
-                        </text>
+
+            </text>
                 }
             sMenu += '</ul>';
             sMenu += '</li>';
 
-        </text>
+            </text>
             }
         }
             $('#ulMenu').html(sMenu);

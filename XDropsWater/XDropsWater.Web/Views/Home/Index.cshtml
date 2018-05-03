@@ -133,20 +133,20 @@
 
                         <!-- /.info-box -->
                     </div>
-                
-                <div class="col-md-3 col-sm-6 col-xs-12">
-                        <a href="@Url.Action("DirectChildMember1","Member")" style="cursor:pointer">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">添加代理</span>
-                                    <span class="info-box-number"></span>
+
+                    @*<div class="col-md-3 col-sm-6 col-xs-12">
+                            <a href="@Url.Action("DirectChildMember1","Member")" style="cursor:pointer">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">添加代理</span>
+                                        <span class="info-box-number"></span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
-                        </a>
-                    </div>
+                                <!-- /.info-box -->
+                            </a>
+                        </div>*@
 
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("GetAllSubMembers1","Member")" style="cursor:pointer">
@@ -175,23 +175,57 @@
                             <!-- /.info-box -->
                         </a>
                     </div>
+                    if (user.RoleID >= (int)enmMemberRole.GeneralAgent)
+                    {
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                            <a href="@Url.Action("Express","Member")" style="cursor:pointer">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">未发货</span>
+                                        <span class="info-box-number">(@ViewBag.NewExpressCount)</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                            </a>
+
+                            <!-- /.info-box -->
+                        </div>
+
+                        @*<div class="col-md-3 col-sm-6 col-xs-12">
+                                <a href="@Url.Action("GeneralOrder","Member")" style="cursor:pointer">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">总代订单</span>
+                                            <span class="info-box-number"></span>
+                                        </div>
+                                        <!-- /.info-box-content -->
+                                    </div>
+                                </a>
+
+                                <!-- /.info-box -->
+                            </div>*@
+
+                        <div class="col-md-3 col-sm-6 col-xs-12">
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#updateAddressModal" style="cursor:pointer">
+                                    <div class="info-box">
+                                        <span class="info-box-icon bg-green"><i class="ion ion-ios-home-outline"></i></span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">修改地址</span>
+                                            <span class="info-box-number"></span>
+                                        </div>
+                                        <!-- /.info-box-content -->
+                                    </div>
+                                </a>
+
+                                <!-- /.info-box -->
+                            </div>
+
+                    }
+
 
                     <div class="col-md-3 col-sm-6 col-xs-12">
-                        <a href="@Url.Action("Express","Member")" style="cursor:pointer">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">未发货</span>
-                                    <span class="info-box-number">(@ViewBag.NewExpressCount)</span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                        </a>
-
-                        <!-- /.info-box -->
-                    </div>
-
-                <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("PersonalInfo1","Member")" style="cursor:pointer">
                             <div class="info-box">
                                 <span class="info-box-icon bg-aqua"><i class="ion ion-ios-gear-outline"></i></span>
@@ -207,7 +241,7 @@
                 }
                 else if (user.UserRoleID == (int)enmRoles.Financial)
                 {
-                  
+
             <!-- fix for small devices only -->
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("MemberOrderManage1","Member")" style="cursor:pointer">
@@ -224,7 +258,7 @@
                         <!-- /.info-box -->
                     </div>
 
-                   
+
                 }
             }
 
@@ -232,7 +266,97 @@
             <!-- /.col -->
         </div>
 
+
+        <div class="modal fade" id="updateAddressModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-bg-xdropswater">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="updateAddressModalLabel">{{title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmUpdateAddress" method="">
+                            <div class="form-horizontal">
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label>选择省份</label><br>
+                                        <select id="address_province" v-model="province" name="address_province" class="form-control" v-on:change="provinceSelected()">
+                                            <option v-for="province in provinces" v-bind:value="province">
+                                                {{province.ProvinceName}}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="form-group" v-show="show.city">
+                                    <div class="col-md-12">
+                                        <label>选择市/地区</label><br>
+                                        <select id="address_city" v-model="city" name="address_city" class="form-control" v-on:change="citySelected()">
+                                            <option v-for="city in cities" v-bind:value="city">
+                                                {{city.CityName}}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="form-group" v-show="show.district">
+                                    <div class="col-md-12">
+                                        <label>选择区/县</label><br>
+                                        <select id="address_district" v-model="district" name="address_district" class="form-control" v-on:change="districtSelected()">
+                                            <option v-for="district in districts" v-bind:value="district">
+                                                {{district.DistrictName}}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="form-group" v-show="show.street">
+                                    <div class="col-md-12">
+                                        <label>选择乡镇/街道</label><br>
+                                        <select id="address_street" v-model="street" name="address_street" class="form-control">
+                                            <option v-for="street in streets" v-bind:value="street">
+                                                {{street.StreetName}}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label>输入具体地址</label><br>
+                                        <textarea id="address_description" name="address_description" v-model="addressDescription" class="form-control" cols="20" rows="2"></textarea>
+
+                                    </div>
+
+                                </div>
+
+
+                                <xdropswater-error v-bind:error="error"></xdropswater-error>
+
+                                @*<div class="form-group has-error" v-show="error.show">
+                                        <div class="col-sm-offset-1  col-sm-10">
+                                            <span class="help-block">{{error.message}}</span>
+                                        </div>
+                                    </div>*@
+
+                                <div class="form-group modal-footer modal-footer-bg-xdropswater">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> 关闭</button>
+                                    <button type="button" class="btn btn-primary" v-on:click="onSubmit"><i class="glyphicon glyphicon-save"></i> 保存</button>
+                                    
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </section>
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+<script src="@Url.Content("~/Content/assets/js/jquery.validate.min.js")"></script>
+<script src="~/Scripts/App/Home/index.js"></script>
+

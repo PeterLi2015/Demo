@@ -14,7 +14,6 @@ E:\Demo\XDropsWater\XDropsWater.CrossCutting\bin\Debug\Microsoft.Practices.Unity
 E:\Demo\XDropsWater\XDropsWater.CrossCutting\bin\Debug\Microsoft.Practices.Unity.dll
 E:\Demo\XDropsWater\XDropsWater.CrossCutting\bin\Debug\Microsoft.Practices.Unity.Interception.Configuration.dll
 E:\Demo\XDropsWater\XDropsWater.CrossCutting\bin\Debug\Microsoft.Practices.Unity.Interception.dll
-E:\Demo\XDropsWater\XDropsWater.CrossCutting\obj\Debug\XDropsWater.CrossCutting.csprojResolveAssemblyReference.cache
 E:\Demo\XDropsWater\XDropsWater.CrossCutting\obj\Debug\XDropsWater.CrossCutting.Resources.Messages.resources
 E:\Demo\XDropsWater\XDropsWater.CrossCutting\obj\Debug\XDropsWater.CrossCutting.csproj.GenerateResource.Cache
 E:\Demo\XDropsWater\XDropsWater.CrossCutting\obj\Debug\XDropsWater.CrossCutting.dll

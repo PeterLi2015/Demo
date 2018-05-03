@@ -7,11 +7,17 @@ using XDropsWater.Model;
 using XDropsWater.Dal.Entity;
 using XDropsWater.DataAccess.Interface;
 using XDropsWater.DataAccess;
+using Unity.Attributes;
+
 namespace XDropsWater.Bll
 {
-    public class UserService : BaseService, IUserService
+    public class UserService : BaseService, IUserService, IRegisterObserver
     {
-        private IUnitOfWork uow = new SimpleWebUnitOfWork();
+        [Dependency]
+        public IUnitOfWork Uow { get; set; }
+
+        [Dependency]
+        public IRepository<UserEntity> UserDb { get; set; }
 
         public string SaveNewPassword(string oldPassowrd, string newPassword)
         {
@@ -20,16 +26,16 @@ namespace XDropsWater.Bll
             {
                 return checkOldPassword;
             }
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var user = repo.FindBy(p => p.ID == this.CurrentUser.ID).FirstOrDefault();
             user.Password = user.SwitchEncryptDecrypt(newPassword);
             repo.Update(user);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
         public string IsValidUser(string password)
         {
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             if (!repo.FindBy(p => p.Account == this.CurrentUser.Account && p.Password == p.SwitchEncryptDecrypt(password)).Any())
             {
                 return "原始密码无效";
@@ -45,7 +51,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public bool IsValidUser(string account, string password)
         {
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var act = repo.FindBy(p => p.Account == account && p.Password == p.SwitchEncryptDecrypt(password)).FirstOrDefault();
             return act != null;
         }
@@ -58,7 +64,7 @@ namespace XDropsWater.Bll
         /// <returns>true：存在，false：不存在</returns>
         public bool IsUserExist(string account)
         {
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var usr = repo.FindBy(p => p.Account == account).FirstOrDefault();
             return usr != null;
         }
@@ -70,7 +76,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public List<UserSummary> GetAll()
         {
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var userSumList = new List<UserSummary>();
             foreach (var user in repo.GetAll().ToList())
             {
@@ -91,12 +97,12 @@ namespace XDropsWater.Bll
 
         public UserSummary GetUser(string account)
         {
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var usr = repo.FindBy(p => p.Account == account).FirstOrDefault();
 
             if (usr != null)
             {
-                Repository<MemberEntity> member = new Repository<MemberEntity>(uow);
+                Repository<MemberEntity> member = new Repository<MemberEntity>(Uow);
                 var mem = member.FindBy(o => o.ID == usr.MemberID).FirstOrDefault();
                 return new UserSummary()
                 {
@@ -118,7 +124,7 @@ namespace XDropsWater.Bll
 
         public UserDetail Get()
         {
-            var repo = new Repository<UserEntity>(uow);
+            var repo = new Repository<UserEntity>(Uow);
             var user = repo.FindBy(p => p.ID == this.CurrentUser.ID).FirstOrDefault();
             if (user != null)
             {
@@ -145,7 +151,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public UserDetail GetDetail(Guid id)
         {
-            Repository<UserEntity> repo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> repo = new Repository<UserEntity>(Uow);
             var user = repo.FindBy(p => p.ID == id).FirstOrDefault();
             if (user != null)
             {
@@ -186,12 +192,12 @@ namespace XDropsWater.Bll
         /// <returns>删除成功或错误信息</returns>
         public ErrorCodes Delete(Guid id)
         {
-            Repository<UserEntity> userRepo = new Repository<UserEntity>(uow);
+            Repository<UserEntity> userRepo = new Repository<UserEntity>(Uow);
             var usr = userRepo.FindBy(p => p.ID == id).FirstOrDefault();
             if (usr != null)
             {
                 userRepo.Remove(usr);
-                uow.Commit();
+                Uow.Commit();
                 return ErrorCodes.Successed;
             }
             else
@@ -216,7 +222,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public ErrorCodes UpdateUser(Guid userId, string name, string account, string password, string telphone, string mobtel, int sex, int departmentid, string department, string roleList)
         {
-            var userRepo = new Repository<UserEntity>(uow);
+            var userRepo = new Repository<UserEntity>(Uow);
 
             var user = userRepo.Find(userId);
 
@@ -224,14 +230,14 @@ namespace XDropsWater.Bll
             user.Account = account;
             user.Password = password;
 
-            uow.Commit();
+            Uow.Commit();
 
             return ErrorCodes.Successed;
         }
 
         public string Save(string name, string telphone, string mobtel, string fax, string address)
         {
-            var userRepo = new Repository<UserEntity>(uow);
+            var userRepo = new Repository<UserEntity>(Uow);
             var user = userRepo.Find(this.CurrentUser.ID);
             if (user == null)
             {
@@ -242,7 +248,7 @@ namespace XDropsWater.Bll
             user.UpdateBy = this.CurrentUser.ID;
             user.UpdateOn = DateTime.Now;
             userRepo.Update(user);
-            uow.Commit();
+            Uow.Commit();
 
             return ExecuteResult.Success.ToString();
         }
@@ -262,7 +268,7 @@ namespace XDropsWater.Bll
         public string ModifyStore(Guid id, string name, int sex, string telephone, string mobile,
             string fax, string address)
         {
-            var repo = new Repository<UserEntity>(uow);
+            var repo = new Repository<UserEntity>(Uow);
 
             UserEntity entity = repo.FindBy(p => p.ID == id).FirstOrDefault();
             if (entity == null)
@@ -278,7 +284,7 @@ namespace XDropsWater.Bll
             //entity.Telphone = telephone;
             //entity.Sex = sex;
             repo.Update(entity);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -289,7 +295,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string ResetPassword(Guid id)
         {
-            var repo = new Repository<UserEntity>(uow);
+            var repo = new Repository<UserEntity>(Uow);
 
             UserEntity entity = repo.FindBy(p => p.ID == id).FirstOrDefault();
             if (entity == null)
@@ -298,7 +304,7 @@ namespace XDropsWater.Bll
             }
             entity.Password = entity.SwitchEncryptDecrypt("111111");
             repo.Update(entity);
-            uow.Commit();
+            Uow.Commit();
             return ExecuteResult.Success.ToString();
         }
 
@@ -309,7 +315,7 @@ namespace XDropsWater.Bll
         /// <returns></returns>
         public string AccountExists(string account)
         {
-            var repo = new Repository<UserEntity>(uow);
+            var repo = new Repository<UserEntity>(Uow);
             if (!repo.FindBy(p => p.Account == account).Any())
             {
                 return "账号不存在";
@@ -332,6 +338,20 @@ namespace XDropsWater.Bll
         public List<UserSummary> GetStoreForUpdateMember(string account, ref int total, int page = 1, int rows = 10)
         {
             throw new NotImplementedException();
+        }
+
+        public void Register(RegisterModel model)
+        {
+            UserEntity user = new UserEntity();
+            user.Account = model.Member.Mobile;
+            user.CreateBy = model.User.Id;
+            user.CreateOn = DateTime.Now;
+            user.ID = Guid.NewGuid();
+            user.MemberID = model.Member.MemberId;
+            user.Password = user.SwitchEncryptDecrypt(GlobalConstants.InitialPassword);
+            user.UserName = model.Member.MemberName;
+            user.UserRoleID = (int)enmRoles.General;
+            UserDb.Add(user);
         }
     }
 }

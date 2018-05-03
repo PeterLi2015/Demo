@@ -55,6 +55,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.5\lib\net40\CommonServiceLocator.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="dotless.Core">
       <HintPath>..\packages\dotless.1.5.2\lib\dotless.Core.dll</HintPath>
     </Reference>
@@ -68,29 +72,13 @@
     <Reference Include="Microsoft.CSharp">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.2.1.505.2\lib\NET35\Microsoft.Practices.Unity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.2.1.505.2\lib\NET35\Microsoft.Practices.Unity.Configuration.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Interception, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Interception.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Interception.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Interception.Configuration, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Interception.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Interception.Configuration.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PagedList">
       <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
@@ -101,6 +89,10 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Net.Http\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Net.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -154,8 +146,20 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Unity.Mvc4, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Mvc4.1.2.0.0\lib\net40\Unity.Mvc4.dll</HintPath>
+    <Reference Include="Unity.Abstractions, Version=3.3.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.5\lib\net40\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.8.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.5\lib\net40\Unity.Container.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Interception, Version=5.5.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.5\lib\net40\Unity.Interception.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.ServiceLocation, Version=2.1.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.5.8.5\lib\net40\Unity.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WebGrease, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -174,12 +178,14 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Controllers\AchieveController.cs" />
     <Compile Include="Controllers\AchieveHistoryController.cs" />
+    <Compile Include="Controllers\AddressController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CommonController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\ControllerHelper.cs" />
     <Compile Include="Controllers\MemberController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\SystemManagmentController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\UserDetailsController.cs" />
@@ -188,9 +194,14 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnityExtensions\SessionLifetimeManager.cs" />
+    <Compile Include="Utility\ContainerExtensions.cs" />
     <Compile Include="Utility\EnumHelper.cs" />
     <Compile Include="Utility\Extensions.cs" />
+    <Compile Include="Utility\Province\AddressCache.cs" />
+    <Compile Include="Utility\Province\IProvince.cs" />
     <Compile Include="Utility\LessTransform.cs" />
+    <Compile Include="Utility\Province\Province.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\AdminLTE-2.3.6\bootstrap\css\bootstrap.css" />
@@ -2122,7 +2133,9 @@
     <Content Include="Images\Login_Table.bmp" />
     <Content Include="Images\logo.jpg" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\App\Home\index.js" />
     <Content Include="Scripts\App\Login\login.js" />
+    <Content Include="Scripts\App\Member\generalOrder.js" />
     <Content Include="Scripts\App\Member\express.js" />
     <Content Include="Scripts\App\Member\addIdentityCode.js" />
     <Content Include="Scripts\App\Member\childMemberOrder1.js" />
@@ -2139,6 +2152,7 @@
     <Content Include="Scripts\App\Member\personalOrder1.js" />
     <Content Include="Scripts\App\Member\shoppingCart.js" />
     <Content Include="Scripts\App\Member\updateOrder.js" />
+    <Content Include="Scripts\App\Register\register.js" />
     <Content Include="Scripts\Vue\vee-validate.min.js" />
     <Content Include="Scripts\App\Shared\_homeLayout.js" />
     <Content Include="Scripts\bootstrap-datepicker.js" />
@@ -2170,6 +2184,27 @@
     <Content Include="Scripts\Vue\vue.min.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Unity.Mvc4.README.txt" />
+    <Content Include="Content\assets\css\bootstrap.min.css" />
+    <Content Include="Content\assets\css\demo.css" />
+    <Content Include="Content\assets\css\gsdk-bootstrap-wizard.css" />
+    <Content Include="Content\assets\img\apple-icon.png" />
+    <Content Include="Content\assets\img\default-avatar.png" />
+    <Content Include="Content\assets\img\favicon.ico" />
+    <Content Include="Content\assets\img\favicon.png" />
+    <Content Include="Content\assets\img\new_logo.png" />
+    <Content Include="Content\assets\img\thumb_list_boat.png" />
+    <Content Include="Content\assets\img\thumb_list_place.png" />
+    <Content Include="Content\assets\img\thumb_register.png" />
+    <Content Include="Content\assets\img\tim_80x80.png" />
+    <Content Include="Content\assets\img\wizard-boat.jpg" />
+    <Content Include="Content\assets\img\wizard-city.jpg" />
+    <Content Include="Content\assets\img\wizard.jpg" />
+    <Content Include="Content\assets\js\bootstrap.min.js" />
+    <Content Include="Content\assets\js\gsdk-bootstrap-wizard.js" />
+    <Content Include="Content\assets\js\jquery-1.10.2.js" />
+    <Content Include="Content\assets\js\jquery-2.2.4.min.js" />
+    <Content Include="Content\assets\js\jquery.bootstrap.wizard.js" />
+    <Content Include="Content\assets\js\jquery.validate.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2263,6 +2298,27 @@
     <Content Include="Views\Member\GetAllSubMembers1.cshtml" />
     <Content Include="Views\Member\Express.cshtml" />
     <Content Include="Views\Member\GetHighSubMembers1.cshtml" />
+    <Content Include="Views\Member\GeneralOrder.cshtml" />
+    <Content Include="Views\Register\Index.cshtml" />
+    <Content Include="Content\assets\.DS_Store" />
+    <Content Include="Content\assets\css\.DS_Store" />
+    <Content Include="Content\assets\img\.DS_Store" />
+    <Content Include="Content\assets\js\.DS_Store" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\mixins\_vendor-prefixes.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_buttons.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_card.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_footers.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_inputs.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_labels.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_misc.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_mixins.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_navs-pagination.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_responsive.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_tooltips.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_typography.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_variables.scss" />
+    <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_wizard-card.scss" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -2283,6 +2339,10 @@
     <ProjectReference Include="..\XDropsWater.CrossCutting\XDropsWater.CrossCutting.csproj">
       <Project>{FC216807-8878-438B-8BDD-AC4A81F41407}</Project>
       <Name>XDropsWater.CrossCutting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XDropsWater.Dal.Entity\XDropsWater.Dal.Entity.csproj">
+      <Project>{F4B4DF7A-D1EE-4598-A39A-3BE732CB636E}</Project>
+      <Name>XDropsWater.Dal.Entity</Name>
     </ProjectReference>
     <ProjectReference Include="..\XDropsWater.DataAccess\XDropsWater.DataAccess.csproj">
       <Project>{DC1B5157-F149-445E-B957-6C525292FA7F}</Project>

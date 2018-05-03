@@ -70,6 +70,8 @@
     <Compile Include="ChildOrders.cs" />
     <Compile Include="DirectorEntity.cs" />
     <Compile Include="ExpressEntity.cs" />
+    <Compile Include="AddressEntity.cs" />
+    <Compile Include="MemberAddressEntity.cs" />
     <Compile Include="MemberProductCode.cs" />
     <Compile Include="MemberProductEntity.cs" />
     <Compile Include="OrderDetailsEntity.cs" />

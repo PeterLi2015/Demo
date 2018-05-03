@@ -1,0 +1,274 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    @*<link rel="apple-touch-icon" sizes="76x76" href="~/assets/img/apple-icon.png">*@
+    <link rel="apple-touch-icon" sizes="76x76" href="@Url.Content("~/Views/Register/assets/img/apple-icon.png")">
+    <link rel="icon" type="image/png" href="@Url.Content("~/Views/Register/assets/img/favicon.png")">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>小水滴环保科技 - 代理注册</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+    <meta name="viewport" content="width=device-width" />
+    <!--     Fonts and icons     -->
+    <!--<link href="http://netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.css" rel="stylesheet">-->
+    <!-- CSS Files -->
+    <link href="@Url.Content("~/Content/assets/css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/assets/css/gsdk-bootstrap-wizard.css")" rel="stylesheet" />
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link href="@Url.Content("~/Content/assets/css/demo.css")" rel="stylesheet" />
+    <style>
+        .form-control-inline {
+            width: auto;
+            float: left;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container set-full-height">
+        <!--   代理注册 Branding   -->
+        <a href="@Url.Action("Index", "Register")">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="@Url.Content("~/Content/assets/img/new_logo.png")">
+                </div>
+                <div class="brand">
+                </div>
+            </div>
+        </a>
+        <!--  Made With Get Shit Done Kit  -->
+        @*<a href="http://www.xsdh2o.cn" class="made-with-mk">
+            <div class="brand">登录</div>
+            <div class="made-with">小水滴后台</div>
+        </a>*@
+        <!--   Big container   -->
+        <div class="container">
+            <div class="row" id="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <!--      Wizard container        -->
+                    <div class="wizard-container">
+                        <div class="card wizard-card" data-color="green" id="wizardProfile">
+                            <form action="" method="">
+                                <!--        You can switch ' data-color="orange" '  with one of the next bright colors: "blue", "green", "orange", "red"          -->
+                                <div class="wizard-header">
+                                    <h3>
+                                        <b>小水滴代理注册</b><br>
+                                    </h3>
+                                </div>
+                                <div class="wizard-navigation">
+                                    <ul>
+                                        <li><a href="#login" data-toggle="tab">登录</a></li>
+                                        <li><a href="#memberbaseinfo" data-toggle="tab">代理基本信息</a></li>
+                                        <li><a href="#address" data-toggle="tab">代理地址</a></li>
+                                        <li><a href="#product" data-toggle="tab">产品信息</a></li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="login">
+                                        <div class="row">
+                                            <h4 class="info-text"> 第一步: 输入您本人的账号和密码</h4>
+                                            <div class="col-sm-4 col-sm-offset-1">
+                                                <div class="picture-container">
+                                                    <div class="picture">
+                                                        <img src="@Url.Content("~/Content/assets/img/default-avatar.png")" class="picture-src" id="wizardPicturePreview" title="" />
+                                                        <input type="text" id="wizard-picture">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label>账号 <small>(必填)</small></label>
+                                                    <input v-model="currentUser.userName" name="currentUser_account" type="text" class="form-control" placeholder="请输入11位手机号码">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>密码 <small>(必填)</small></label>
+                                                    <input v-model="currentUser.password" name="currentUser_password" type="password" class="form-control" placeholder="请输入密码">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="memberbaseinfo">
+                                        <h4 class="info-text"> 第二步: 输入您要注册的代理信息 </h4>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label>上级手机号码 <small></small></label>
+                                                <input v-model="registerUser.parentMobile" id="registerUser_parentMobile" name="registerUser_parentMobile" type="text" class="form-control" placeholder="请输入上级代理账号(11位手机号码)" v-on:keyup="getParentName(registerUser.parentMobile)">
+                                            </div>
+                                            <div class="form-group" v-show="registerUser.showParentName">
+                                                <lable style="color:red">{{registerUser.parentMemberName}}</lable>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>代理手机号码 <small>(必填)</small></label>
+                                                <input v-model="registerUser.mobile" name="registerUser_mobile" type="text" class="form-control" placeholder="请输入11位手机号码">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>代理姓名 <small>(必填)</small></label>
+                                                <input v-model="registerUser.memberName" name="registerUser_memberName" type="text" class="form-control" placeholder="请输入代理真实姓名">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>代理身份证号 <small></small></label>
+                                                <input v-model="registerUser.identityNo" name="registerUser_identityNo" type="text" class="form-control" placeholder="请输入代理身份证号码">
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="address">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <h4 class="info-text"> 第三步: 完善代理的地址信息 </h4>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    <label>选择省份</label><br>
+                                                    <select id="address_province" v-model="registerUser.province" name="address_province" class="form-control" v-on:change="provinceSelected()">
+                                                        <option v-for="province in registerUser.provinces" v-bind:value="province">
+                                                            {{province.ProvinceName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group" v-show="show.city">
+                                                    <label>选择市/地区</label><br>
+                                                    <select id="address_city" v-model="registerUser.city" name="address_city" class="form-control" v-on:change="citySelected()">
+                                                        <option v-for="city in registerUser.cities" v-bind:value="city">
+                                                            {{city.CityName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group" v-show="show.district">
+                                                    <label>选择区/县</label><br>
+                                                    <select id="address_district" v-model="registerUser.district" name="address_district" class="form-control" v-on:change="districtSelected()">
+                                                        <option v-for="district in registerUser.districts" v-bind:value="district">
+                                                            {{district.DistrictName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group" v-show="show.street">
+                                                    <label>选择乡镇/街道</label><br>
+                                                    <select id="address_street" v-model="registerUser.street" name="address_street" class="form-control">
+                                                        <option v-for="street in registerUser.streets" v-bind:value="street">
+                                                            {{street.StreetName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>输入具体地址</label><br>
+                                                    <textarea name="address_description" v-model="registerUser.addressDescription" class="form-control" cols="20" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane" id="product">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <h4 class="info-text"> 第四步: 输入购买的商品数量 </h4>
+                                            </div>
+                                            <div class="col-sm-12">
+
+                                                <div class="form-group" v-show="product.product1Show">
+                                                    <label>小水滴二代饮宝</label><br>
+                                                    <input v-model="product.product1Quantity" name="product1Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product2Show">
+                                                    <label>小水滴二代浴宝</label><br>
+                                                    <input v-model="product.product2Quantity" name="product2Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product3Show">
+                                                    <label>小水滴前置</label><br>
+                                                    <input v-model="product.product3Quantity" name="product3Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product4Show">
+                                                    <label>小水滴304不锈钢Y1饮宝</label><br>
+                                                    <input v-model="product.product4Quantity" name="product4Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product5Show">
+                                                    <label>小水滴304不锈钢M1浴宝</label><br>
+                                                    <input v-model="product.product5Quantity" name="product5Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product6Show">
+                                                    <label>小水滴304不锈钢L1龙头宝</label><br>
+                                                    <input v-model="product.product6Quantity" name="product6Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product7Show">
+                                                    <label>小水滴茶吧机</label><br>
+                                                    <input v-model="product.product7Quantity" name="product7Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product8Show">
+                                                    <label>小水滴能量杯</label><br>
+                                                    <input v-model="product.product8Quantity" name="product8Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product9Show">
+                                                    <label>小水滴洗衣球</label><br>
+                                                    <input v-model="product.product9Quantity" name="product9Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="form-control form-control-inline">选择商品</label>
+                                                    <select class="form-control form-control-inline" v-model="product.product">
+                                                        <option v-for="product in product.products" v-bind:value="product">
+                                                            {{product.productName}}
+                                                        </option>
+                                                    </select>
+                                                    <button class="btn btn-success form-control form-control-inline" type="button" v-on:click="selectProduct()">
+                                                        <i class="glyphicon glyphicon-plus"></i> 添加
+                                                    </button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group has-error" v-show="error.show">
+                                    <div class="col-sm-offset-1  col-sm-10">
+                                        <span class="help-block">{{error.message}}</span>
+                                        <input type="hidden" id="addressValidate" />
+                                    </div>
+
+                                </div>
+
+                                <div class="wizard-footer height-wizard">
+                                    <div class="pull-right">
+                                        <input type='button' class='btn btn-next btn-fill btn-warning btn-wd btn-sm' name='next' value='下一步'/>
+                                        <input v-on:click="save()" type='button' class='btn btn-finish btn-fill btn-warning btn-wd btn-sm' name='finish' value='保存' />
+                                    </div>
+                                    <div class="pull-left">
+                                        <input type='button' class='btn btn-previous btn-fill btn-default btn-wd btn-sm' name='previous' value='上一步' />
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div> <!-- wizard container -->
+                </div>
+            </div><!-- end row -->
+        </div> <!--  big container -->
+        <div class="footer">
+            <div class="container">
+                浙江小水滴环保科技有限公司版权所有
+            </div>
+        </div>
+    </div>
+</body>
+
+
+@Scripts.Render("~/Scripts/Vue/vue.min.js")
+@Scripts.Render("~/Scripts/Vue/vue-resource.min.js")
+@Scripts.Render("~/Scripts/Vue/vue-validator.min.js")
+@Scripts.Render("~/Scripts/Vue/moment.min.js")
+@Scripts.Render("~/Scripts/common.js")
+<!--   Core JS Files   -->
+<script src="@Url.Content("~/Content/assets/js/jquery-2.2.4.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/assets/js/bootstrap.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/assets/js/jquery.bootstrap.wizard.js")" type="text/javascript"></script>
+<!--  Plugin for the Wizard -->
+<script src="@Url.Content("~/Content/assets/js/gsdk-bootstrap-wizard.js")"></script>
+<!--  More information about jquery.validate here: http://jqueryvalidation.org/	 -->
+<script src="@Url.Content("~/Content/assets/js/jquery.validate.min.js")"></script>
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/bootstrap/js/bootbox.min.js")
+
+<script src="@Url.Content("~/Scripts/App/Register/register.js")"></script>
+</html>

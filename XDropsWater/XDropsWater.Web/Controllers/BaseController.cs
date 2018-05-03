@@ -12,13 +12,9 @@ namespace XDropsWater.Web.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
 
-            if (this.Session["CurUser"] == null)
+            if (this.Session["CurUser"] == null && !(filterContext.Controller is RegisterController))
             {
-                if (!filterContext.HttpContext.Request.IsAjaxRequest())
-                {
-                    filterContext.Result = RedirectToRoute("Default", new { Controller = "Login", Action = "Logout" });
-                }
-                else
+                if (filterContext.HttpContext.Request.IsAjaxRequest())
                 {
                     if (filterContext.HttpContext.Request["SystemMenu"] == "Menu")
                     {

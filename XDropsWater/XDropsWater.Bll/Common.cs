@@ -80,8 +80,9 @@ namespace XDropsWater.Bll
                     }
                 }
             }
-            roleAmount = 0;
-            return 0;
+            // 如果匹配不到，角色金额=角色金额+订单金额，角色ID=当前角色ID
+            roleAmount = roleAndOrderAmount;
+            return currentRoleId;
         }
 
         public static List<CityAgent> GetCityAgent(string xml)

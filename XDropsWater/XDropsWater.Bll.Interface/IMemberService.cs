@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.Attributes;
+using XDropsWater.Dal.Entity;
+using XDropsWater.DataAccess.Interface;
 using XDropsWater.Model;
 
 namespace XDropsWater.Bll.Interface
 {
     public interface IMemberService : IService
     {
+        //[Dependency]
+        //IUnitOfWork Uow { get; set; }
+        //[Dependency]
+        //IRepository<MemberEntity> MemDb { get; set; }
         ErrorCodes Add(MemberModel model);
         ErrorCodes Update(MemberModel model);
         MemberModel Get(string mobile);
@@ -514,6 +521,14 @@ namespace XDropsWater.Bll.Interface
         /// <param name="oldCode">老识别码</param>
         /// <param name="productId">产品ID</param>
         void UpdateCode(long newCode, long oldCode, int productId);
+
+        /// <summary>
+        /// 根据时间获取总代订单
+        /// </summary>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <returns></returns>
+        GeneralOrderSummary GeneralOrder(int page, int size, DateTime? dateFrom, DateTime? dateTo);
 
     }
 }
