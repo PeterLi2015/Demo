@@ -110,6 +110,9 @@
                                                     <button v-show="!item.IsDeliverly && (item.FinancialStatus==0)" class="btn btn-sm btn-primary" disabled v-on:click="financialConfirm(item, index)">
                                                         <i class="glyphicon glyphicon-yen"></i> 未付款
                                                     </button>
+                                                    <button v-show="!item.IsDeliverly && (item.FinancialStatus==0)" class="btn btn-sm btn-danger" v-on:click="remove(item, index)">
+                                                        <i class="glyphicon glyphicon-remove"></i> 删除
+                                                    </button>
                                                 </td>
                                                 <td v-show="permission.isFinancial">
                                                     <button v-show="!item.IsDeliverly && (item.FinancialStatus==0)" class="btn btn-sm btn-warning" v-on:click="financialConfirm(item, index)">

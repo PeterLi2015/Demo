@@ -51,6 +51,10 @@ var rows = new Vue({
         financialConfirm: function (order, index) {
             financialConfirm(order, index);
         },
+        remove: function (item, index) {
+            //删除订单
+            removeOrder(this, item);
+        }
         
         //calculatePages: function (current, length, displayLength) {
         //    var indexes = calculatePages(current, length, displayLength);
@@ -61,6 +65,28 @@ var rows = new Vue({
         //},
     }
 });
+
+
+//删除订单
+function removeOrder(vm, item) {
+    var message = '您确定要删除【' + item.Member.MemberName + '】订单【' + item.OrderNo + '】吗？';
+    showConfirm(message, function () {
+        var url = '/Member/RemoveOrder';
+        data = {
+            orderId: item.ID
+        }
+        vm.$http.post(url, data).then(
+            function (result) {
+                if (relogin(result.data)) {
+                    return;
+                }
+
+                showDialog('删除成功', 1000);
+                vm.getPages(1);
+            }
+            );
+    });
+}
 
 
 /*
