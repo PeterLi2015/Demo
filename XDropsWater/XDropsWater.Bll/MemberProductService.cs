@@ -136,27 +136,35 @@ namespace XDropsWater.Bll
             }
             if (model.Product.Product2Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 1, model.Member.ParentId);
+                CheckParentStore(model.Product.Product1Quantity, 2, model.Member.ParentId);
             }
             if (model.Product.Product3Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 1, model.Member.ParentId);
+                CheckParentStore(model.Product.Product1Quantity, 3, model.Member.ParentId);
             }
             if (model.Product.Product4Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 1, model.Member.ParentId);
+                CheckParentStore(model.Product.Product1Quantity, 4, model.Member.ParentId);
             }
             if (model.Product.Product5Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 1, model.Member.ParentId);
+                CheckParentStore(model.Product.Product1Quantity, 5, model.Member.ParentId);
             }
             if (model.Product.Product6Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 1, model.Member.ParentId);
+                CheckParentStore(model.Product.Product1Quantity, 6, model.Member.ParentId);
             }
             if (model.Product.Product7Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 1, model.Member.ParentId);
+                CheckParentStore(model.Product.Product1Quantity, 7, model.Member.ParentId);
+            }
+            if (model.Product.Product8Quantity > 0)
+            {
+                CheckParentStore(model.Product.Product1Quantity, 8, model.Member.ParentId);
+            }
+            if (model.Product.Product9Quantity > 0)
+            {
+                CheckParentStore(model.Product.Product1Quantity, 9, model.Member.ParentId);
             }
         }
 

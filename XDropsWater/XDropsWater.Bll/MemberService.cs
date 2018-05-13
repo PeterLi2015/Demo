@@ -28,6 +28,9 @@ namespace XDropsWater.Bll
         [Dependency]
         public IRepository<ShoppingCartEntity> shoppingCartDb { get; set; }
 
+        [Dependency]
+        public IRepository<ProductEntity> ProductDb { get; set; }
+
         /// <summary>
         /// 添加不存在的代理
         /// </summary>
@@ -4451,8 +4454,7 @@ namespace XDropsWater.Bll
             Mapper.CreateMap<ProductEntity, Product>();
             Mapper.CreateMap<ShoppingCartEntity, ShoppingCart>();
 
-            result.ShoppingCarts = Mapper.Map<IEnumerable<ShoppingCart>>(shoppingCarts);
-            CalculateRowNo(result, result.ShoppingCarts, page, rows, totalCount);
+            
 
             var roleDb = new Repository<MemberRoleEntity>(Uow);
             var role = roleDb.FindBy(o => o.ID == this.CurrentUser.RoleID).Single();
@@ -4462,6 +4464,10 @@ namespace XDropsWater.Bll
                 decimal total = 0m;
                 foreach (var cart in shoppingCarts)
                 {
+                    if (cart.Product == null)
+                    {
+                        cart.Product = ProductDb.FindBy(o => o.ID == cart.ProductID).First();
+                    }
                     total += cart.Product.Price * cart.Quantity;
                 }
                 var settingDb = new Repository<SystemConfigEntity>(Uow);
@@ -4473,6 +4479,8 @@ namespace XDropsWater.Bll
                 result.Description = Common.GetTotalAmountDescription1(role.Price, role.RoleRiseDescription, totalQuantity, role.ID, this.CurrentUser.CurrentRoleQuantity, out totalAmount);
 
             }
+            result.ShoppingCarts = Mapper.Map<IEnumerable<ShoppingCart>>(shoppingCarts);
+            CalculateRowNo(result, result.ShoppingCarts, page, rows, totalCount);
 
             return result;
         }
