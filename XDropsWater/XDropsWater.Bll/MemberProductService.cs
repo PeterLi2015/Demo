@@ -136,41 +136,47 @@ namespace XDropsWater.Bll
             }
             if (model.Product.Product2Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 2, model.Member.ParentId);
+                CheckParentStore(model.Product.Product2Quantity, 2, model.Member.ParentId);
             }
             if (model.Product.Product3Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 3, model.Member.ParentId);
+                CheckParentStore(model.Product.Product3Quantity, 3, model.Member.ParentId);
             }
             if (model.Product.Product4Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 4, model.Member.ParentId);
+                CheckParentStore(model.Product.Product4Quantity, 4, model.Member.ParentId);
             }
             if (model.Product.Product5Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 5, model.Member.ParentId);
+                CheckParentStore(model.Product.Product5Quantity, 5, model.Member.ParentId);
             }
             if (model.Product.Product6Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 6, model.Member.ParentId);
+                CheckParentStore(model.Product.Product6Quantity, 6, model.Member.ParentId);
             }
             if (model.Product.Product7Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 7, model.Member.ParentId);
+                CheckParentStore(model.Product.Product7Quantity, 7, model.Member.ParentId);
             }
             if (model.Product.Product8Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 8, model.Member.ParentId);
+                CheckParentStore(model.Product.Product8Quantity, 8, model.Member.ParentId);
             }
             if (model.Product.Product9Quantity > 0)
             {
-                CheckParentStore(model.Product.Product1Quantity, 9, model.Member.ParentId);
+                CheckParentStore(model.Product.Product9Quantity, 9, model.Member.ParentId);
             }
         }
 
         private void CheckParentStore(int quantity, int productId, Guid parentId)
         {
             MemberProductEntity sendMp = null;
+            var memberProduct = MpDb.FindBy(o => o.ProductID == productId && o.MemberID == parentId);
+            if (!memberProduct.Any())
+            {
+                var product = ProductDb.FindBy(o => o.ID == productId).First();
+                throw new Exception(string.Format("上级【{0}】库存只有{1}件，少于{2}件，不能注册", product.Name, 0, quantity));
+            }
             if (!MpDb.FindBy(o => o.ProductID == productId && o.MemberID == parentId && o.Quantity >= quantity).Any())
             {
                 var product = ProductDb.FindBy(o => o.ID == productId).First();
