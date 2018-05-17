@@ -74,7 +74,8 @@ namespace XDropsWater.Web
                 new InterceptionBehavior<LoggingInterceptionBehavior>()
                 );
             container.RegisterType<IUnitOfWork, SimpleWebUnitOfWork>(
-                new SessionLifetimeManager("uow")
+                //new SessionLifetimeManager("uow")
+                new PerRequestLifetimeManager("uow")
                 );
             
             container.RegisterType<IProvince, Province>(
