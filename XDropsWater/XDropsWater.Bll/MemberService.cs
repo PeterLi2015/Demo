@@ -1568,7 +1568,7 @@ namespace XDropsWater.Bll
 
                 iRoleID = Common.GetRoleID1(memberRole.RoleRiseDescription, orderAmount + member.CurrentRoleAmount, unitAmount, minusAmount, member.RoleID, out roleAmount);
 
-                if(member.RoleID != iRoleID)
+                if (member.RoleID != iRoleID)
                 {
                     RoleUpgradeEntity ruEntity = new RoleUpgradeEntity();
                     ruEntity.CreateBy = this.CurrentUser.ID;
@@ -4454,7 +4454,7 @@ namespace XDropsWater.Bll
             Mapper.CreateMap<ProductEntity, Product>();
             Mapper.CreateMap<ShoppingCartEntity, ShoppingCart>();
 
-            
+
 
             var roleDb = new Repository<MemberRoleEntity>(Uow);
             var role = roleDb.FindBy(o => o.ID == this.CurrentUser.RoleID).Single();
@@ -4756,7 +4756,7 @@ namespace XDropsWater.Bll
             }
             else
             {
-                var entity = db.FindBy(o => o.ProductID == model.ProductID).FirstOrDefault();
+                var entity = db.FindBy(o => o.ProductID == model.ProductID && o.OrderID == model.OrderID).FirstOrDefault();
                 if (entity != null)
                 {
                     //累加
