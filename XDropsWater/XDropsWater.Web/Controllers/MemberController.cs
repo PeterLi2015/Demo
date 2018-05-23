@@ -1333,9 +1333,9 @@ namespace XDropsWater.Web.Controllers
         /// <param name="mobileOrName"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult GetExpress(int page, int size, int status, string mobileOrName)
+        public ActionResult GetExpress(int page, int size, int status, string mobileOrName, bool recieve)
         {
-            var result = service.GetExpress(page, size, status, mobileOrName);
+            var result = service.GetExpress(page, size, status, mobileOrName, recieve);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 

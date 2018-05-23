@@ -6,7 +6,8 @@ var rows = new Vue({
         items: [],
         search: {
             status: -1, // 0未发货，1发货中，2已发货，-1全部
-            mobileOrName: '' //电话号码或姓名
+            mobileOrName: '', //发件人电话号码或姓名
+            checked: 'Recieve' //收件人 or 发件人
         },
         error: {
             show: false,
@@ -341,6 +342,7 @@ function AddExpress(vm, url) {
         hideModal($('#addOrUpdateModal'));
 
         rows.search.mobileOrName = '';
+        rows.search.checked = 'Recieve';
         rows.search.status = -1;
 
         rows.getPages(1);
@@ -362,7 +364,8 @@ function getExpress(vm, page) {
         page: page,
         size: getRowsCount(),
         status: vm.search.status, // 状态，0未发货，1已发货，-1全部
-        mobileOrName: vm.search.mobileOrName // 电话号码或姓名模糊查询
+        mobileOrName: vm.search.mobileOrName, // 发件人电话号码或姓名模糊查询
+        recieve: vm.search.checked == 'Recieve' ? true : false
 
     };
     vm.$http.post(url, data).then(function (result) {

@@ -481,7 +481,7 @@ namespace XDropsWater.Bll.Interface
         /// <param name="status"></param>
         /// <param name="mobileOrName"></param>
         /// <returns></returns>
-        ExpressSummary GetExpress(int page, int size, int status, string mobileOrName);
+        ExpressSummary GetExpress(int page, int size, int status, string mobileOrName, bool recieve);
 
         /// <summary>
         /// 新增修改快递信息

@@ -47,6 +47,10 @@
                                 <option value="1">已发货</option>
                             </select>
                         </div>
+                        <div class="form-group" v-show="admin">
+                            <label><input name="radioGroup" type="radio" value="Recieve" checked="checked" v-model="search.checked" />收件人</label>
+                            <label><input name="radioGroup" type="radio" value="Send" v-model="search.checked" />发件人</label>
+                        </div>
                         <div class="form-group">
                             <input v-model="search.mobileOrName" class="form-control" placeholder="电话号码或姓名" type="text">
                         </div>

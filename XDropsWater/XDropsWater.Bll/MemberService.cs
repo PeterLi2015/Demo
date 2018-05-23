@@ -5325,7 +5325,7 @@ namespace XDropsWater.Bll
         /// <param name="status"></param>
         /// <param name="mobileOrName"></param>
         /// <returns></returns>
-        public ExpressSummary GetExpress(int page, int size, int status, string mobileOrName)
+        public ExpressSummary GetExpress(int page, int size, int status, string mobileOrName, bool recieve)
         {
             status = status == -1 ? -1 : status;
             var result = new ExpressSummary();
@@ -5339,20 +5339,32 @@ namespace XDropsWater.Bll
             {
                 if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
                 {
-                    // 代理用收件人的用户名和手机号码查询
+                    // 普通用户只能查询收件人
                     whereExp = whereExp.And(o => (o.RecipientMobile.Contains(mobileOrName)
                         || o.RecipientName.ToUpper().Contains(mobileOrName.ToUpper()))
                         );
                 }
                 else
                 {
-                    // 管理员用代理的手机号码和姓名查询
-                    whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
-                        || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                    if (recieve)
+                    {
+                        // 管理员查询收件人
+                        whereExp = whereExp.And(o => (o.RecipientMobile.Contains(mobileOrName)
+                        || o.RecipientName.ToUpper().Contains(mobileOrName.ToUpper()))
                         );
+                    }
+                    else
+                    {
+                        // 管理员查询发件人
+                        whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
+                            || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                            );
+                    }
+                    
                 }
 
             }
+            
             if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
             {
                 whereExp = whereExp.And(o => o.MemberID == this.CurrentUser.MemberID);
