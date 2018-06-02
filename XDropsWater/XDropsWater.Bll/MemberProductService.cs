@@ -64,6 +64,18 @@ namespace XDropsWater.Bll
             {
                 MemberAddQuantity(7, model.Product.Product7Quantity, memId, userId);
             }
+            if (model.Product.Product8Quantity > 0)
+            {
+                MemberAddQuantity(8, model.Product.Product8Quantity, memId, userId);
+            }
+            if (model.Product.Product9Quantity > 0)
+            {
+                MemberAddQuantity(9, model.Product.Product9Quantity, memId, userId);
+            }
+            if (model.Product.Product10Quantity > 0)
+            {
+                MemberAddQuantity(10, model.Product.Product10Quantity, memId, userId);
+            }
         }
 
         private void MemberAddQuantity(int productId, int quantity, Guid memberId, Guid curUserId)
@@ -118,6 +130,18 @@ namespace XDropsWater.Bll
             {
                 ParentSubQuantity(7, model.Member.ParentId, model.Product.Product7Quantity);
             }
+            if (model.Product.Product8Quantity > 0)
+            {
+                ParentSubQuantity(8, model.Member.ParentId, model.Product.Product8Quantity);
+            }
+            if (model.Product.Product9Quantity > 0)
+            {
+                ParentSubQuantity(9, model.Member.ParentId, model.Product.Product9Quantity);
+            }
+            if (model.Product.Product10Quantity > 0)
+            {
+                ParentSubQuantity(10, model.Member.ParentId, model.Product.Product10Quantity);
+            }
         }
 
         private void ParentSubQuantity(int productId, Guid parentId, int quantity)
@@ -165,6 +189,10 @@ namespace XDropsWater.Bll
             if (model.Product.Product9Quantity > 0)
             {
                 CheckParentStore(model.Product.Product9Quantity, 9, model.Member.ParentId);
+            }
+            if (model.Product.Product10Quantity > 0)
+            {
+                CheckParentStore(model.Product.Product10Quantity, 10, model.Member.ParentId);
             }
         }
 

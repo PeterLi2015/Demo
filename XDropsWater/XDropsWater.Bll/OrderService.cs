@@ -175,6 +175,10 @@ namespace XDropsWater.Bll
             {
                 CreateOrderDetails(orderId, 9, model.Product.Product9Quantity);
             }
+            if (model.Product.Product10Quantity > 0)
+            {
+                CreateOrderDetails(orderId, 10, model.Product.Product10Quantity);
+            }
         }
 
         private void CreateOrderDetails(Guid orderId, int productId, int quantity)
@@ -382,6 +386,21 @@ namespace XDropsWater.Bll
             {
                 price = ProductDb.FindBy(o => o.ID == 7).First().Price;
                 total += model.Product.Product7Quantity * price;
+            }
+            if (model.Product.Product8Quantity > 0)
+            {
+                price = ProductDb.FindBy(o => o.ID == 8).First().Price;
+                total += model.Product.Product8Quantity * price;
+            }
+            if (model.Product.Product9Quantity > 0)
+            {
+                price = ProductDb.FindBy(o => o.ID == 9).First().Price;
+                total += model.Product.Product9Quantity * price;
+            }
+            if (model.Product.Product10Quantity > 0)
+            {
+                price = ProductDb.FindBy(o => o.ID == 10).First().Price;
+                total += model.Product.Product10Quantity * price;
             }
             return total;
         }

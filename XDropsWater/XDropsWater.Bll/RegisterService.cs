@@ -58,7 +58,10 @@ namespace XDropsWater.Bll
                 model.Product.Product4Quantity +
                 model.Product.Product5Quantity +
                 model.Product.Product6Quantity +
-                model.Product.Product7Quantity;
+                model.Product.Product7Quantity +
+                model.Product.Product8Quantity +
+                model.Product.Product9Quantity +
+                model.Product.Product10Quantity;
             if (total == 0)
             {
                 throw new Exception("必须至少购买一件商品");
