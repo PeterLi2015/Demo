@@ -88,7 +88,7 @@ namespace XDropsWater.Web
             });
             result.Add(new AddressModel()
             {
-                Province = "福建",
+                Province = "福建省",
                 ProvinceCode = "fujian"
             });
             result.Add(new AddressModel()
@@ -108,6 +108,11 @@ namespace XDropsWater.Web
             {
                 Province = "河南省",
                 ProvinceCode = "henan"
+            });
+            result.Add(new AddressModel()
+            {
+                Province = "湖南省",
+                ProvinceCode = "hunan"
             });
             result.Add(new AddressModel()
             {
