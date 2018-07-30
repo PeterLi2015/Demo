@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{DEE8F648-834B-4010-802C-D6BF507AC073}"
 EndProject
@@ -26,6 +26,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XDropsWater.Web", "XDropsWater.Web\XDropsWater.Web.csproj", "{A70DBB8B-51CC-4BDE-AB84-7729BDDB548C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XDropsWater.Model", "XDropsWater.Model\XDropsWater.Model.csproj", "{67982515-08B5-4188-8B94-517EAD076AE8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataTransfer", "DataTransfer", "{86610C02-6ED1-45C7-8146-AA7693ADAD24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTransfer.Console", "DataTransfer.Console\DataTransfer.Console.csproj", "{44DCDC96-0B98-491C-A073-3CA600AABD8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +65,10 @@ Global
 		{67982515-08B5-4188-8B94-517EAD076AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67982515-08B5-4188-8B94-517EAD076AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67982515-08B5-4188-8B94-517EAD076AE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44DCDC96-0B98-491C-A073-3CA600AABD8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44DCDC96-0B98-491C-A073-3CA600AABD8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44DCDC96-0B98-491C-A073-3CA600AABD8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44DCDC96-0B98-491C-A073-3CA600AABD8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,8 +81,10 @@ Global
 		{DC1B5157-F149-445E-B957-6C525292FA7F} = {05EA88B7-D790-4E5C-A400-3F3AD656E747}
 		{A70DBB8B-51CC-4BDE-AB84-7729BDDB548C} = {02344ACB-4467-4DD6-9E24-0BD65043155B}
 		{67982515-08B5-4188-8B94-517EAD076AE8} = {40596A03-8143-4D80-AC50-6372DDF00AC3}
+		{44DCDC96-0B98-491C-A073-3CA600AABD8D} = {86610C02-6ED1-45C7-8146-AA7693ADAD24}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.2\lib\NET35;packages\Unity.Interception.2.1.505.0\lib\NET35
+		SolutionGuid = {506FD599-2E73-4CC2-89D0-08AC135339CB}
 	EndGlobalSection
 EndGlobal
