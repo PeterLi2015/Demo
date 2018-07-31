@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using XDropsWater.Bll.Interface;
@@ -195,6 +198,60 @@ namespace XDropsWater.Web.Controllers
                 rows = list.ToArray()
             };
             return Json(json, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult DataTransfer()
+        {
+            try
+            {
+                var users = service.DataTransfer();
+
+                var handler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip };
+
+                //创建HttpClient（注意传入HttpClientHandler）
+                using (var http = new HttpClient(handler))
+                {
+                    var url = "http://www.xsdhbkj.com/api/userinfoapi";
+                    long timeSpan = DateTime.Now.Ticks;
+                    var appKey = "PG6e31aa765fcb436b";
+                    var secret = "D9U7YY5D7FF2748AED89E90HJ88881E6";
+                    var sign = MakeSign(appKey + secret + timeSpan);
+                    int i = 0;
+                    foreach (var user in users)
+                    {
+                        i++;
+                        //使用FormUrlEncodedContent做HttpContent
+                        var content = new FormUrlEncodedContent(new Dictionary<string, string>()
+                        {
+                            {"username", user.Account},
+                            {"password", "111111"},
+                            {"integration", "10000"},
+                            {"timespan", timeSpan.ToString()},
+                            {"appkey", appKey},
+                            {"sign", sign},
+                            {"force_gzip", "1"}
+                        });
+
+                        //await异步等待回应
+                        var task = http.PostAsync(url, content);
+                        task.Wait();
+                        Console.WriteLine(task.Result);
+                    }
+                    Console.WriteLine(i);
+
+                }
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+            
+            return new EmptyResult();
+        }
+        private string MakeSign(string str)
+        {
+            return System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(str, "MD5").ToLower();
         }
     }
 }

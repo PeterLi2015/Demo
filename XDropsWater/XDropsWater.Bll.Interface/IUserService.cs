@@ -82,5 +82,7 @@ namespace XDropsWater.Bll.Interface
         /// <param name="rows"></param>
         /// <returns></returns>
         List<UserSummary> GetStoreForUpdateMember(string account, ref int total, int page = 1, int rows = 10);
+
+        List<UserEntity> DataTransfer();
     }
 }

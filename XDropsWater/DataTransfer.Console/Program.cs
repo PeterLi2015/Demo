@@ -57,7 +57,7 @@ namespace DataTransfer.Console
                 //使用FormUrlEncodedContent做HttpContent
                 var content = new FormUrlEncodedContent(new Dictionary<string, string>()
                 {
-                    {"username", "13235820053"},
+                    {"username", "13735106883"},
                     {"password", "111111"},
                     {"integration", "10000"},
                     {"timespan", timeSpan.ToString()},

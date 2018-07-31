@@ -8,6 +8,7 @@ using XDropsWater.Dal.Entity;
 using XDropsWater.DataAccess.Interface;
 using XDropsWater.DataAccess;
 using Unity.Attributes;
+using System.Net;
 
 namespace XDropsWater.Bll
 {
@@ -244,7 +245,7 @@ namespace XDropsWater.Bll
                 return "获取用户信息失败";
             }
             user.UserName = name;
-            
+
             user.UpdateBy = this.CurrentUser.ID;
             user.UpdateOn = DateTime.Now;
             userRepo.Update(user);
@@ -253,7 +254,7 @@ namespace XDropsWater.Bll
             return ExecuteResult.Success.ToString();
         }
 
-     
+
         /// <summary>
         /// 修改专卖店信息
         /// </summary>
@@ -324,7 +325,7 @@ namespace XDropsWater.Bll
         }
 
 
-       
+
         public List<UserSummary> GetStore(string account, ref int total, int page = 1, int rows = 10)
         {
             throw new NotImplementedException();
@@ -352,6 +353,18 @@ namespace XDropsWater.Bll
             user.UserName = model.Member.MemberName;
             user.UserRoleID = (int)enmRoles.General;
             UserDb.Add(user);
+        }
+
+        public List<UserEntity> DataTransfer()
+        {
+            
+            return UserDb.FindAll<UserEntity>(o => o.UserRoleID == (int)enmRoles.General).ToList();
+                
+        }
+
+        private string MakeSign(string str)
+        {
+            return System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(str, "MD5").ToLower();
         }
     }
 }

@@ -530,5 +530,6 @@ namespace XDropsWater.Bll.Interface
         /// <returns></returns>
         GeneralOrderSummary GeneralOrder(int page, int size, DateTime? dateFrom, DateTime? dateTo);
 
+        void DataTransfer();
     }
 }

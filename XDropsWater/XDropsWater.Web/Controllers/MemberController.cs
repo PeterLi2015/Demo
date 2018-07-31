@@ -1423,5 +1423,16 @@ namespace XDropsWater.Web.Controllers
             var result = service.GeneralOrder(page, size, dateFrom, dateTo);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// 会员导入到商城
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult DataTransfer()
+        {
+            service.DataTransfer();
+            return new EmptyResult();
+        }
     }
 }

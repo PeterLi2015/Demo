@@ -5749,5 +5749,9 @@ namespace XDropsWater.Bll
                 address.Street.StreetName +
                 address.Description;
         }
+
+        public void DataTransfer()
+        {
+        }
     }
 }
