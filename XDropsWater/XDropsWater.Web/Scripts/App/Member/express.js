@@ -378,6 +378,9 @@ function getExpress(vm, page) {
             if (vm.items[i].Status == 0) {
                 vm.items[i].BackgroundColor = 'lightpink';
             }
+            else if (vm.items[i].Status == 2) {
+                vm.items[i].BackgroundColor = 'yellow';
+            }
         }
         CalculateTablePages(vm, page, result);
     }, function (error) {

@@ -47,7 +47,7 @@ namespace XDropsWater.Dal.Entity
         public string Content { get; set; }
 
         /// <summary>
-        /// 状态(0未发货,1已发货)
+        /// 状态(0未发货,1已发货,2 部分发货)
         /// </summary>
         public int Status { get; set; }
 

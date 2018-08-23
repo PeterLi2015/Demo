@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -234,6 +235,7 @@ namespace XDropsWater.Web.Controllers
                         });
 
                         //await异步等待回应
+                        Thread.Sleep(500);
                         var task = http.PostAsync(url, content);
                         task.Wait();
                         Console.WriteLine(task.Result);

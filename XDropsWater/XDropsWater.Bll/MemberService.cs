@@ -279,11 +279,11 @@ namespace XDropsWater.Bll
             if (this.CurrentUser.UserRoleID == (int)enmRoles.Admin ||
                 this.CurrentUser.UserRoleID == (int)enmRoles.All)
             {
-                iRet = db.FindBy(o => o.Status == 0).Count();
+                iRet = db.FindBy(o => o.Status == 0 || o.Status == 2).Count();
             }
             else if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
             {
-                iRet = db.FindBy(o => o.Status == 0 && o.MemberID == this.CurrentUser.MemberID).Count();
+                iRet = db.FindBy(o => (o.Status == 0 || o.Status == 2) && o.MemberID == this.CurrentUser.MemberID).Count();
             }
             return iRet;
         }
@@ -5360,11 +5360,11 @@ namespace XDropsWater.Bll
                             || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
                             );
                     }
-                    
+
                 }
 
             }
-            
+
             if (this.CurrentUser.UserRoleID == (int)enmRoles.General)
             {
                 whereExp = whereExp.And(o => o.MemberID == this.CurrentUser.MemberID);
@@ -5440,6 +5440,7 @@ namespace XDropsWater.Bll
                     entity.RecipientAddress = express.RecipientAddress;
                     entity.RecipientMobile = express.RecipientMobile;
                     entity.RecipientName = express.RecipientName;
+                    entity.Status = express.Status;
                 }
                 else
                 {
@@ -5457,7 +5458,6 @@ namespace XDropsWater.Bll
                     {
                         entity.ExpressDate = express.ExpressDate;
                     }
-                    entity.Status = express.Status;
                     if (entity.Status == 0)
                     {
                         entity.ExpressDate = null;
