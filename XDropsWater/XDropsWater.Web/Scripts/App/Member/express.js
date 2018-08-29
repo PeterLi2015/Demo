@@ -37,6 +37,9 @@ var rows = new Vue({
         send: function (item, index) {
             send(item, index);
         },
+        sendDetails: function (item, index) {
+            sendDetails(item, index);
+        },
         sendConfirm: function (item, index) {
             sendConfirm(item, index);
         },
@@ -203,6 +206,44 @@ var sendModal = new Vue({
 });
 
 
+// 发货明细
+var sendDetailsModal = new Vue({
+    el: '#sendDetailsModal',
+    data: {
+        model: {
+            Title: '发货明细',
+            ID: '', // 发货记录ID
+            RecipientName: '', // 收件人姓名
+            RecipientMobile: '', // 收件人手机号码
+            RecipientAddress: '', // 收件人地址
+            Content: '', // 发货内容
+            ExpressName: '', // 快递名称
+            ExpressNo: '', // 快递单号
+            ExpressDate: '', // 发货日期
+            Index: 0, // 要修改的记录的索引
+            IsUpdate: false,
+            Status: 0
+        },
+        error: {
+            message: '',
+            show: false
+        },
+        items: [],
+        displayPages: [],
+        totalPages: 0,
+        currentPage: 1,
+        totalCount: 0,
+        rowFrom: 0,
+        rowTo: 0
+    },
+    methods: {
+        submit: function () {
+            addOrUpdate(this);
+        }
+    }
+});
+
+
 // 重置发货记录并弹出修改窗口
 function send(item, index) {
     var model = sendModal.model;
@@ -221,6 +262,26 @@ function send(item, index) {
     sendModal.error.message = '';
     sendModal.model.IsUpdate = true;
     showModal($('#sendModal'));
+}
+
+//发货明细
+function sendDetails(item, index) {
+    var model = sendDetailsModal.model;
+    model.Title = '发货明细';
+    model.MemberName = item.Member.MemberName;
+    model.RecipientName = item.RecipientName;
+    model.RecipientMobile = item.RecipientMobile;
+    model.RecipientAddress = item.RecipientAddress;
+    model.Content = item.Content;
+    model.ID = item.ID;
+    model.Index = index;
+    model.ExpressName = item.ExpressName;
+    model.ExpressNo = item.ExpressNo;
+    model.Status = item.Status;
+    sendDetailsModal.error.show = false;
+    sendDetailsModal.error.message = '';
+    sendDetailsModal.model.IsUpdate = true;
+    showModal($('#sendDetailsModal'));
 }
 
 // 新增或修改发货记录

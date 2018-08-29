@@ -55,7 +55,7 @@
                         <div class="form-group">
                             <input v-model="search.mobileOrName" class="form-control" placeholder="电话号码或姓名" type="text">
                         </div>
-                        
+
                         <div class="form-group">
                             <div class="input-group">
                                 <span>
@@ -65,10 +65,10 @@
                                 <span v-show="!admin">
                                     <xdropswater-add-button></xdropswater-add-button>
                                 </span>
-                                
+
                             </div>
                         </div>
-                        
+
 
                     </div>
                     <!-- /.box-header -->
@@ -124,6 +124,9 @@
                                                     </button>
                                                     <button v-show="admin && item.Status>0" class="btn btn-sm btn-success" v-on:click="send(item, index)">
                                                         <i class="glyphicon glyphicon-pencil"></i> 修改
+                                                    </button>
+                                                    <button v-show="!admin && item.Status>0" class="btn btn-sm btn-success" v-on:click="sendDetails(item, index)">
+                                                        <i class="glyphicon glyphicon-pencil"></i> 发货明细
                                                     </button>
                                                 </td>
                                             </tr>
@@ -225,7 +228,7 @@
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <label class="control-label" for="RecipientMobile">收件人手机号码</label>
-                                        <input name="RecipientMobile"  v-model="model.RecipientMobile" class="form-control" type="text" />
+                                        <input name="RecipientMobile" v-model="model.RecipientMobile" class="form-control" type="text" />
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -281,6 +284,89 @@
             </div>
         </div>
 
+        <div class="modal fade" id="sendDetailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-bg-xdropswater">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalMemberOrderLabel">{{model.Title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/Member/SendMemberOrder" method="post" id="sendForm" v-on:submit="submit">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="MemberName">代理姓名</label>
+                                        <input name="model.MemberName" readonly="readonly" v-model="model.MemberName" class="form-control" type="text" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="RecipientName">收件人姓名</label>
+                                        <input name="RecipientName" v-model="model.RecipientName" class="form-control" type="text" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="RecipientMobile">收件人手机号码</label>
+                                        <input name="RecipientMobile" v-model="model.RecipientMobile" class="form-control" type="text" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="RecipientAddress">收件人地址</label>
+                                        <textarea name="RecipientAddress" v-model="model.RecipientAddress" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group" v-show="model.IsUpdate">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="Status">状态</label>
+                                        <select name="Content" v-model="model.Status" class="form-control">
+                                            <option value="0">未发货</option>
+                                            <option value="1">已发货</option>
+                                            <option value="2">部分发货</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="Content">发货内容</label>
+                                        <textarea name="Content" v-model="model.Content" class="form-control"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="ExpressName">快递名称</label>
+                                        <input name="ExpressName" v-model="model.ExpressName" class="form-control" type="text" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="control-label" for="ExpressNo">快递单号</label>
+                                        <input name="ExpressNo" v-model="model.ExpressNo" class="form-control" type="text" />
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group has-error" v-show="error.show">
+                                    <div class="col-sm-offset-1  col-sm-10">
+                                        <span class="help-block">{{error.message}}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group modal-footer modal-footer-bg-xdropswater">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> 关闭</button>
+                                    
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
 
     </section>
