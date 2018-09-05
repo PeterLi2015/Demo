@@ -93,6 +93,21 @@ $(document).ready(function () {
             product7Quantity: {
                 isNumber: true
             },
+            product8Quantity: {
+                isNumber: true
+            },
+            product9Quantity: {
+                isNumber: true
+            },
+            product10Quantity: {
+                isNumber: true
+            },
+            product11Quantity: {
+                isNumber: true
+            },
+            product12Quantity: {
+                isNumber: true
+            },
         },
         messages: {
             currentUser_account: {
@@ -152,6 +167,21 @@ $(document).ready(function () {
                 isNumber: '产品数量必须是数字'
             },
             product7Quantity: {
+                isNumber: '产品数量必须是数字'
+            },
+            product8Quantity: {
+                isNumber: '产品数量必须是数字'
+            },
+            product9Quantity: {
+                isNumber: '产品数量必须是数字'
+            },
+            product10Quantity: {
+                isNumber: '产品数量必须是数字'
+            },
+            product11Quantity: {
+                isNumber: '产品数量必须是数字'
+            },
+            product12Quantity: {
                 isNumber: '产品数量必须是数字'
             }
         }

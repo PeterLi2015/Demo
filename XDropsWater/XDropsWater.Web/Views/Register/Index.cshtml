@@ -205,7 +205,14 @@
                                                     <label>小水滴五级滤芯水质处理器</label><br>
                                                     <input v-model="product.product10Quantity" name="product10Quantity" type="text" class="form-control" placeholder="请输入购买数量">
                                                 </div>
-
+                                                <div class="form-group" v-show="product.product11Show">
+                                                    <label>小水滴油净宝</label><br>
+                                                    <input v-model="product.product11Quantity" name="product11Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
+                                                <div class="form-group" v-show="product.product12Show">
+                                                    <label>小水滴空气净化器</label><br>
+                                                    <input v-model="product.product12Quantity" name="product12Quantity" type="text" class="form-control" placeholder="请输入购买数量">
+                                                </div>
                                                 <div class="form-group">
                                                     <label class="form-control form-control-inline">选择商品</label>
                                                     <select class="form-control form-control-inline" v-model="product.product">

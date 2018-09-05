@@ -17,5 +17,7 @@ namespace XDropsWater.Model.Register
         public int Product8Quantity { get; set; }
         public int Product9Quantity { get; set; }
         public int Product10Quantity { get; set; }
+        public int Product11Quantity { get; set; }
+        public int Product12Quantity { get; set; }
     }
 }

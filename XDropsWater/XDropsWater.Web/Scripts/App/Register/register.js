@@ -54,6 +54,8 @@ var rows = new Vue({
             product8Quantity: 0,
             product9Quantity: 0,
             product10Quantity: 0,
+            product11Quantity: 0,
+            product12Quantity: 0,
 
             product1Show: false,
             product2Show: false,
@@ -65,6 +67,8 @@ var rows = new Vue({
             product8Show: false,
             product9Show: false,
             product10Show: false,
+            product11Show: false,
+            product12Show: false,
 
             product: {
                 productId: 0,
@@ -111,7 +115,15 @@ var rows = new Vue({
                {
                    productId: 10,
                    productName: '小水滴五级滤芯水质处理器'
-               },
+                },
+                {
+                    productId: 11,
+                    productName: '小水滴油净宝'
+                },
+                {
+                    productId: 12,
+                    productName: '小水滴空气净化器'
+                },
             ]
         },
         error: {
@@ -214,6 +226,12 @@ function selectProduct(vm) {
         else if (productId == 10) {
             vm.product.product10Show = true;
         }
+        else if (productId == 11) {
+            vm.product.product11Show = true;
+        }
+        else if (productId == 12) {
+            vm.product.product12Show = true;
+        }
     }
     else {
         var error = {
@@ -310,10 +328,12 @@ function save(vm) {
     var product8Quantity = tryParseInt(vm.product.product8Quantity, 0);
     var product9Quantity = tryParseInt(vm.product.product9Quantity, 0);
     var product10Quantity = tryParseInt(vm.product.product10Quantity, 0);
+    var product11Quantity = tryParseInt(vm.product.product11Quantity, 0);
+    var product12Quantity = tryParseInt(vm.product.product12Quantity, 0);
 
     var total = product1Quantity + product2Quantity + product3Quantity + product4Quantity
         + product5Quantity + product6Quantity + product7Quantity + product8Quantity
-    + product9Quantity + product10Quantity;
+        + product9Quantity + product10Quantity + product11Quantity + product12Quantity;
 
     if (total == 0) {
 
@@ -374,6 +394,8 @@ function save(vm) {
             Product8Quantity: vm.product.product8Quantity == '' ? 0 : parseInt(vm.product.product8Quantity),
             Product9Quantity: vm.product.product9Quantity == '' ? 0 : parseInt(vm.product.product9Quantity),
             Product10Quantity: vm.product.product10Quantity == '' ? 0 : parseInt(vm.product.product10Quantity),
+            Product11Quantity: vm.product.product11Quantity == '' ? 0 : parseInt(vm.product.product11Quantity),
+            Product12Quantity: vm.product.product12Quantity == '' ? 0 : parseInt(vm.product.product12Quantity),
         }
     }
     showDialog('正在注册，请稍后...');
