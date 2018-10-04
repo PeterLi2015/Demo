@@ -1,7 +1,0 @@
-E:\Demo\XDropsWater\bin\XDropsWater.DataAccess.dll.config
-E:\Demo\XDropsWater\bin\XDropsWater.DataAccess.xml
-E:\Demo\XDropsWater\bin\XDropsWater.DataAccess.dll
-E:\Demo\XDropsWater\bin\XDropsWater.DataAccess.pdb
-E:\Demo\XDropsWater\XDropsWater.DataAccess\obj\Debug\XDropsWater.DataAccess.csprojResolveAssemblyReference.cache
-E:\Demo\XDropsWater\XDropsWater.DataAccess\obj\Debug\XDropsWater.DataAccess.dll
-E:\Demo\XDropsWater\XDropsWater.DataAccess\obj\Debug\XDropsWater.DataAccess.pdb
