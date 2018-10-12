@@ -39,7 +39,7 @@
                         <!-- /.info-box -->
                     </div>
 
-            <!-- fix for small devices only -->
+                    <!-- fix for small devices only -->
                     <div class="clearfix visible-sm-block"></div>
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("MemberOrderManage1","Member")" style="cursor:pointer">
@@ -85,7 +85,7 @@
                         </a>
                     </div>
 
-            <!-- /.col -->
+                    <!-- /.col -->
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("Logout","Login")" style="cursor:pointer">
                             <div class="info-box">
@@ -99,7 +99,7 @@
                         </a>
                         <!-- /.info-box -->
                     </div>
-            <!-- /.col -->
+                    <!-- /.col -->
                 }
                 else if (user.UserRoleID == (int)enmRoles.General)
                 {
@@ -118,7 +118,7 @@
                         <!-- /.info-box -->
                     </div>
 
-            <!-- fix for small devices only -->
+                    <!-- fix for small devices only -->
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("MemberOrderManage1","Member")" style="cursor:pointer">
                             <div class="info-box">
@@ -135,18 +135,18 @@
                     </div>
 
                     @*<div class="col-md-3 col-sm-6 col-xs-12">
-                            <a href="@Url.Action("DirectChildMember1","Member")" style="cursor:pointer">
-                                <div class="info-box">
-                                    <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">添加代理</span>
-                                        <span class="info-box-number"></span>
-                                    </div>
-                                    <!-- /.info-box-content -->
-                                </div>
-                                <!-- /.info-box -->
-                            </a>
-                        </div>*@
+                    <a href="@Url.Action("DirectChildMember1","Member")" style="cursor:pointer">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">添加代理</span>
+                                <span class="info-box-number"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </a>
+                </div>*@
 
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("GetAllSubMembers1","Member")" style="cursor:pointer">
@@ -193,19 +193,19 @@
                         </div>
 
                         @*<div class="col-md-3 col-sm-6 col-xs-12">
-                                <a href="@Url.Action("GeneralOrder","Member")" style="cursor:pointer">
-                                    <div class="info-box">
-                                        <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text">总代订单</span>
-                                            <span class="info-box-number"></span>
-                                        </div>
-                                        <!-- /.info-box-content -->
-                                    </div>
-                                </a>
+                        <a href="@Url.Action("GeneralOrder","Member")" style="cursor:pointer">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">总代订单</span>
+                                    <span class="info-box-number"></span>
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                        </a>
 
-                                <!-- /.info-box -->
-                            </div>*@
+                        <!-- /.info-box -->
+                    </div>*@
 
 
 
@@ -244,7 +244,7 @@
                 else if (user.UserRoleID == (int)enmRoles.Financial)
                 {
 
-            <!-- fix for small devices only -->
+                    <!-- fix for small devices only -->
                     <div class="col-md-3 col-sm-6 col-xs-12">
                         <a href="@Url.Action("MemberOrderManage1","Member")" style="cursor:pointer">
                             <div class="info-box">
@@ -260,6 +260,38 @@
                         <!-- /.info-box -->
                     </div>
 
+
+                }
+                else if (user.UserRoleID == (int)enmRoles.Sales)
+                {
+
+                    <!-- fix for small devices only -->
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <a href="@Url.Action("SalesGeneralOrder","Member")" style="cursor:pointer">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">总代订单</span>
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                        </a>
+
+                        <!-- /.info-box -->
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <a href="@Url.Action("SalesAllOrder","Member")" style="cursor:pointer">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">所有订单</span>
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                        </a>
+
+                        <!-- /.info-box -->
+                    </div>
 
                 }
             }

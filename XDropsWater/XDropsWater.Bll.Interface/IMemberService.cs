@@ -107,7 +107,7 @@ namespace XDropsWater.Bll.Interface
         /// <returns></returns>
         List<MemberModel> GetRecommendMemberLocation(string recommendCardNo, ref int total, int page = 1, int rows = 10);
 
-         /// <summary>
+        /// <summary>
         /// 获取代理信息，用来修改专卖店账号
         /// </summary>
         /// <param name="createBy"></param>
@@ -118,7 +118,7 @@ namespace XDropsWater.Bll.Interface
         /// <param name="rows"></param>
         /// <returns></returns>
         List<MemberModel> GetMemberForUpdateStore(string cardNo, string name, ref int total, int page = 1, int rows = 10);
-        
+
         /// <summary>
         /// 修改代理专卖店
         /// </summary>
@@ -160,6 +160,10 @@ namespace XDropsWater.Bll.Interface
         List<MemberOrderModel> GetMemberOrder(string mobileOrName, bool? iSubmit);
 
         OrderSummary GetMemberOrder1(int page, int size, string mobileOrName, bool? isDelivery, enmOrderLevel orderLevel);
+        OrderSummary SalesGeneralOrder(int page, int size, string mobileOrName, bool? isDelivery, enmOrderLevel orderLevel);
+
+        OrderSummary GetMemberOrder2(int page, int size, string mobileOrName, bool? isDelivery);
+        OrderSummary SalesAllOrder(int page, int size, string mobileOrName, bool? isDelivery);
 
         IdentityCodeSummary GetCodePages(int page, int rows, Guid orderDetailsId);
 

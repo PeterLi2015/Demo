@@ -126,7 +126,11 @@ namespace XDropsWater.Model
         /// <summary>
         /// 财务
         /// </summary>
-        Financial = 3
+        Financial = 3,
+        /// <summary>
+        /// 营运部门
+        /// </summary>
+        Sales = 4
     }
     public enum enmMemberRole
     {

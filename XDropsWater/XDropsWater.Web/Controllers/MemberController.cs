@@ -157,6 +157,42 @@ namespace XDropsWater.Web.Controllers
             var orderSummary = service.GetMemberOrder1(page, rows, mobileOrName, isDelivery, orderLevel);
             return Json(orderSummary, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult SalesGeneralOrder()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult SalesGeneralOrder(string mobileOrName, bool? isDelivery, int page = 1, int rows = 10)
+        {
+            var orderLevel = enmOrderLevel.Company;
+            
+            var orderSummary = service.SalesGeneralOrder(page, rows, mobileOrName, isDelivery, orderLevel);
+            return Json(orderSummary, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult MemberOrderManage2()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult MemberOrderManage2(string mobileOrName, bool? isDelivery, int page = 1, int rows = 10)
+        {
+            var orderSummary = service.GetMemberOrder2(page, rows, mobileOrName, isDelivery);
+            return Json(orderSummary, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult SalesAllOrder()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult SalesAllOrder(string mobileOrName, bool? isDelivery, int page = 1, int rows = 10)
+        {
+            var orderSummary = service.SalesAllOrder(page, rows, mobileOrName, isDelivery);
+            return Json(orderSummary, JsonRequestBehavior.AllowGet);
+        }
 
 
         /// <summary>

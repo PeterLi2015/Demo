@@ -31,6 +31,7 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -2145,6 +2146,9 @@
     <Content Include="Scripts\App\Member\getHighSubMembers1.js" />
     <Content Include="Scripts\App\Member\memberManage1.js" />
     <Content Include="Scripts\App\Member\memberOrderManage1 - Copy.js" />
+    <Content Include="Scripts\App\Member\salesAllOrder.js" />
+    <Content Include="Scripts\App\Member\salesGeneralOrder.js" />
+    <Content Include="Scripts\App\Member\memberOrderManage2.js" />
     <Content Include="Scripts\App\Member\memberOrderManage1.js" />
     <Content Include="Scripts\App\Member\memberStock.js" />
     <Content Include="Scripts\App\Member\myStock.js" />
@@ -2320,6 +2324,9 @@
     <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_typography.scss" />
     <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_variables.scss" />
     <Content Include="Content\assets\scss\gsdk-bootstrap-wizard\_wizard-card.scss" />
+    <Content Include="Views\Member\MemberOrderManage2.cshtml" />
+    <Content Include="Views\Member\SalesGeneralOrder.cshtml" />
+    <Content Include="Views\Member\SalesAllOrder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

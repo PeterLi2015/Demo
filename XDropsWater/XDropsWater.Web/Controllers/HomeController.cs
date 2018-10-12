@@ -50,14 +50,15 @@ namespace XDropsWater.Web.Controllers
                 menu.Name = "系统管理";
                 menu.MenuItems = new List<MenuItem>() {
                         new MenuItem(){  Icon = "icon-sys",Id="MemberManage", Name="代理管理", Url="/Member/MemberManage1?SystemMenu=Menu"},
-                        new MenuItem(){  Icon = "icon-sys",Id="MemberOrderManage", Name="代理订单管理", Url="/Member/MemberOrderManage1?SystemMenu=Menu"},
+                        new MenuItem(){  Icon = "icon-sys",Id="MemberOrderManage", Name="总代订单", Url="/Member/MemberOrderManage1?SystemMenu=Menu"},
+                        new MenuItem(){  Icon = "icon-sys",Id="MemberOrderManage2", Name="所有订单", Url="/Member/MemberOrderManage2?SystemMenu=Menu"},
                         new MenuItem(){  Icon = "icon-sys",Id="MemberOrderSearch", Name="代理订单查询", Url="/Member/MemberOrderSearch?SystemMenu=Menu"},
                         new MenuItem(){  Icon = "icon-sys",Id="Member503020", Name="总代50-30-20分红", Url="/Member/Member503020?SystemMenu=Menu"},
                         new MenuItem(){  Icon = "icon-sys",Id="DirectorBonus", Name="董事加权分红", Url="/Member/DirectorBonus?SystemMenu=Menu"}
                 };
                 if (user.UserRoleID == (int)enmRoles.All)
                 {
-                    menu.MenuItems.Add(new MenuItem() { Icon = "icon-sys", Id = "BackOfficeManage", Name = "后台管理", Url = "/Member/BackOfficeManage?SystemMenu=Menu" });
+                    //menu.MenuItems.Add(new MenuItem() { Icon = "icon-sys", Id = "BackOfficeManage", Name = "后台管理", Url = "/Member/BackOfficeManage?SystemMenu=Menu" });
                 }
                 menuGroups.Add(menu);
             }
@@ -92,6 +93,18 @@ namespace XDropsWater.Web.Controllers
                     Name = "系统管理",
                     MenuItems = new List<MenuItem>() {
                     new MenuItem(){  Icon = "icon-sys",Id="MemberOrderManage", Name="总代订单", Url="/Member/MemberOrderManage1?SystemMenu=Menu"},
+                }
+                });
+                ViewBag.SelfNewOrderCount = Service.GetSelfNewOrderCount();
+            }
+            else if (user.UserRoleID == (int)enmRoles.Sales)
+            {
+                menuGroups.Add(new MenuGroup()
+                {
+                    Name = "系统管理",
+                    MenuItems = new List<MenuItem>() {
+                    new MenuItem(){  Icon = "icon-sys",Id="SalesGeneralOrder", Name="总代订单", Url="/Member/SalesGeneralOrder?SystemMenu=Menu"},
+                    new MenuItem(){  Icon = "icon-sys",Id="SalesAllOrder", Name="所有订单", Url="/Member/SalesAllOrder?SystemMenu=Menu"},
                 }
                 });
                 ViewBag.SelfNewOrderCount = Service.GetSelfNewOrderCount();

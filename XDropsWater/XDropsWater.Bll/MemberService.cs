@@ -236,6 +236,10 @@ namespace XDropsWater.Bll
             {
                 orderList = orderRepo.FindBy(o => o.SendMemberID == Guid.Empty && !o.IsDeliverly && (o.FinancialStatus != (int)OrderFinancialStatus.Paid));
             }
+            else if (this.CurrentUser.UserRoleID == (int)enmRoles.Sales)
+            {
+                orderList = orderRepo.FindBy(o => o.SendMemberID == Guid.Empty && !o.IsDeliverly && (o.Status != (int)OrderStatus.LessAmount));
+            }
             return orderList.Count();
         }
 
@@ -552,6 +556,142 @@ namespace XDropsWater.Bll
                 default:
                     break;
             }
+
+            var totalCount = repo.Find(whereExp, o => o.CreateOn).Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
+            var orders = repo.Find(whereExp, o => o.CreateOn).OrderByDescending(o => o.CreateOn).Skip((page - 1) * size).Take(size).ToList();
+            Mapper.CreateMap<MemberRoleEntity, MemberRole>();
+            Mapper.CreateMap<MemberEntity, Member>();
+            Mapper.CreateMap<OrderEntity, Order>();
+
+            result.Orders = Mapper.Map<IEnumerable<Order>>(orders);
+            CalculateRowNo(result, result.Orders, page, size, totalCount);
+
+            return result;
+
+        }
+        /// <summary>
+        /// 获取代理订单
+        /// </summary>
+        /// <param name="page">页码</param>
+        /// <param name="size">每页显示行数</param>
+        /// <param name="mobileOrName">查询条件：手机号码或姓名</param>
+        /// <param name="isDelivery">查询条件：是否发货</param>
+        /// <param name="orderLevel">订单级别：公司发货的订单，代理发货的订单</param>
+        /// <returns></returns>
+        public OrderSummary SalesGeneralOrder(int page, int size, string mobileOrName, bool? isDelivery, enmOrderLevel orderLevel)
+        {
+            var result = new OrderSummary();
+            var repo = new Repository<OrderEntity>(Uow);
+            DateTime dCreateOn = DateTime.Parse("2018-09-01");
+            Expression<Func<OrderEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.CreateOn >= dCreateOn;
+            whereExp = whereExp.And(o => (o.Status != (int)OrderStatus.LessAmount));
+            if (!string.IsNullOrWhiteSpace(mobileOrName))
+            {
+                whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
+                || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                );
+            }
+            if (isDelivery.HasValue)
+            {
+                whereExp = whereExp.And(o => o.IsDeliverly == isDelivery.Value);
+            }
+            switch (orderLevel)
+            {
+                case enmOrderLevel.Agency:
+                    {
+                        whereExp = whereExp.And(o => o.SendMemberID == this.CurrentUser.MemberID);
+                    }
+                    break;
+                case enmOrderLevel.Company:
+                    {
+                        whereExp = whereExp.And(o => o.SendMemberID == Guid.Empty);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            var totalCount = repo.Find(whereExp, o => o.CreateOn).Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
+            var orders = repo.Find(whereExp, o => o.CreateOn).OrderByDescending(o => o.CreateOn).Skip((page - 1) * size).Take(size).ToList();
+            Mapper.CreateMap<MemberRoleEntity, MemberRole>();
+            Mapper.CreateMap<MemberEntity, Member>();
+            Mapper.CreateMap<OrderEntity, Order>();
+
+            result.Orders = Mapper.Map<IEnumerable<Order>>(orders);
+            CalculateRowNo(result, result.Orders, page, size, totalCount);
+
+            return result;
+
+        }
+        /// <summary>
+        /// 获取代理订单
+        /// </summary>
+        /// <param name="page">页码</param>
+        /// <param name="size">每页显示行数</param>
+        /// <param name="mobileOrName">查询条件：手机号码或姓名</param>
+        /// <param name="isDelivery">查询条件：是否发货</param>
+        /// <returns></returns>
+        public OrderSummary GetMemberOrder2(int page, int size, string mobileOrName, bool? isDelivery)
+        {
+            var result = new OrderSummary();
+            var repo = new Repository<OrderEntity>(Uow);
+            Expression<Func<OrderEntity, bool>> whereExp = o => o.ID != Guid.Empty;
+            whereExp = whereExp.And(o => (o.Status != (int)OrderStatus.LessAmount));
+            if (!string.IsNullOrWhiteSpace(mobileOrName))
+            {
+                whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
+                || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                );
+            }
+            if (isDelivery.HasValue)
+            {
+                whereExp = whereExp.And(o => o.IsDeliverly == isDelivery.Value);
+            }
+
+
+            var totalCount = repo.Find(whereExp, o => o.CreateOn).Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
+            var orders = repo.Find(whereExp, o => o.CreateOn).OrderByDescending(o => o.CreateOn).Skip((page - 1) * size).Take(size).ToList();
+            Mapper.CreateMap<MemberRoleEntity, MemberRole>();
+            Mapper.CreateMap<MemberEntity, Member>();
+            Mapper.CreateMap<OrderEntity, Order>();
+
+            result.Orders = Mapper.Map<IEnumerable<Order>>(orders);
+            CalculateRowNo(result, result.Orders, page, size, totalCount);
+
+            return result;
+
+        }
+        /// <summary>
+        /// 获取代理订单
+        /// </summary>
+        /// <param name="page">页码</param>
+        /// <param name="size">每页显示行数</param>
+        /// <param name="mobileOrName">查询条件：手机号码或姓名</param>
+        /// <param name="isDelivery">查询条件：是否发货</param>
+        /// <returns></returns>
+        public OrderSummary SalesAllOrder(int page, int size, string mobileOrName, bool? isDelivery)
+        {
+            var result = new OrderSummary();
+            var repo = new Repository<OrderEntity>(Uow);
+
+            DateTime dCreateOn = DateTime.Parse("2018-09-01");
+            Expression<Func<OrderEntity, bool>> whereExp = o => o.ID != Guid.Empty && o.CreateOn >= dCreateOn;
+
+            whereExp = whereExp.And(o => (o.Status != (int)OrderStatus.LessAmount));
+            if (!string.IsNullOrWhiteSpace(mobileOrName))
+            {
+                whereExp = whereExp.And(o => (o.Member.Mobile.Contains(mobileOrName)
+                || o.Member.MemberName.ToUpper().Contains(mobileOrName.ToUpper()))
+                );
+            }
+            if (isDelivery.HasValue)
+            {
+                whereExp = whereExp.And(o => o.IsDeliverly == isDelivery.Value);
+            }
+
 
             var totalCount = repo.Find(whereExp, o => o.CreateOn).Count();
             var totalPages = (int)Math.Ceiling((decimal)totalCount / size);
