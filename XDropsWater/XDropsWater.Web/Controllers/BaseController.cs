@@ -12,7 +12,8 @@ namespace XDropsWater.Web.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
 
-            if (this.Session["CurUser"] == null && !(filterContext.Controller is RegisterController))
+            if (this.Session["CurUser"] == null && !(filterContext.Controller is RegisterController)
+                && !(filterContext.Controller is VideoController))
             {
                 if (filterContext.HttpContext.Request.IsAjaxRequest())
                 {
