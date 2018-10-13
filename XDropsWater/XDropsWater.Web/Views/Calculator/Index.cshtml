@@ -1,0 +1,564 @@
+﻿@{
+    ViewBag.Title = "计算器";
+}
+
+<h2>计算器</h2>
+<br />
+<br />
+<br />
+<div id="main">
+    <label class="form-control form-control-inline">选择级别</label>
+    <select class="form-control form-control-inline" v-model="level" v-on:change="selectlevel(level)">
+        <option v-for="level in levels" v-bind:value="level">
+            {{level}}
+        </option>
+    </select>
+</div>
+<br />
+<div id="one" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+    <input v-model="sale.price" style="width:50px" v-on:change="calculateone"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculateone"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+<div id="two" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculatetwo"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculatetwo"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculatetwo"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculatetwo"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+<div id="county" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculatecounty"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculatecounty"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculatecounty"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculatecounty"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给二级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.two.price" style="width:50px" v-on:change="calculatecounty"> X
+    <label>数量</label>
+    <input v-model="wholesale.two.quantity" style="width:50px" v-on:change="calculatecounty"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.two.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+<div id="city" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculatecity"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculatecity"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculatecity"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculatecity"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给二级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.two.price" style="width:50px" v-on:change="calculatecity"> X
+    <label>数量</label>
+    <input v-model="wholesale.two.quantity" style="width:50px" v-on:change="calculatecity"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.two.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给县级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.county.price" style="width:50px" v-on:change="calculatecity"> X
+    <label>数量</label>
+    <input v-model="wholesale.county.quantity" style="width:50px" v-on:change="calculatecity"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.county.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+<div id="province" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculateprovince"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculateprovince"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculateprovince"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculateprovince"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给二级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.two.price" style="width:50px" v-on:change="calculateprovince"> X
+    <label>数量</label>
+    <input v-model="wholesale.two.quantity" style="width:50px" v-on:change="calculateprovince"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.two.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给县级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.county.price" style="width:50px" v-on:change="calculateprovince"> X
+    <label>数量</label>
+    <input v-model="wholesale.county.quantity" style="width:50px" v-on:change="calculateprovince"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.county.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给市级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.city.price" style="width:50px" v-on:change="calculateprovince"> X
+    <label>数量</label>
+    <input v-model="wholesale.city.quantity" style="width:50px" v-on:change="calculateprovince"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.city.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+<div id="general" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculategeneral"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculategeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculategeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculategeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给二级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.two.price" style="width:50px" v-on:change="calculategeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.two.quantity" style="width:50px" v-on:change="calculategeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.two.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给县级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.county.price" style="width:50px" v-on:change="calculategeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.county.quantity" style="width:50px" v-on:change="calculategeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.county.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给市级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.city.price" style="width:50px" v-on:change="calculategeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.city.quantity" style="width:50px" v-on:change="calculategeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.city.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给省级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.province.price" style="width:50px" v-on:change="calculategeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.province.quantity" style="width:50px" v-on:change="calculategeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.province.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+<div id="biggeneral" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给二级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.two.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.two.quantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.two.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给县级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.county.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.county.quantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.county.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给市级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.city.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.city.quantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.city.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给省级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.province.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.province.quantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.province.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>50分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.general50.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.general50.quantity" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>人数</label>
+    <input v-model="wholesale.general50.generalquantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.general50.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>30分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.general30.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.general30.quantity" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>人数</label>
+    <input v-model="wholesale.general30.generalquantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.general30.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>20分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.general20.price" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>数量</label>
+    <input v-model="wholesale.general20.quantity" style="width:50px" v-on:change="calculatebiggeneral"> X
+    <label>人数</label>
+    <input v-model="wholesale.general20.generalquantity" style="width:50px" v-on:change="calculatebiggeneral"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.general20.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+<div id="director" v-show="show">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>零售</label>
+    <label>差价</label>
+
+    <input v-model="sale.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="sale.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{sale.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给一级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.one.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.one.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.one.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给二级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.two.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.two.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.two.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给县级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.county.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.county.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.county.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给市级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.city.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.city.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.city.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>批发给省级代理</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>差价</label>
+    <input v-model="wholesale.province.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.province.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.province.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>50分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.general50.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.general50.quantity" style="width:50px" v-on:change="calculatedirector"> X
+    <label>人数</label>
+    <input v-model="wholesale.general50.generalquantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.general50.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>30分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.general30.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.general30.quantity" style="width:50px" v-on:change="calculatedirector"> X
+    <label>人数</label>
+    <input v-model="wholesale.general30.generalquantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.general30.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>20分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.general20.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.general20.quantity" style="width:50px" v-on:change="calculatedirector"> X
+    <label>人数</label>
+    <input v-model="wholesale.general20.generalquantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.general20.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>董事本部门分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.self.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.self.quantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.self.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label>董事总业绩分红</label>
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input v-model="wholesale.other.price" style="width:50px" v-on:change="calculatedirector"> X
+    <label>数量</label>
+    <input v-model="wholesale.other.quantity" style="width:50px" v-on:change="calculatedirector">
+    &divide;
+    <label>董事总数</label>
+    <input v-model="wholesale.other.directorquantity" style="width:50px" v-on:change="calculatedirector"> =
+    <label>盈利</label>
+    <span style="color:red; font-weight:bold">{{wholesale.other.total}}</span>
+    <br />
+    <br />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <span style="color:red; font-weight:bold; font-size:xx-large">总盈利 = {{total}}</span>
+</div>
+
+
+@Scripts.Render("~/Scripts/Vue/vue.min.js")
+@Scripts.Render("~/Scripts/Vue/vue-resource.min.js")
+@Scripts.Render("~/Scripts/Vue/vue-validator.min.js")
+@Scripts.Render("~/Scripts/Vue/moment.min.js")
+@Scripts.Render("~/Scripts/common.js")
+<!--   Core JS Files   -->
+<script src="@Url.Content("~/Content/assets/js/jquery-2.2.4.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/assets/js/bootstrap.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/assets/js/jquery.bootstrap.wizard.js")" type="text/javascript"></script>
+<!--  Plugin for the Wizard -->
+<script src="@Url.Content("~/Content/assets/js/gsdk-bootstrap-wizard.js")"></script>
+<!--  More information about jquery.validate here: http://jqueryvalidation.org/	 -->
+<script src="@Url.Content("~/Content/assets/js/jquery.validate.min.js")"></script>
+
+@Scripts.Render("~/Content/AdminLTE-2.3.6/bootstrap/js/bootbox.min.js")
+
+<script src="@Url.Content("~/Scripts/App/Calculator/index.js")"></script>
