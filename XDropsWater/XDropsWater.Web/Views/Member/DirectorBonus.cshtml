@@ -270,15 +270,22 @@
                 if (search1 != '')
                     search = '&mobileOrName=' + search1;
 
-                var dateFrom = $('#dateFrom').val();
-                if (dateFrom != '') {
-                    search = search + '&dateFrom=' + dateFrom;
+
+
+                var yearMonth = $('#yearMonth').val();
+                if (yearMonth != '') {
+                    search = search + '&yearMonth=' + yearMonth;
                 }
 
-                var dateTo = $('#dateTo').val();
-                if (dateTo != '') {
-                    search = search + '&dateTo=' + dateTo;
-                }
+                //var dateFrom = $('#dateFrom').val();
+                //if (dateFrom != '') {
+                //    search = search + '&dateFrom=' + dateFrom;
+                //}
+
+                //var dateTo = $('#dateTo').val();
+                //if (dateTo != '') {
+                //    search = search + '&dateTo=' + dateTo;
+                //}
 
                 search += random;
                 var url = $(this).attr('href') + search;

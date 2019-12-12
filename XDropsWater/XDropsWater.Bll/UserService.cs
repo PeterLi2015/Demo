@@ -105,6 +105,10 @@ namespace XDropsWater.Bll
             {
                 Repository<MemberEntity> member = new Repository<MemberEntity>(Uow);
                 var mem = member.FindBy(o => o.ID == usr.MemberID).FirstOrDefault();
+                Repository<SystemConfigEntity> sys = new Repository<SystemConfigEntity>(Uow);
+                var price = sys.FindBy(o => o.Name.Equals("price", StringComparison.CurrentCultureIgnoreCase)).First().ConfigValue;
+                mem.CurrentRoleQuantity = mem.CurrentRoleAmount / decimal.Parse(price);
+                mem.CurrentRoleQuantity = Math.Round(mem.CurrentRoleQuantity, 4);
                 return new UserSummary()
                 {
                     UserName = usr.UserName,
@@ -113,7 +117,8 @@ namespace XDropsWater.Bll
                     UserRoleID = usr.UserRoleID,
                     ID = usr.ID,
                     MemberID = usr.MemberID.HasValue ? usr.MemberID.Value : Guid.Empty,
-                    RoleID = mem != null ? mem.RoleID : -1
+                    RoleID = mem != null ? mem.RoleID : -1,
+                    CurrentRoleQuantity = mem.CurrentRoleQuantity
 
                 };
             }

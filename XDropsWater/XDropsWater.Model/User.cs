@@ -51,7 +51,7 @@ namespace XDropsWater.Model
 
         public int ChildTotalQuantity { get; set; }
 
-        public int CurrentRoleQuantity { get; set; }
+        public decimal CurrentRoleQuantity { get; set; }
         
     }
     public class UserDetail

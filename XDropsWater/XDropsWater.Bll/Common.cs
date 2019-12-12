@@ -134,14 +134,14 @@ namespace XDropsWater.Bll
         /// <param name="rolePrice"></param>
         /// <param name="currentRoleAmount"></param>
         /// <returns></returns>
-        public static decimal GetUpgradeAmount(string roleXmlString, decimal unitAmount, decimal currentRoleAmount)
+        public static decimal GetUpgradeAmount(int roleID, string roleXmlString, decimal unitAmount, decimal currentRoleAmount)
         {
             decimal upgradeAmount = 0m;
             if (!string.IsNullOrWhiteSpace(roleXmlString))
             {
                 XDocument roleXml = XDocument.Parse(roleXmlString);
                 var lastElement = roleXml.XPathSelectElements("//Role").LastOrDefault();
-                int roleID = int.Parse(lastElement.XPathSelectElement("./RoleID").Value);
+                //int roleID = int.Parse(lastElement.XPathSelectElement("./RoleID").Value);
                 int tempRoleID = 0;
 
                 // 升级数量
@@ -149,9 +149,9 @@ namespace XDropsWater.Bll
                 foreach (XElement element in roleXml.XPathSelectElements("//Role"))
                 {
                     tempRoleID = int.Parse(element.XPathSelectElement("./RoleID").Value);
-                    if (tempRoleID == roleID + 1)
+                    if (tempRoleID == roleID)
                     {
-                        upgradeQuantity = int.Parse(element.XPathSelectElement("./Quantity").Value);
+                        upgradeQuantity = int.Parse(element.XPathSelectElement("./UpgradeQuantity").Value);
                         break;
                     }
                 }
@@ -162,6 +162,7 @@ namespace XDropsWater.Bll
             return upgradeAmount;
         }
 
+        
         public static string GetTotalAmountDescription(int price, string roleXmlString, int orderQuantity, int currentRoleID, int currentQuantity, out int totalAmount)
         {
             totalAmount = 0;

@@ -3551,7 +3551,7 @@ namespace XDropsWater.Bll
                 var unitAmount = decimal.Parse(strUnitAmount);
 
                 // 原价升级金额
-                var upgradeAmount = Common.GetUpgradeAmount(role.RoleRiseDescription, unitAmount, member.CurrentRoleAmount);
+                var upgradeAmount = Common.GetUpgradeAmount(role.ID, role.RoleRiseDescription, unitAmount, member.CurrentRoleAmount);
                 if (member.DirectorCount > 0)
                 {
                     if (member.DirectorCount == 2)
